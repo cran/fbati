@@ -180,7 +180,7 @@ ibat2 <- function( data, marker, markerNames, envCols, envColsNames, method, mod
                                   numInf=numInf,
                                   model=c("additive","dominant","recessive")[model+1],
                                   pvalue=pvalue )
-        if( length(strataSum)>1 ) {
+        if( length(strataSum)>=1 ) {  ## 05.28.2007
           ## If strataSum is empty, then we can't tack this on!
           resultsAddi <- cbind( resultsAddi, strataSum )
         }
@@ -205,6 +205,7 @@ ibat2 <- function( data, marker, markerNames, envCols, envColsNames, method, mod
       colKeep[cc] <- FALSE
   }
   results <- results[,colKeep]
+
 
   ## And more lastly, rename the stratas!
   if( ncol(results) > 7 ) {

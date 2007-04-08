@@ -1,4 +1,11 @@
 fbatjFunc <- function( ped, phe, env, marker, model="additive", trait="AffectionStatus", write_results ) {
+  ## 05/28/2008
+  if( is.null( ped ) || is.na( ped ) || (is.character(ped) & nchar(ped)==0) )
+    return( "A 'pedigree' must be specified." )
+
+  if( is.null( phe ) || is.na( phe ) || (is.character(phe) & nchar(phe)==0) )
+    return( "The 'phenotype' must be specified." )
+
   ## 05/28/2006
   if( is.na(trait) || is.null(trait) )
     trait="AffectionStatus"
@@ -66,6 +73,7 @@ writeFbatjGUI <- function() {
     ## Prompt user for a filename
     outStr <- tclvalue(tkgetSaveFile(title="Write FBAT-J Results",filetypes="{{CSV (spreadsheet)} {.csv}}", initialfile=defaultFile))
     if( nchar(outStr)>0 ) {
+      outStr <- getFromNamespace( "str.file.extension", "pbatR" )( outStr, "csv" ) ## 05/28/2008
       write.csv( res, outStr, row.names=FALSE )
       cat( "Results written to disk.\n" )
     }else{

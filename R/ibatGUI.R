@@ -3,8 +3,18 @@
 #library( ibat )
 
 fbatiFunc <- function( ped, phe, env, marker, model="additive", iter=10000, seed=7, maxSib=3, write_results ) {
+  ## 05/28/2008
+  if( is.null( ped ) || is.na( ped ) || (is.character(ped) & nchar(ped)==0) )
+    return( "A 'pedigree' must be specified." )
+
+  if( is.null( phe ) || is.na( phe ) || (is.character(phe) & nchar(phe)==0) )
+    return( "The 'phenotype' must be specified." )
+
   fped <- fread.ped(ped,lowercase=FALSE)  ## lowercase added 05/26/2008
   fphe <- fread.phe(phe,lowercase=FALSE)
+
+  if( is.null( env ) || is.na( env ) )
+    return( "Environment must be specified." )
 
   if( !is.null(marker) && is.na(marker[1]) ) marker <- NULL
 
@@ -57,6 +67,7 @@ writeFbatiGUI <- function() {
     ## Prompt user for a filename
     outStr <- tclvalue(tkgetSaveFile(title="Write FBAT-I Results",filetypes="{{CSV (spreadsheet)} {.csv}}", initialfile=defaultFile))
     if( nchar(outStr)>0 ) {
+      outStr <- getFromNamespace( "str.file.extension", "pbatR" )( outStr, "csv" ) ## 05/28/2008
       write.csv( res, outStr, row.names=FALSE )
       cat( "Results written to disk.\n" )
     }else{

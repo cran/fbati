@@ -220,6 +220,6 @@ fbatj <- function( ped=NULL, phe=NULL,
 
   pvalue <- pchisq( stat, df=rank, lower.tail=FALSE )
   if( length(markerNames) > 1 )
-    return( c( stat=stat, pvalue=pvalue, rank=rank ) )
-  return( c( marker=markerNames, stat=stat, pvalue=pvalue, rank=rank ) )
+    return( data.frame( stat=stat, pvalue=pvalue, rank=rank ) )
+  return( data.frame( marker=markerNames, stat=stat, pvalue=pvalue, rank=rank ) )
 }
