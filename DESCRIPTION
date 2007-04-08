@@ -1,5 +1,5 @@
 Package: fbati
-Version: 0.5
+Version: 0.5.1
 Date: 2007-04-08
 Title: Gene by Environment Interaction Tests
 Author: Thomas Hoffmann
@@ -10,4 +10,4 @@ Description: Does family-based gene by environment interaction tests, and joint 
 License: GPL
 URL: http://www.people.fas.harvard.edu/~tjhoffm/ibat.html
 LazyLoad: true
-Packaged: Wed May 21 12:12:39 2008; merlin
+Packaged: Mon May 26 23:21:10 2008; merlin

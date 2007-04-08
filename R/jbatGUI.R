@@ -1,9 +1,16 @@
 fbatjFunc <- function( ped, phe, env, marker, model="additive", trait="AffectionStatus", write_results ) {
+  ## 05/28/2006
+  if( is.na(trait) || is.null(trait) )
+    trait="AffectionStatus"
+
+  if( is.na(env) || is.null(env) )
+    return( "Environment must be specified." )
+
   if( trait==env )
     return( "Trait cannot be the same as the environment!" )
 
-  fped <- fread.ped(ped)
-  fphe <- fread.phe(phe)
+  fped <- fread.ped(ped,lowercase=FALSE)  ## lowercase added 05/26/2008
+  fphe <- fread.phe(phe,lowercase=FALSE)
 
   if( !is.null(marker) && is.na(marker[1]) ) marker <- NULL
 

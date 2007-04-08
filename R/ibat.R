@@ -12,9 +12,15 @@ computeAfreq <- function( idfath, idmoth, m0, m1, allele=2 ) {
   ##wh <- idfath==0 & idmoth==0 & m0!=0 & m1!=0
   wh <- rep(TRUE, length(m0))
   #print( wh )
-  #print( m0[wh] )
-  #print( m1[wh] )
-  afreq <- ( sum(m0[wh]==allele) + sum(m1[wh]==allele) ) / ( sum(m0[wh]!=0) + sum(m1[wh]!=0) )
+  #print( m0 )
+  #print( m1 )
+
+  ## 05/28/2008 update
+  ##afreq <- ( sum(m0[wh]==allele) + sum(m1[wh]==allele) ) / ( sum(m0[wh]!=0) + sum(m1[wh]!=0) )
+  afreq <- ( sum(m0[wh]==allele,na.rm=TRUE) + sum(m1[wh]==allele,na.rm=TRUE) ) / ( sum(m0[wh]!=0,na.rm=TRUE) + sum(m1[wh]!=0,na.rm=TRUE) )
+  #cat( "afreq num", ( sum(m0[wh]==allele,na.rm=TRUE) + sum(m1[wh]==allele,na.rm=TRUE) ),
+  #     "afreq den", ( sum(m0[wh]!=0,na.rm=TRUE) + sum(m1[wh]!=0,na.rm=TRUE) ),
+  #     "\n" )
   return( afreq )
 }
 
@@ -162,7 +168,7 @@ ibat2 <- function( data, marker, markerNames, envCols, envColsNames, method, mod
         }
 
         ## how about the allele frequency?
-        aafreq <-computeAfreq( dataRecode$idfath, dataRecode$idmoth, dataRecode[,m0pos], dataRecode[,m1pos] )
+        aafreq <-computeAfreq( dataRecode$idfath, dataRecode$idmoth, dataRecode[,s.m0pos], dataRecode[,s.m1pos] ) ## s., 5/28/2008
 
         ## also nice would be the number of informative families...
 

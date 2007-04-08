@@ -37,6 +37,9 @@ fbatj <- function( ped=NULL, phe=NULL,
   if( mode != "univariate" )
     stop( "Only 'univariate' is supported for mode." );
 
+  if( is.na(trait) || is.null(trait) )
+    stop( "Trait must be specified (e.g. AffectionStatus)." )
+
   ##################################
   ## TAKEN DIRECTLY FROM 'ibat.R' ##
 

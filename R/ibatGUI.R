@@ -3,8 +3,8 @@
 #library( ibat )
 
 fbatiFunc <- function( ped, phe, env, marker, model="additive", iter=10000, seed=7, maxSib=3, write_results ) {
-  fped <- fread.ped(ped)
-  fphe <- fread.phe(phe)
+  fped <- fread.ped(ped,lowercase=FALSE)  ## lowercase added 05/26/2008
+  fphe <- fread.phe(phe,lowercase=FALSE)
 
   if( !is.null(marker) && is.na(marker[1]) ) marker <- NULL
 
