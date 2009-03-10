@@ -873,7 +873,7 @@ public:
 		double sum_xijm[analyze_allele_index_size];
 		if (!onlyComputeConditional) {
 			// new, only compute the conditional if asked to save computation time
-			for (unsigned int a = 0; a < analyze_allele_index_size; a++) {
+			for (int a = 0; a < analyze_allele_index_size; a++) {
 				sum_xijm[a] = 0.0;
 				for (unsigned int j = 0; j < observed.size(); j++)
 					if (trait[j] == 1)
@@ -884,7 +884,7 @@ public:
 
 		double sum_xijc0[conditional_allele_index_size];
 		double sum_xijc1[conditional_allele_index_size];
-		for (unsigned int a = 0; a < conditional_allele_index_size; a++) {
+		for (int a = 0; a < conditional_allele_index_size; a++) {
 			sum_xijc0[a] = sum_xijc1[a] = 0.0;
 			for (unsigned int j = 0; j < observed.size(); j++) {
 				if (trait[j] == 1) {
@@ -898,12 +898,12 @@ public:
 
 		// Now calculate the other pieces
 		double numM[analyze_allele_index_size];
-		for (unsigned int a = 0; a < analyze_allele_index_size; a++)
+		for (int a = 0; a < analyze_allele_index_size; a++)
 			numM[a] = 0.0;
 
 		double numC0[conditional_allele_index_size];
 		double numC1[conditional_allele_index_size];
-		for (unsigned int a = 0; a < conditional_allele_index_size; a++)
+		for (int a = 0; a < conditional_allele_index_size; a++)
 			numC0[a] = numC1[a] = 0.0;
 
 		double den = 0.0;
@@ -925,7 +925,7 @@ public:
 			for (unsigned int p = 0; p < genoPerm.size(); p++) {
 				double sum_xstarjm[analyze_allele_index_size];
 				if (!onlyComputeConditional) {
-					for (unsigned int a = 0; a < analyze_allele_index_size; a++) {
+					for (int a = 0; a < analyze_allele_index_size; a++) {
 						sum_xstarjm[a] = 0.0;
 						for (unsigned int j = 0; j < genoPerm[p].size(); j++) {
 							if (trait[j] == 1)
@@ -937,7 +937,7 @@ public:
 
 				double sum_xstarjc0[conditional_allele_index_size];
 				double sum_xstarjc1[conditional_allele_index_size];
-				for (unsigned int a = 0; a < conditional_allele_index_size; a++) {
+				for (int a = 0; a < conditional_allele_index_size; a++) {
 					sum_xstarjc0[a] = 0.0;
 					sum_xstarjc1[a] = 0.0;
 					for (unsigned int j = 0; j < genoPerm[p].size(); j++) {
@@ -952,18 +952,18 @@ public:
 
 				double temp = 0.0; // exp( b0*x0 + ... )
 				if (!onlyComputeConditional)
-					for (unsigned int a = 0; a < analyze_allele_index_size; a++)
+					for (int a = 0; a < analyze_allele_index_size; a++)
 						temp += bm[a] * sum_xstarjm[a];
-				for (unsigned int a = 0; a < conditional_allele_index_size; a++)
+				for (int a = 0; a < conditional_allele_index_size; a++)
 					temp += (bc0[a] * sum_xstarjc0[a] + bc1[a]
 							* sum_xstarjc1[a]);
 				temp = exp(temp) * genoDistP[x] * permWeight;
 
 				if (!onlyComputeConditional)
-					for (unsigned int a = 0; a < analyze_allele_index_size; a++)
+					for (int a = 0; a < analyze_allele_index_size; a++)
 						numM[a] += sum_xstarjm[a] * temp;
 
-				for (unsigned int a = 0; a < conditional_allele_index_size; a++) {
+				for (int a = 0; a < conditional_allele_index_size; a++) {
 					numC0[a] += sum_xstarjc0[a] * temp;
 					numC1[a] += sum_xstarjc1[a] * temp;
 				}
@@ -974,10 +974,10 @@ public:
 		} // x
 
 		if (!onlyComputeConditional)
-			for (unsigned int a = 0; a < analyze_allele_index_size; a++)
+			for (int a = 0; a < analyze_allele_index_size; a++)
 				ret_analyze[a] = sum_xijm[a] - (numM[a] / den);
 
-		for (unsigned int a = 0; a < conditional_allele_index_size; a++) {
+		for (int a = 0; a < conditional_allele_index_size; a++) {
 			ret_conditional0[a] = sum_xijc0[a] - (numC0[a] / den);
 			ret_conditional1[a] = sum_xijc1[a] - (numC1[a] / den);
 		} // a
@@ -1007,9 +1007,9 @@ public:
 		double ai0 = 0.0;
 		double ai1[R];
 		double ai2[R][R];
-		for (unsigned int k1 = 0; k1 < R; k1++) {
+		for (int k1 = 0; k1 < R; k1++) {
 			ai1[k1] = 0.0;
-			for (unsigned int k2 = 0; k2 < R; k2++)
+			for (int k2 = 0; k2 < R; k2++)
 				ai2[k1][k2] = 0.0;
 		}
 
@@ -1027,7 +1027,7 @@ public:
 			for (unsigned int p = 0; p < genoPerm.size(); p++) {
 				double sum_xstarjm[analyze_allele_index_size];
 				if (true) { // !onlyComputeConditional ) {
-					for (unsigned int a = 0; a < analyze_allele_index_size; a++) {
+					for (int a = 0; a < analyze_allele_index_size; a++) {
 						sum_xstarjm[a] = 0.0;
 						for (unsigned int j = 0; j < genoPerm[p].size(); j++) {
 							if (trait[j] == 1)
@@ -1039,7 +1039,7 @@ public:
 
 				double sum_xstarjc0[conditional_allele_index_size];
 				double sum_xstarjc1[conditional_allele_index_size];
-				for (unsigned int a = 0; a < conditional_allele_index_size; a++) {
+				for (int a = 0; a < conditional_allele_index_size; a++) {
 					sum_xstarjc0[a] = 0.0;
 					sum_xstarjc1[a] = 0.0;
 					for (unsigned int j = 0; j < genoPerm[p].size(); j++) {
@@ -1054,9 +1054,9 @@ public:
 
 				double temp = 0.0; // exp( b0*x0 + ... )
 				if (true) // !onlyComputeConditional )
-					for (unsigned int a = 0; a < analyze_allele_index_size; a++)
+					for (int a = 0; a < analyze_allele_index_size; a++)
 						temp += bm[a] * sum_xstarjm[a];
-				for (unsigned int a = 0; a < conditional_allele_index_size; a++)
+				for (int a = 0; a < conditional_allele_index_size; a++)
 					temp += (bc0[a] * sum_xstarjc0[a] + bc1[a]
 							* sum_xstarjc1[a]);
 				temp = exp(temp) * genoDistP[x] * permWeight;
@@ -1067,15 +1067,15 @@ public:
 						* conditional_allele_index_size];
 				int ca = 0;
 
-				for (unsigned int a = 0; a < analyze_allele_index_size; a++) {
+				for (int a = 0; a < analyze_allele_index_size; a++) {
 					sum_xstar[ca] = sum_xstarjm[a];
 					ca++;
 				}
-				for (unsigned int a = 0; a < conditional_allele_index_size; a++) {
+				for (int a = 0; a < conditional_allele_index_size; a++) {
 					sum_xstar[ca] = sum_xstarjc0[a];
 					ca++;
 				}
-				for (unsigned int a = 0; a < conditional_allele_index_size; a++) {
+				for (int a = 0; a < conditional_allele_index_size; a++) {
 					sum_xstar[ca] = sum_xstarjc1[a];
 					ca++;
 				}
@@ -1103,21 +1103,20 @@ public:
 	void robustStat(int *analyze_allele_index, int analyze_allele_index_size,
 			int *conditional_allele_index, int conditional_allele_index_size,
 			double *ret_analyze) {
-		for (unsigned int aa = 0; aa < analyze_allele_index_size; aa++)
+		for (int aa = 0; aa < analyze_allele_index_size; aa++)
 			ret_analyze[aa] = 0.0;
 
-		for (int j = 0; j < observed.size(); j++) {
+		for (unsigned int j = 0; j < observed.size(); j++) {
 			if (!isnan(trait[j])) {
 				double weight = 0.0;
 				double ex[analyze_allele_index_size];
 				for (int aa = 0; aa < analyze_allele_index_size; aa++)
 					ex[aa] = 0.0;
 
-				for (int k = 0; k < g.size(); k++) {
+				for (unsigned int k = 0; k < g.size(); k++) {
 					// make sure all alleles match
 					bool good = true;
-					for (unsigned int ca = 0; good && ca
-							< conditional_allele_index_size; ca++)
+					for (int ca = 0; good && ca < conditional_allele_index_size; ca++)
 						if (g[k].genotype(
 								0,
 								conditional_allele_index[ca],
@@ -1129,14 +1128,14 @@ public:
 					if (good) {
 						// all alleles match
 						weight += pg[k];
-						for (unsigned int aa = 0; aa
+						for (int aa = 0; aa
 								< analyze_allele_index_size; aa++)
 							ex[aa] += pg[k] * g[k].xCode(0,
 									analyze_allele_index[aa], 2, ADDITIVE);
 					}
 				} // k
 
-				for (unsigned int aa = 0; aa < analyze_allele_index_size; aa++) {
+				for (int aa = 0; aa < analyze_allele_index_size; aa++) {
 					ex[aa] /= weight;
 					ret_analyze[aa] += trait[j] * (g[observed[j]].xCode(0,
 							analyze_allele_index[aa], 2, ADDITIVE) - ex[aa]);
@@ -1243,7 +1242,7 @@ public:
 
 		// calculate the observed part of the vector
 		double sumB[R];
-		for (unsigned int r = 0; r < R; r++)
+		for (int r = 0; r < R; r++)
 			sumB[r] = 0.0;
 		double X[R];
 		double sumBAddi[R];
@@ -1260,13 +1259,13 @@ public:
 			//  sumB[a] += sumBAddi[a];
 			//} // a
 
-			for (unsigned int r = 0; r < R; r++)
+			for (int r = 0; r < R; r++)
 				sumB[r] += sumBAddi[r];
 		} // j
 
 		// now calculate the expected piece
 		double num[R];
-		for (unsigned int r = 0; r < R; r++)
+		for (int r = 0; r < R; r++)
 			num[r] = 0.0;
 		double den = 0.0;
 		for (unsigned int x = 0; x < genoDist.size(); x++) {
@@ -1283,7 +1282,7 @@ public:
 			for (unsigned int p = 0; p < genoPerm.size(); p++) {
 				double sumAStar = 0.0;
 				double sumBStar[R];
-				for (unsigned int r = 0; r < R; r++)
+				for (int r = 0; r < R; r++)
 					sumBStar[r] = 0.0;
 
 				for (unsigned int j = 0; j < genoPerm[p].size(); j++) {
@@ -1303,7 +1302,7 @@ public:
 							analyze_allele_index, analyze_allele_index_size,
 							conditional_allele_index,
 							conditional_allele_index_size, ignoreBtX, sumBAddi);
-					for (unsigned int r = 0; r < R; r++)
+					for (int r = 0; r < R; r++)
 						sumBStar[r] += sumBAddi[r];
 				} // j
 
@@ -1352,7 +1351,7 @@ public:
 					conditional_allele_index, conditional_allele_index_size,
 					ignoreBtX, sumCAddi);
 
-			for (unsigned int rr = 0; rr < Rsq; rr++)
+			for (int rr = 0; rr < Rsq; rr++)
 				sumC[rr] += sumCAddi[rr];
 		} // j
 
@@ -1381,9 +1380,9 @@ public:
 				double sumAStar = 0.0;
 				double sumBStar[R];
 				double sumCStar[Rsq];
-				for (unsigned int r = 0; r < R; r++)
+				for (int r = 0; r < R; r++)
 					sumBStar[r] = 0.0;
-				for (unsigned int rr = 0; rr < Rsq; rr++)
+				for (int rr = 0; rr < Rsq; rr++)
 					sumCStar[rr] = 0.0;
 
 				for (unsigned int j = 0; j < genoPerm[p].size(); j++) {
@@ -1403,14 +1402,14 @@ public:
 							analyze_allele_index, analyze_allele_index_size,
 							conditional_allele_index,
 							conditional_allele_index_size, ignoreBtX, sumBAddi);
-					for (unsigned int r = 0; r < R; r++)
+					for (int r = 0; r < R; r++)
 						sumBStar[r] += sumBAddi[r];
 
 					contsC(alpha, sigmaSq, b, XStar, bXStar, j,
 							analyze_allele_index, analyze_allele_index_size,
 							conditional_allele_index,
 							conditional_allele_index_size, ignoreBtX, sumCAddi);
-					for (unsigned int rr = 0; rr < Rsq; rr++)
+					for (int rr = 0; rr < Rsq; rr++)
 						sumCStar[rr] = +sumCAddi[rr];
 				} // j
 
@@ -1442,7 +1441,7 @@ public:
 		//return( 0 );
 		// Hash based on code from GxE work!
 		int nG[3] = {0,0,0};
-		for( int j=0; j<observed.size(); j++ ) {
+		for( unsigned int j=0; j<observed.size(); j++ ) {
 			int gc = g[ observed[j] ].gCode( 0, index );
 			if( gc != Genotype::gMiss )
 				nG[ gc ]++;
@@ -1515,9 +1514,9 @@ public:
 	// DEBUG: MOST CONCERNING ROUTINE -- what happens when a trait is missing?
 	void linkTrait(int *pid, double *trait, int n) {
 		// somewhat inefficient code to do this... but it isn't what is really taking the most time (i.e. other optimizations would probably be better)
-		for (unsigned int iped = 0; iped < ped.size(); iped++) {
-			for (unsigned int ipid = 0; (int) ipid < n; ipid++)
-				if ((int) ped[iped].pid == (int) pid[ipid]) // && !isnan(trait[ipid]) ) // added second piece 7/28/2008
+		for( unsigned int iped = 0; iped < ped.size(); iped++) {
+			for( unsigned int ipid = 0; (int)ipid < n; ipid++)
+				if ( (int)ped[iped].pid == pid[ipid]) // && !isnan(trait[ipid]) ) // added second piece 7/28/2008
 					ped[iped].trait.push_back(trait[ipid]);
 		} // iped
 
@@ -1602,10 +1601,10 @@ public:
 					conditional_allele_index_size, onlyComputeConditional,
 					temp_ret_analyze, temp_ret_conditional0,
 					temp_ret_conditional1);
-			for (unsigned int a = 0; a < analyze_allele_index_size; a++)
+			for (int a = 0; a < analyze_allele_index_size; a++)
 				ret_analyze[p + a * P] = temp_ret_analyze[a];
 
-			for (unsigned int a = 0; a < conditional_allele_index_size; a++) {
+			for (int a = 0; a < conditional_allele_index_size; a++) {
 				ret_conditional0[p + a * P] = temp_ret_conditional0[a];
 				ret_conditional1[p + a * P] = temp_ret_conditional1[a];
 			} // a
@@ -1639,12 +1638,12 @@ public:
 					conditional_allele_index, conditional_allele_index_size,
 					temp_ret_analyze);
 
-			for (unsigned int a = 0; a < analyze_allele_index_size; a++)
+			for (int a = 0; a < analyze_allele_index_size; a++)
 				ret_analyze[p + a * P] = temp_ret_analyze[a];
 		}
 	} // robustStat
 
-	double contsUimc(double alpha,
+	void contsUimc(double alpha,
 			double sigmaSq,
 			double *b, // bm, bc0, bc1
 			int *analyze_allele_index, int analyze_allele_index_size,
@@ -1674,10 +1673,10 @@ public:
 		//
 		int R = analyze_allele_index_size + conditional_allele_index_size * 2;
 		int Rsq = R * R;
-		unsigned int P = ped.size();
+		/////unsigned int P = ped.size();
 		double temp_ret_I[Rsq];
 
-		for (unsigned int rr = 0; rr < Rsq; rr++)
+		for (int rr = 0; rr < Rsq; rr++)
 			ret_I[rr] = 0.0;
 
 		for (unsigned int p = 0; p < ped.size(); p++) {
@@ -1939,13 +1938,13 @@ void condGeneFBATControl_estEqNuis(
 		double xijc[nc2], exijc[nc2], eij=0;
 
 		// need to know the number of offspring
-		int noff = data[referenceCondition[0]].ped[i].observed.size();
+		unsigned int noff = data[referenceCondition[0]].ped[i].observed.size();
 		for( int c=1; c<nc; c++)
 			if( data[referenceCondition[c]].ped[i].observed.size() < noff )
 				noff = data[referenceCondition[c]].ped[i].observed.size();
 
 		// go across each of the offspring
-		for( int j=0; j<noff; j++ ) {
+		for( unsigned int j=0; j<noff; j++ ) {
 			// go across all of the conditioning alleles
 			bool traitSet = false;
 			eij = 0.0;
@@ -1964,13 +1963,13 @@ void condGeneFBATControl_estEqNuis(
 				// 01.20.2009
 				if( ped->observed.size() != ped->nonzeroDelX.size() ) {
 					ped->nonzeroDelX.resize( ped->observed.size() );
-					for( int jj=0; jj<ped->nonzeroDelX.size(); jj++ )
+					for( unsigned int jj=0; jj<ped->nonzeroDelX.size(); jj++ )
 						ped->nonzeroDelX[jj] = false;
 				}
 					
 				////if( ped[i].observed.size() < 0 ) {
 				//if( ped->observed.size() <= 0 ) {
-				if( j>= ped->observed.size() ) {
+				if( j >= ped->observed.size() ) {
 					// noninformative, set everything to be zero
 					xijc[c*2+0] = xijc[c*2+1] = 0.0;
 					exijc[c*2+0] = exijc[c*2+1] = 0.0;
@@ -1982,7 +1981,7 @@ void condGeneFBATControl_estEqNuis(
 
 					// compute the expected [[yes, this really shouldn't be necessary for all offspring, inefficient]]
 					exijc[c*2+0] = exijc[c*2+1] = 0.0;
-					for( int gg=0; gg<ped->g.size(); gg++ ) {
+					for( unsigned int gg=0; gg<ped->g.size(); gg++ ) {
 						exijc[c*2+0] += ped->g[gg].genotype( 0, 0, 2, 2 ) * ped->pg[gg];
 						exijc[c*2+1] += ped->g[gg].genotype( 0, 0, 1, 2 ) * ped->pg[gg];
 					}// gg
@@ -2057,13 +2056,13 @@ void condGeneFBATControl_estEqNuisUpdate(
 		double xijc[nc2], eij=0;
 
 		// need to know the number of offspring
-		int noff = data[referenceCondition[0]].ped[i].observed.size();
+		unsigned int noff = data[referenceCondition[0]].ped[i].observed.size();
 		for( int c=1; c<nc; c++)
 			if( data[referenceCondition[c]].ped[i].observed.size() < noff )
 				noff = data[referenceCondition[c]].ped[i].observed.size();
 
 		// go across each of the offspring
-		for( int j=0; j<noff; j++ ) {
+		for( unsigned int j=0; j<noff; j++ ) {
 			// go across all of the conditioning alleles
 			bool traitSet = false;
 			eij = 0.0;
@@ -2110,7 +2109,7 @@ void condGeneFBATControl_estEqNuisUpdate(
 	// WARNING: TODO: OH HELL: Make SURE that we search the conditioning alleles for the trait first!!!
 	for( int i=0; i<np; i++ ) {
 		for( int c=0; c<nc; c++ )
-			for( int j=0; j<data[referenceCondition[c]].ped[i].trait.size(); j++ )
+			for( unsigned int j=0; j<data[referenceCondition[c]].ped[i].trait.size(); j++ )
 				data[referenceCondition[c]].ped[i].trait[j] -= eijSum;
 	}
 }
@@ -2292,10 +2291,10 @@ void condGeneFBATControl_estEqNuisUpdate2(
 		//cout << "b=" << b << ";";
 		for( int i=0; i<np; i++ ) {
 			//cout << " " << i;
-			int c = b;
+			//////int c = b;
 
 			// get the number of offspring
-			int noff = data[referenceCondition[0]].ped[i].observed.size();
+			unsigned int noff = data[referenceCondition[0]].ped[i].observed.size();
 			for( int ck=1; ck<nc; ck++ )
 				if( data[referenceCondition[ck]].ped[i].observed.size() < noff )
 					noff = data[referenceCondition[ck]].ped[i].observed.size();
@@ -2311,7 +2310,7 @@ void condGeneFBATControl_estEqNuisUpdate2(
 				//cout << "ss = " << ss << endl;
 
 				// go across the offspring, and add them to the hash table
-				for( int j=0; j<noff; j++ )
+				for( unsigned int j=0; j<noff; j++ )
 					bucket[b].add( ss, i, j );
 			}
 		}
@@ -2330,11 +2329,11 @@ void condGeneFBATControl_estEqNuisUpdate2(
 	//cout << "mbucket.size() " << mbucket.size(); // the number of strata...
 
 	// Now for the merged bucket, compute the mean of the eij, and then subtract it off of the traits
-	for( int h=0; h<mbucket.size(); h++ ) {
+	for( unsigned int h=0; h<mbucket.size(); h++ ) {
 		double eijSum = 0.0;
 		double eijCount = 0;
 
-		for( int k=0; k<mbucket[h].size(); k++ ) {
+		for( unsigned int k=0; k<mbucket[h].size(); k++ ) {
 			int i = mbucket[h].memberPedIndexI[k];
 			int j = mbucket[h].memberPedIndexJ[k];
 
@@ -2347,7 +2346,7 @@ void condGeneFBATControl_estEqNuisUpdate2(
 				Pedigree *ped = &data[referenceCondition[c]].ped[i];
 				////if( ped[i].observed.size() < 0 ) {
 				//if( ped->observed.size() <= 0 ) {
-				if( j>= ped->observed.size() ) {
+				if( j >= (int)ped->observed.size() ) {
 					// noninformative, set everything to be zero
 					informative = false;
 				}else if( !ped->nonzeroDelX[j] ) { // 01.20.2009
@@ -2380,12 +2379,12 @@ void condGeneFBATControl_estEqNuisUpdate2(
 		//cout << "eijSum (mean) = " << eijSum << endl;
 
 		// and subtract the mean from every trait
-		for( int k=0; k<mbucket[h].size(); k++ ) {
+		for( unsigned int k=0; k<mbucket[h].size(); k++ ) {
 			int i = mbucket[h].memberPedIndexI[k];
 			int j = mbucket[h].memberPedIndexJ[k];
 
 			for( int c=0; c<nc; c++ ) {
-				if( j < data[referenceCondition[c]].ped[i].trait.size() ) {
+				if( j < (int)data[referenceCondition[c]].ped[i].trait.size() ) {
 					/*
 					cout << "Trait (" << i << "," << j << "," << c << ") before=" <<
 						data[referenceCondition[c]].ped[i].trait[j] <<
@@ -2451,7 +2450,7 @@ void condGeneFBATControl_estEq(
 		double xija[na], exija[na],  xijc[nc2], exijc[nc2],  eij=0.0;
 
 		// need to know the number of offspring? why?
-		int noff = data[referenceCondition[0]].ped[i].observed.size();
+		unsigned int noff = data[referenceCondition[0]].ped[i].observed.size();
 		for( int c=1; c<nc; c++ )
 			if( data[referenceCondition[c]].ped[i].observed.size() > noff )
 				noff = data[referenceCondition[c]].ped[i].observed.size();
@@ -2460,7 +2459,7 @@ void condGeneFBATControl_estEq(
 				noff = data[referenceAnalyze[a]].ped[i].observed.size();
 
 		// go across each of the offspring
-		for( int j=0; j<noff; j++ ) {
+		for( unsigned int j=0; j<noff; j++ ) {
 			bool traitSet = false;
 			eij = 0.0;
 
@@ -2469,7 +2468,7 @@ void condGeneFBATControl_estEq(
 			for( int a=0; a<na; a++ ) {
 				Pedigree *ped = &data[referenceAnalyze[a]].ped[i];
 				//if( ped->observed.size() <= 0 ) {
-				if( j>= ped->observed.size() ) {
+				if( j >= ped->observed.size() ) {
 					// noninformative
 					xija[a] = exija[a] = 0.0;
 					informative = false;
@@ -2479,7 +2478,7 @@ void condGeneFBATControl_estEq(
 
 					// compute the expected
 					exija[a] = 0.0;
-					for( int gg=0; gg<ped->g.size(); gg++ )
+					for( unsigned int gg=0; gg<ped->g.size(); gg++ )
 						exija[a] += ped->g[gg].xCode( 0, 0, 2, ADDITIVE ) * ped->pg[gg];
 
 					// set the trait?
@@ -2497,7 +2496,7 @@ void condGeneFBATControl_estEq(
 				Pedigree *ped = &data[referenceCondition[c]].ped[i];
 				////if( ped[i].observed.size() < 0 ) {
 				//if( ped->observed.size() <= 0 ) {
-				if( j>= ped->observed.size() ) {
+				if( j >= ped->observed.size() ) {
 					// noninformative, set everything to be zero
 					xijc[c*2+0] = xijc[c*2+1] = 0.0;
 					exijc[c*2+0] = exijc[c*2+1] = 0.0;
@@ -2511,7 +2510,7 @@ void condGeneFBATControl_estEq(
 
 					// compute the expected [[yes, this really shouldn't be necessary for all offspring, inefficient]]
 					exijc[c*2+0] = exijc[c*2+1] = 0.0;
-					for( int gg=0; gg<ped->g.size(); gg++ ) {
+					for( unsigned int gg=0; gg<ped->g.size(); gg++ ) {
 						exijc[c*2+0] += ped->g[gg].genotype( 0, 0, 2, 2 ) * ped->pg[gg];
 						exijc[c*2+1] += ped->g[gg].genotype( 0, 0, 1, 2 ) * ped->pg[gg];
 					}// gg
@@ -2607,13 +2606,13 @@ void condGeneFBATControl_dUdBc(
 	int nc2 = nc*2;
 	// make sure the references are good
 	for( int a=0; a<na; a++ ) {
-		if( referenceAnalyze[a] < 0 || referenceAnalyze[a] >= data.size() ) {
+		if( referenceAnalyze[a] < 0 || referenceAnalyze[a] >= (int)data.size() ) {
 			cout << "condGeneFBATControl_dUmdBc " << referenceAnalyze[a] << " no longer exists. Terminating." << endl;
 			return;
 		}
 	}
 	for( int c=0; c<nc; c++ ) {
-		if( referenceCondition[c] < 0 || referenceCondition[c] >= data.size() ) {
+		if( referenceCondition[c] < 0 || referenceCondition[c] >= (int)data.size() ) {
 			cout << "condGeneFBATControl_dUmdBc " << referenceCondition[c] << " no longer exists. Terminating." << endl;
 			return;
 		}
@@ -2662,7 +2661,7 @@ void condGeneFBATControl_dUdBc(
 				double permWeight = (double) 1.0 / (double) genoPerm.size();
 				for( unsigned int p = 0; p < genoPerm.size(); p++ ) {
 					double sum_xstarjm[analyze_allele_index_size];
-					for( unsigned int a = 0; a < analyze_allele_index_size; a++ ) {
+					for( int a = 0; a < analyze_allele_index_size; a++ ) {
 						sum_xstarjm[a] = 0.0;
 						for (unsigned int j = 0; j < genoPerm[p].size(); j++) {
 							if( pp->trait[j] == 1 )
@@ -2672,7 +2671,7 @@ void condGeneFBATControl_dUdBc(
 
 					double sum_xstarjc0[conditional_allele_index_size];
 					double sum_xstarjc1[conditional_allele_index_size];
-					for (unsigned int a = 0; a < conditional_allele_index_size; a++) {
+					for (int a = 0; a < conditional_allele_index_size; a++) {
 						sum_xstarjc0[a] = 0.0;
 						sum_xstarjc1[a] = 0.0;
 						for (unsigned int j = 0; j < genoPerm[p].size(); j++) {
@@ -2684,7 +2683,7 @@ void condGeneFBATControl_dUdBc(
 					} // a
 
 					double temp = 0.0; // exp( b0*x0 + ... )
-					for (unsigned int a = 0; a < conditional_allele_index_size; a++)
+					for (int a = 0; a < conditional_allele_index_size; a++)
 						temp += (bc0[a] * sum_xstarjc0[a] + bc1[a] * sum_xstarjc1[a]);
 					temp = exp(temp) * pp->genoDistP[x] * permWeight;
 
@@ -2737,7 +2736,7 @@ void condGeneFBATControl_dUdBc(
 			for (unsigned int p = 0; p < genoPerm.size(); p++) {
 				double sum_xstarjc0[conditional_allele_index_size2];
 				double sum_xstarjc1[conditional_allele_index_size2];
-				for (unsigned int a = 0; a < conditional_allele_index_size2; a++) {
+				for (int a = 0; a < conditional_allele_index_size2; a++) {
 					sum_xstarjc0[a] = 0.0;
 					sum_xstarjc1[a] = 0.0;
 					for (unsigned int j = 0; j < genoPerm[p].size(); j++) {
@@ -2749,7 +2748,7 @@ void condGeneFBATControl_dUdBc(
 				} // a
 
 				double temp = 0.0; // exp( b0*x0 + ... )
-				for (unsigned int a = 0; a < conditional_allele_index_size2; a++)
+				for (int a = 0; a < conditional_allele_index_size2; a++)
 					temp += (bc0[a] * sum_xstarjc0[a] + bc1[a]*sum_xstarjc1[a]);
 				temp = exp(temp) * pp->genoDistP[x] * permWeight;
 
@@ -2790,7 +2789,7 @@ void condGeneFBATControl_varExplConts(
 	cout << "condGeneFBATControl_varExplConts is deprecated." << endl;
 
 	int nc = *referenceSize;
-	int nc2 = nc * 2;
+	//////int nc2 = nc * 2;
 	int np = data[ reference[0] ].ped.size();
 
 	//cout << "nc: " << nc << " nc2: " << nc2 << " np: " << np << endl;
@@ -2812,20 +2811,20 @@ void condGeneFBATControl_varExplConts(
 	int ymeanCount = 0;
 	for( int i=0; i<np; i++ ) {
 		// determine the number of offspring
-		int noff = data[ reference[0] ].ped[i].observed.size();
+		unsigned int noff = data[ reference[0] ].ped[i].observed.size();
 		for( int c=1; c<nc; c++ )
 			if( data[reference[c]].ped[i].observed.size() < noff )
 				noff = data[reference[c]].ped[i].observed.size();
 
 		// go across each offspring
-		for( int j=0; j<noff; j++ ) {
+		for( unsigned int j=0; j<noff; j++ ) {
 			double y = data[ reference[0] ].ped[i].trait[j];
 			if( !isnan(y) ) {
 				ymean += y;
 				ymeanCount++;
 			}
-        }
-	}
+    }//j
+	}//i
 	if( ymeanCount < 1 ) {
 		*ret_varExpl = 0.0;
 		cout << "No variation in trait!" << endl;
@@ -2867,22 +2866,24 @@ void condGeneFBATControl_varExplConts(
 	// - go across each pedigree to compute the variances
 	for( int i=0; i<np; i++ ) {
 		// determine the number of offspring
-		int noff = data[ reference[0] ].ped[i].observed.size();
+		unsigned int noff = data[ reference[0] ].ped[i].observed.size();
 		for( int c=1; c<nc; c++ )
 			if( data[reference[c]].ped[i].observed.size() < noff )
 				noff = data[reference[c]].ped[i].observed.size();
 
-		if( noff > data[reference[0] ].ped[i].trait.size() < noff )
+    // ????
+		if( data[reference[0] ].ped[i].trait.size() < noff )
+      noff = data[reference[0]].ped[i].trait.size();
 
 		// go across each offspring
-		for( int j=0; j<noff; j++ ) {
+		for( unsigned int j=0; j<noff; j++ ) {
 			bool informative = true;
 
 			// go across the "conditioning" alleles
 			double bx = 0.0;
 			for( int c=0; c<nc; c++ ) {
 				Pedigree *ped = &data[reference[c]].ped[i];
-				if( j>= ped->observed.size() ) {
+				if( j >= ped->observed.size() ) {
 					informative = false;
 				}else{
 					// compute the observed
@@ -2950,7 +2951,7 @@ void condGeneFBATControl_varContsMean(
 
 	// fill in some constants
 	int nc = *referenceSize;
-	int nc2 = nc*2;
+	//////int nc2 = nc*2;
 	int np = data[ reference[0] ].ped.size();
 
 	// fill in the mean, but select those that are informative to the current markers...
@@ -2958,13 +2959,13 @@ void condGeneFBATControl_varContsMean(
 	vector<int> good_i, good_j;
 	for( int i=0; i<np; i++ ) {
 		// determine the number of offspring
-		int noff = data[reference[0]].ped[i].observed.size();
+		unsigned int noff = data[reference[0]].ped[i].observed.size();
 		for( int c=1; c<nc; c++ )
 			if( data[reference[c]].ped[i].observed.size() < noff )
 				noff = data[reference[c]].ped[i].observed.size();
 
 		// go across each offspring
-		for( int j=0; j<noff; j++ ) {
+		for( unsigned int j=0; j<noff; j++ ) {
 			bool informative = true;
 
 			// go across the conditioning alleles
@@ -2998,7 +2999,7 @@ void condGeneFBATControl_varContsMean(
 
 	// finally compute the variance
 	double var = 0.0;
-	for( int k=0; k<good_i.size(); k++ ) {
+	for( unsigned int k=0; k<good_i.size(); k++ ) {
 		double y = data[reference[0]].ped[good_i[k]].trait[good_j[k]];
 		var += ( y - ymean ) * ( y - ymean );
 	}
@@ -3022,20 +3023,20 @@ void condGeneFBATControl_varContsModel(
 
 	// fill in some constants
 	int nc = *referenceSize;
-	int nc2 = nc*2;
+	//////int nc2 = nc*2;
 	int np = data[ reference[0] ].ped.size();
 
 	// fill in the variance
 	double varModel = 0.0;
 	for( int i=0; i<np; i++ ) {
 		// determine the number of offspring
-		int noff = data[reference[0]].ped[i].observed.size();
+		unsigned int noff = data[reference[0]].ped[i].observed.size();
 		for( int c=1; c<nc; c++ )
 			if( data[reference[c]].ped[i].observed.size() < noff )
 				noff = data[reference[c]].ped[i].observed.size();
 
 		// go across each offspring
-		for( int j=0; j<noff; j++ ) {
+		for( unsigned int j=0; j<noff; j++ ) {
 			bool informative = true;
 
 			// go across the conditioning alleles
