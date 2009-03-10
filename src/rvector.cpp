@@ -3,16 +3,16 @@
 using namespace std;
 
 // setting it up
-void RVector::set( double *data, int *dimData )
+void RVector::set( double *p_data, int *p_dimData )
 {
-  this->data = data;
-  this->I = *dimData;
+  this->data = p_data;
+  this->I = *p_dimData;
 }
 
-void RVector::set( double *data, int dimData )
+void RVector::set( double *p_data, int p_dimData )
 {
-  this->data = data;
-  this->I = dimData;
+  this->data = p_data;
+  this->I = p_dimData;
 }
 // accessor function
 double& RVector::operator () (unsigned i)

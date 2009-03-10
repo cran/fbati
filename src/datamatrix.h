@@ -38,7 +38,7 @@ class DataMatrix : public RMatrix
   public:
     // fills in the constants above as well,
     //  this is for the generation routines...
-    void setGen( double *data, unsigned int R, unsigned int C=9 );
+    void setGen( double *p_data, unsigned int p_R, unsigned int p_C=9 );
 
     bool getNextFamily( int &start, int &end );
     void computeGroupG( int *groups,

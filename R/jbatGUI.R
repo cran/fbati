@@ -95,7 +95,7 @@ fbatjGUI <- function() {
        callback=updateFbatjGUI,
        helpsFunc="fbatj",
        title="FBAT-J GUI",
-       argText=list(ped="Pedigree File ...", phe="Phenotype file ...", env="Environment",trait="Trait"),
+       argText=list(ped="Pedigree File ...", phe="Phenotype file ...", env="Environment", trait="Trait", marker="Choose genetic marker (or all will be done)", write_results="Write data results in csv format (press after running)"),
        verbose=FALSE )
   return( guiGetSafe( "fbatjRes" ) )
 }

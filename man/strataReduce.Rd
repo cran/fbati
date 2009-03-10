@@ -2,7 +2,7 @@
 \alias{strataReduce}
 \title{Strata Reduction}
 \description{
-  Reduces the number of strata in nuclear pedigrees for testing. For nuclear families with both parents, a random affected child is drawn. For nuclear families with at least one parent missing, a random affected and another random sib is used (parents ignored).
+  Reduces the number of strata in nuclear pedigrees for testing (for use with FBAT-I). For nuclear families with both parents, a random affected child is drawn. For nuclear families with at least one parent missing, a random affected and another random sib is used (parents ignored).
 }
 \usage{
 strataReduce( data, envCol, m0, m1=m0+1, maxSib=3 )
@@ -17,10 +17,20 @@ strataReduce( data, envCol, m0, m1=m0+1, maxSib=3 )
 \examples{
 ## Function creates a family with the specified markers and statuses
 ## NOTE: affection is false/true, whereas it is coded 1/2 in the ped file
-createFam <- function( pa=c(0,0), pb=c(0,0), ca, cb, caffected=rep(TRUE,length(ca)), env=1:length(ca) ) {
+createFam <- function( pa=c(0,0), pb=c(0,0),
+                       ca, cb,
+                       caffected=rep(TRUE,length(ca)),
+                       env=1:length(ca) ) {
   ## pid, id, idfath, idmoth, sex, affection, m0a, m0b
   numC <- length(ca)
-  return( data.frame( pid=rep(1,2+numC), id=1:(2+numC), idfath=c(0,0,rep(1,numC)), idmoth=c(0,0,rep(2,numC)), sex=c(2,1,rep(0,numC)), affection=c(0,0,as.integer(caffected)+1), m0.a=c(pa,ca), m0.b=c(pb,cb), env=c(NA,NA,env) ) )
+  return( data.frame( pid=rep(1,2+numC),
+                      id=1:(2+numC),
+                      idfath=c(0,0,rep(1,numC)),
+                      idmoth=c(0,0,rep(2,numC)),
+                      sex=c(2,1,rep(0,numC)),
+                      affection=c(0,0,as.integer(caffected)+1),
+                      m0.a=c(pa,ca), m0.b=c(pb,cb),
+                      env=c(NA,NA,env) ) )
 }
 ## Function tests/exemplifies the strataReduce(...) routine
 srFam <- function( ... ) {
@@ -42,7 +52,10 @@ srFam( ca=c(1,1,2), cb=c(1,2,2), pa=c(1,1), pb=c(2,2) )
 ## The affected should always be one of the first three,
 ##  the unaffected could be one the first eight
 for( i in 1:10 )
-  srFam( ca=c(1:8,0,0), cb=c(1:8,0,0), pa=c(1,1), caffected=c(rep(TRUE,6),rep(FALSE,4)), env=c(1:3,rep(NA,7)) )
+  srFam( ca=c(1:8,0,0), cb=c(1:8,0,0),
+         pa=c(1,1),
+         caffected=c(rep(TRUE,6),rep(FALSE,4)),
+         env=c(1:3,rep(NA,7)) )
 
 ## Now just to make sure, a full pedigree, rather than just one family
 data <- createFam( ca=1:2, cb=1:2 )

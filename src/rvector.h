@@ -7,8 +7,8 @@ class RVector
 {
   public:
     // setting it up
-    void set( double *data, int *dimData );
-    void set( double *data, int dimData );
+    void set( double *p_data, int *p_dimData );
+    void set( double *p_data, int p_dimData );
     // accessor function
     double& operator () ( unsigned i );
     double& elt( unsigned i );

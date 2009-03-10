@@ -2,7 +2,7 @@
 \alias{fbatj}
 \title{fbatj}
 \description{
-  Family based joint test for both the main effect of the gene and gene-environment interaction, command/line or GUI (provide no options to start gui, i.e. just type \code{fbati()} and press return).
+  Family based joint test for both the main effect of the gene and gene-environment interaction, command/line or GUI (provide no options to start gui, i.e. just type \code{fbatj()} and press return).
 }
 \usage{
 fbatj( ped=NULL, phe=NULL,

@@ -1,8 +1,8 @@
 #include "datamatrix.h"
 
-void DataMatrix::setGen( double *data, unsigned int R, unsigned int C )
+void DataMatrix::setGen( double *p_data, unsigned int p_R, unsigned int p_C )
 {
-  set( data, R, C );
+  set( p_data, p_R, p_C );
   c_m0 = 6;
   c_m1 = 7;
   c_env = 8;

@@ -2,7 +2,7 @@
 \alias{fbati}
 \title{fbati}
 \description{
-  Family based test for gene-environment interaction for bi-allelic snps, command/line or GUI (provide no options to start gui, i.e. just type \code{fbati()} and press return).
+  Family based test for gene-environment interaction for bi-allelic snps, command/line or GUI (provide no options to start the graphical interface, i.e. just type \code{fbati()} and press return).
 }
 \usage{
 fbati( ped=NULL, phe=NULL,

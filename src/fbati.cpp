@@ -38,10 +38,17 @@ double sum( double* v, int LEN )
 }
 
 double sumProd( double *a, double *b, int N ) {
-  double c[N];
+  //double c[N];
+  //for( int n=0; n<N; n++ )
+  //  c[n] = a[n] * b[n];
+  //return( sum( c, N ) );
+
+  double *c = new double[N];
   for( int n=0; n<N; n++ )
     c[n] = a[n] * b[n];
-  return( sum( c, N ) );
+  double ssum = sum( c, N );
+  delete [] c;
+  return( ssum );
 }
 
 extern "C" {

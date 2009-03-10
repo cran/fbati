@@ -3,15 +3,15 @@
 using namespace std;
 
 // Call to initialize
-void RMatrix::set( double *data, unsigned int R, unsigned int C )
+void RMatrix::set( double *p_data, unsigned int p_R, unsigned int p_C )
 {
-  this->data = data;
-  this->R = R;
-  this->C = C;
+  this->data = p_data; // sunCC hell
+  this->R = p_R;
+  this->C = p_C;
 }
-void RMatrix::set( double *data, int *dimData )
+void RMatrix::set( double *p_data, int *p_dimData )
 {
-  set( data, dimData[0], dimData[1] );
+  set( p_data, p_dimData[0], p_dimData[1] );
 }
 
 // accessor function

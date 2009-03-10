@@ -89,7 +89,7 @@ fbatiGUI <- function() {
        callback=updateFbatiGUI,
        helpsFunc="fbati",
        title="FBAT-I GUI",
-       argText=list(ped="Pedigree File ...", phe="Phenotype file ...", env="Environment"),
+       argText=list(ped="Pedigree File ...", phe="Phenotype file ...", env="Environmental Exposure", marker="Choose genetic marker (or all will be done)", write_results="Write data results in csv format (press after running)", iter="Monte-Carlo iterations", seed="Random Seed", maxSib="Maximum sibs"),
        verbose=FALSE )
   return( guiGetSafe( "fbatiRes" ) )
 }

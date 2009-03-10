@@ -6,10 +6,14 @@
 #ifndef _ge_defines_h_
 #define _ge_defines_h_
 
+// New addition here because sunCC is a bitch
+#ifndef NAN
+#define NAN numeric_limits<float>::quiet_NaN()
+#endif
+
 /** For debugging **/
 #define DEBUG_RMATRIX
 #define DEBUG_RVECTOR
-
 
 
 /** setup for globals **/

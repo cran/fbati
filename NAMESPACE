@@ -1,6 +1,7 @@
 export(
   fbati,
   fbatj,
+  fbatc,
 
   mergePhePed,
   nuclifyMerged,
@@ -8,10 +9,14 @@ export(
 
   strataReduce,
 
+  fbatcStrategyStep, fbatcStrategyStepUp, fbatcStrategyStepDown, fbatcStrategyStepLatex,
+
   launchpad
 )
 
 import( tcltk )
 import( pbatR )
+
+S3method( print, fbatcSStep )
 
 useDynLib(fbati)

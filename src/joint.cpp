@@ -40,7 +40,8 @@ void REXP_joint( RMatrix &data,  RVector &marker, double trait, double env,  dou
   int start=-1, end=-1;
   while( d.getNextFamily( start, end ) ) {
     // Stores \sum_j U_ij (since effectively looping over 'i' above)
-    double tempVec[marker.I];
+    // double tempVec[marker.I]; // sunCC hell
+    double *tempVec = new double[marker.I];
 
     // go across each marker
     for( m=0; m<marker.I; m+=2 ) {
@@ -84,7 +85,7 @@ void REXP_joint( RMatrix &data,  RVector &marker, double trait, double env,  dou
           //crow[curC] = i; // DEBUG ONLY
           curC++;
         }
-      }
+      }//i
 
       // now compute the temp vector
       double ex = fbat_EXS( curC,  p1, p2,  ca, cb,  y,  (int)model );
@@ -98,8 +99,8 @@ void REXP_joint( RMatrix &data,  RVector &marker, double trait, double env,  dou
           tempVec[m] += txmex;
           tempVec[m+1] += txmex * cEnv[j];
         }
-      }
-    }
+      }//j
+    }//m
 
     /*
     cout << "tempVec ";
@@ -112,7 +113,9 @@ void REXP_joint( RMatrix &data,  RVector &marker, double trait, double env,  dou
       RET_a(m) += tempVec[m];
       for( unsigned int mp=0; mp<marker.I; mp++ )
         RET_b(m,mp) += tempVec[m] * tempVec[mp];
-    }
+    }//m
+
+    delete [] tempVec;
   }
 
   /*

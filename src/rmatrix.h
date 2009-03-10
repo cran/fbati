@@ -7,8 +7,8 @@ class RMatrix
 {
   public:
     //setting it up
-    void set( double *data, unsigned int R, unsigned int C );
-    void set( double *data, int *dimData );
+    void set( double *p_data, unsigned int p_R, unsigned int p_C );
+    void set( double *p_data, int *p_dimData );
     //accessor function
     double& operator() ( unsigned r, unsigned c );
     double& elt( unsigned r, unsigned c );
