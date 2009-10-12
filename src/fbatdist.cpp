@@ -12,6 +12,11 @@
  */
 //#define DEBUG_FBATDIST
 
+#include <R.h>
+
+#include <vector>
+using namespace std;
+
 #include "fbatdist.h"
 
 bool first( int a, int b, int c ) {
@@ -40,10 +45,14 @@ bool all( int a, int b, int c ) {
 void printFamily( int *p1, int *p2,
                   int *ca, int *cb,
                   int numSibs ) {
-  cout << "P: " << p1[0] << " "  << p1[1] << ", " << p2[0] << " " << p2[1] << endl << "C: ";
-  for( int i=0; i<numSibs; i++ )
-    cout << ca[i] << " " << cb[i] << ", ";
-  cout << endl;
+  //cout << "P: " << p1[0] << " "  << p1[1] << ", " << p2[0] << " " << p2[1] << endl << "C: ";
+  //for( int i=0; i<numSibs; i++ )
+  //  cout << ca[i] << " " << cb[i] << ", ";
+  //cout << endl;
+  Rprintf("P: %d %d, %d %d\nC: ", p1[0], p1[1], p2[0], p2[1]);
+  for(int i=0; i<numSibs; i++)
+    Rprintf("%d %d, ", ca[i], cb[i]);
+  Rprintf("\n");
 }
 
 bool pG( int gP1, int gP2, // parental mating type
@@ -205,7 +214,7 @@ bool pG( int gP1, int gP2, // parental mating type
   if( (gP1==gAA||gP1==gBB) && gP2==gMiss
       && all(nAA,nAB,nBB) ) {
 #ifndef LOOKUP_COMPARE
-    cout << "WARNING: impossible genotype in file." << endl;
+    Rprintf("WARNING: impossible genotype in file.\n");
     //printFamily();
 #endif
     return(true);
@@ -233,13 +242,13 @@ bool pGG( int gP1, int gP2,
   // zero everything
   pg[0] = pg[1] = pg[2] = 0.0;
   pgg[0][0] = pgg[0][1] = pgg[0][2] = pgg[1][0] = pgg[1][1] = pgg[1][2] = pgg[2][0] = pgg[2][1] = pgg[2][2] = 0.0;
-  
+
   // fill in the univariate
   if( !pG( gP1, gP2,  nAA, nAB, nBB,  pg ) )
     return( false );
 
   int n = nAA + nAB + nBB;
-  
+
   if( gP1!=gMiss ) {
     // neither parent is missing
     for( int g1=gAA; g1<=gBB; g1++ )
@@ -279,7 +288,7 @@ bool pGG( int gP1, int gP2,
       pgg[gAB][gAB] = ( pow(4,n-1) - 8*pow(3,n-2) + pow(2,n) ) / ( pow(4,n) - 2*pow(3,n) + pow(2,n) );
     }
   }
-  
+
   return( true );
 }
 */
@@ -304,7 +313,7 @@ int xCode( int a, int b, int MODEL ) {
   case( MODEL_RECESSIVE ):
     return( (int)(a==ALLELE_A && b==ALLELE_A) );
   }
-  cout << "xCode (1) out of bounds! " << a << " " << b << endl;
+  Rprintf("xCode (1) out of bounds! %d %d\n", a, b);
   return( -1 ); // should never get here
 }
 int xCode( int g, int MODEL ) {
@@ -316,7 +325,7 @@ int xCode( int g, int MODEL ) {
   case gBB:
     return( xCode( ALLELE_B, ALLELE_B, MODEL ) );
   }
-  cout << "xCode (2) out of bounds! " << g << endl;
+  Rprintf("xCode (2) out of bounds! %d\n", g);
   return( -1 ); // should never get here
 }
 
@@ -491,7 +500,7 @@ bool pGG( int gP1, int gP2, // parental mating type
         return(true);
       }
       if( first_third(nAA,nAB,nBB) ) {
-        cout << "Impossible genotypes, 1 missing parent." << endl;
+        Rprintf("Impossible genotypes, 1 missing parent.\n");
         return(false);
       }
       if( second_third(nAA,nAB,nBB) ) {
@@ -567,7 +576,7 @@ bool pGG( int n,
   //cout << "pGG n=" << n << " p1=" << p1[0] << p1[1] << " p2=" << p2[0] << p2[1];
   //for( int i=0; i<n; i++ ) cout << "c" << i << "=" << ca[i] << cb[i];
   //cout << endl;
-          
+
   int nG[3] = {0,0,0};
   for( int i=0; i<n; i++ )
     if( ca[i]!=0 && cb[i]!=0 ) // NEW 06.24.2009
@@ -627,9 +636,14 @@ double fbat_Si( int n,
                 int nPhenotyped ) { // hack for power
   // get rid of individuals who are missing a trait (y) or have bad genotypes; this is the easy way to do this!:
   int ngenopheno = 0;
-  double y_genopheno[n]; int ca_genopheno[n], cb_genopheno[n];
+  //double y_genopheno[n]; int ca_genopheno[n], cb_genopheno[n];
+  vector<double> y_genopheno; y_genopheno.resize(n);
+  vector<int> ca_genopheno; ca_genopheno.resize(n);
+  vector<int> cb_genopheno; cb_genopheno.resize(n);
   int ngeno = 0;
-  int ca_geno[n], cb_geno[n];
+  //int ca_geno[n], cb_geno[n];
+  vector<int> ca_geno; ca_geno.resize(n);
+  vector<int> cb_geno; cb_geno.resize(n);
   for( int j=0; j<n; j++ ) {
     if( ca[j]!=0 && cb[j]!=0 ) {
       if( !isnan(y[j]) ) {
@@ -660,10 +674,10 @@ double fbat_Si( int n,
   }
   n = ngenopheno + ngeno;
 // end of get rid of bad individuals
-                
+
   double pg[3];
   if( !pG( n,  p1, p2,  ca, cb,  pg ) ) {
-    cout << "really did fail..." << endl;
+    Rprintf("really did fail...\n");
     fbat_Vi = 0.0;
     return( 0.0 );
   }
@@ -673,7 +687,7 @@ double fbat_Si( int n,
   double pgg[9];
   if( n>1 && nPhenotyped>1 )
     pGG( n,  p1, p2,  ca, cb,  pgg );
-  
+
   n = ngenopheno; // NEW NEW OY VAY!!!!
 
   double exj = 0;
@@ -719,9 +733,9 @@ double fbat_Si( int n,
   for( gg=0; gg<9; gg++ ) pgg_sum += pgg[gg];
   if( pgg_sum<0.99 || pgg_sum>1.01 ) {
     printFamily( p1, p2,  ca, cb,  n );
-    cout << "pgg_sum = " << pgg_sum << endl;
+    Rprintf("pgg_sum = %f\n", pgg_sum);
     for( gg=0; gg<9; gg++ )
-      cout << " P[" << gg << "]=" << pgg[gg] << endl;
+      Rprintf(" P[%g]=%g\n", gg, pgg[gg]);
     exit(1);
   }
 #endif
@@ -740,7 +754,7 @@ double fbat_Si( int n,
       fbat_Vi += xCode(g1,model)*xCode(g2,model)
         *( pgg[ggConvert(g1,g2)] - pg[g1]*pg[g2] );
   fbat_Vi *= sumTj*sumTj;
-  
+
 
   // the second term
   for( j=0; j<n && j<nPhenotyped; j++ ) {
@@ -779,9 +793,15 @@ void fbat_Si_joint_G_GE( int n,
 
   // get rid of individuals who are missing a trait (y) or have bad genotypes; this is the easy way to do this!:
   int ngenopheno = 0;
-  double y_genopheno[n], z_genopheno[n]; int ca_genopheno[n], cb_genopheno[n];
+  //double y_genopheno[n], z_genopheno[n]; int ca_genopheno[n], cb_genopheno[n];
+  vector<double> y_genopheno; y_genopheno.resize(n);
+  vector<double> z_genopheno; z_genopheno.resize(n);
+  vector<int> ca_genopheno; ca_genopheno.resize(n);
+  vector<int> cb_genopheno; cb_genopheno.resize(n);
   int ngeno = 0;
-  int ca_geno[n], cb_geno[n];
+  //int ca_geno[n], cb_geno[n];
+  vector<int> ca_geno; ca_geno.resize(n);
+  vector<int> cb_geno; cb_geno.resize(n);
   for( int j=0; j<n; j++ ) {
     if( ca[j]!=0 && cb[j]!=0 ) {
       if( !isnan(y[j]) && !isnan(z[j]) ) {
@@ -817,7 +837,7 @@ void fbat_Si_joint_G_GE( int n,
 
   double pg[3];
   if( !pG( n,  p1, p2,  ca, cb,  pg ) ) {
-    cout << "really did fail..." << endl;
+    Rprintf("really did fail...\n");
     // everything was already zeroed out
     return;
   }
@@ -872,20 +892,20 @@ void fbat_Si_joint_G_GE( int n,
   double covXi = 0.0;
   double E_Xi = 0.0;
   double E_Xisq = 0.0;
-  
+
   for( int g=0; g<3; g++ ) {
     double x = xCode(g,model);
     E_Xi += x * pg[g];
     E_Xisq += x * x * pg[g];
   }
   VXi = E_Xisq - E_Xi*E_Xi;
-  
+
   double E_XiXj = 0.0;
   for( int g1=0; g1<3; g1++ )
     for( int g2=0; g2<3; g2++ )
       E_XiXj += xCode(g1,model) * xCode(g2,model) * pgg[ggConvert(g1,g2)];
   covXi = E_XiXj - E_Xi*E_Xi;
-  
+
   for( int j0=0; j0<n && j0<nPhenotyped; j0++ ) {
     for( int j1=0; j1<n && j1<nPhenotyped; j1++ ) {
       double temp = 0.0;
@@ -894,7 +914,7 @@ void fbat_Si_joint_G_GE( int n,
       }else{
         temp = covXi;
       }
-      
+
       double Tij0 = (y[j0] - offset) * (y[j1] - offset);
       double Tij1 = Tij0 * z[j0] * z[j1];
 
@@ -1022,7 +1042,8 @@ void recursiveFillLookupCompare( int curSib, int numSibs,
       if( !fuzzyEqual( chart_g1(index), pg[0] ) ||
           !fuzzyEqual( chart_g2(index), pg[1] ) ||
           !fuzzyEqual( chart_g3(index), pg[2] ) ) {
-        cout << "Lookup failure! You: " << pg[0] << " " << pg[1] << " " << pg[2] << "Fbat: " << chart_g1(index) << " " << chart_g2(index) << " " << chart_g3(index) << endl;
+        //cout << "Lookup failure! You: " << pg[0] << " " << pg[1] << " " << pg[2] << "Fbat: " << chart_g1(index) << " " << chart_g2(index) << " " << chart_g3(index) << endl;
+        Rprintf("Lookup failure! You: %g %g %g, FBAT: %g %g %g\n", pg[0], pg[1], pg[2], chart_g1(index), chart_g2(index), chart_g3(index));
         printFamily( p1, p2,  ca, cb,  numSibs );
       }
 
@@ -1035,14 +1056,14 @@ void recursiveFillLookupCompare( int curSib, int numSibs,
   if( (gP1==gAA||gP1==gBB) && gP2==gMiss
       && all(nAA,nAB,nBB) ) {
 #ifndef LOOKUP_COMPARE
-    cout << "WARNING: impossible genotype in file." << endl;
+    Rprintf("WARNING: impossible genotype in file.\n");
     printFamily();
 #endif
     return(true);
   }
 
-  cout << "failed all cases!" << endl;
-  cout << gP1 << " " << gP2 << endl;
+  Rprintf("failed all cases!\n");
+  Rprintf(" %g %g\n", gP1, gP2);
   return(false);
 }
 
@@ -1051,7 +1072,7 @@ void fillLookupCompare()
   int i;
 
   int N=4; // temporary...
-  cout << "Table size = " << N << endl;
+  Rprintf("Table size = %d\n", N);
 
   // now begin the recursive fill
   // - setup

@@ -1,3 +1,4 @@
+#include <R.h>
 #include "fbatmeev.h"
 
 const int MAX_CHILD_MEEV = 20;
@@ -45,7 +46,7 @@ void REXP_fbatmeev(RMatrix &data, RVector &marker,  double trait, double model, 
         if( d(i, C_FATH)==0 && d(i, C_MOTH)==0 ) {
           // it's a parent
           if( curP>1 ) {
-            cout << "Too many parents in family " << d(i,C_PID) << ", ignoring parents 3 and higher." << endl;
+            Rprintf("Too many parents in family %d, ignoring parents 3 and higher.\n", d(i,C_PID));
           }else{
             if( curP==0 ) {
               p1[0] = (int)d(i,m0);
@@ -165,7 +166,7 @@ void REXP_fbatme(RMatrix &data, RVector &marker,  double trait, double model,  R
         if( d(i, C_FATH)==0 && d(i, C_MOTH)==0 ) {
           // it's a parent
           if( curP>1 ) {
-            cout << "Too many parents in family " << d(i,C_PID) << ", ignoring parents 3 and higher." << endl;
+            Rprintf("Too many parents in family %d, ignoring parents 3 and higher.\n", d(i,C_PID));
           }else{
             if( curP==0 ) {
               p1[0] = (int)d(i,m0);

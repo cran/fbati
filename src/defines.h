@@ -3,6 +3,8 @@
  * defines.cpp auto-generates a compatible R-file based on this.
  */
 
+#include <R.h>
+
 #ifndef _ge_defines_h_
 #define _ge_defines_h_
 

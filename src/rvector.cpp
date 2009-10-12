@@ -1,3 +1,5 @@
+#include <R.h>
+
 #include "rvector.h"
 #include <iostream>
 using namespace std;
@@ -19,7 +21,7 @@ double& RVector::operator () (unsigned i)
 {
 #ifdef DEBUG_RVECTOR
   if( i<0 || i>=I ) {
-    cout << "Index (" << i << ") is out of range " << I << "." << endl;
+    Rprintf("Index (%d) is out of range (%d).\n", i, I);
   }
 #endif
   return( data[i] );
@@ -30,7 +32,7 @@ double& RVector::elt( unsigned i )
 {
 #ifdef DEBUG_RVECTOR
   if( i<0 || i>=I ) {
-    cout << "Index (" << i << ") is out of range " << I << "." << endl;
+    Rprintf("Index (%d) is out of range (%d).\n", i, I);
   }
 #endif
   return( data[i] );

@@ -1,3 +1,5 @@
+#include <R.h>
+
 #include "joint.h"
 #include "fbatdist.h"
 
@@ -11,7 +13,7 @@ const int MAX_CHILD = 20;
 // {
 //   DataMatrix d;
 //   d.setGen( data.data, data.R, data.C );
-// 
+//
 //   /*
 //   // print out the data -- debug
 //   for( int rr=0; rr<d.R; rr++ ) {
@@ -20,7 +22,7 @@ const int MAX_CHILD = 20;
 //     }
 //     cout << endl;
 //   }*/
-// 
+//
 //   // zero out the a and b RMatrix objects
 //   unsigned int r=0, c=0, m=0;
 //   for( r=0; r<RET_a.I; r++ )
@@ -28,7 +30,7 @@ const int MAX_CHILD = 20;
 //   for( r=0; r<RET_b.R; r++ )
 //     for( c=0; c<RET_b.C; c++ )
 //       RET_b(r,c) = 0.0;
-// 
+//
 //   /*
 //   cout << "dim(data) " << d.R << " " << d.C << endl;
 //   cout << "zeroed out" << endl;
@@ -36,18 +38,18 @@ const int MAX_CHILD = 20;
 //   cout << "env " << (int)env << endl;
 //   cout << "model " << (int)model << endl;
 //   */
-// 
+//
 //   int start=-1, end=-1;
 //   while( d.getNextFamily( start, end ) ) {
 //     // Stores \sum_j U_ij (since effectively looping over 'i' above)
 //     // double tempVec[marker.I]; // sunCC hell
 //     double *tempVec = new double[marker.I];
-// 
+//
 //     // go across each marker
 //     for( m=0; m<marker.I; m+=2 ) {
 //       int m0 = (int)marker(m);
 //       int m1 = (int)marker(m+1);
-// 
+//
 //       // first find all the children and parental alleles
 //       int p1[2]; p1[0] = 0; p1[1] = 0;
 //       int p2[2]; p2[0] = 0; p2[1] = 0;
@@ -57,9 +59,9 @@ const int MAX_CHILD = 20;
 //       double cEnv[MAX_CHILD];
 //       int curC=0; // n
 //       double y[MAX_CHILD];
-// 
+//
 //       //int crow[MAX_CHILD]; // DEBUG ONLY
-// 
+//
 //       for( int i=start; i<=end; i++ ) {
 //         //if( d(i, m0)!=0 && d(i,m1)!=0 ) {
 //         if( d(i, C_FATH)==0 && d(i, C_MOTH)==0 ) {
@@ -86,7 +88,7 @@ const int MAX_CHILD = 20;
 //           curC++;
 //         }
 //       }//i
-// 
+//
 //       // now compute the temp vector
 //       double ex = fbat_EXS( curC,  p1, p2,  ca, cb,  y,  (int)model );
 //       tempVec[m]   = 0.0;
@@ -101,23 +103,23 @@ const int MAX_CHILD = 20;
 //         }
 //       }//j
 //     }//m
-// 
+//
 //     /*
 //     cout << "tempVec ";
 //     for( m=0; m<marker.I; m++ ) cout << tempVec[m] << " ";
 //     cout << endl;
 //     */
-// 
+//
 //     // now use the tempVec information to update a and b
 //     for( m=0; m<marker.I; m++ ) {
 //       RET_a(m) += tempVec[m];
 //       for( unsigned int mp=0; mp<marker.I; mp++ )
 //         RET_b(m,mp) += tempVec[m] * tempVec[mp];
 //     }//m
-// 
+//
 //     delete [] tempVec;
 //   }
-// 
+//
 //   /*
 //   cout << "RET_a= "
 //   for( m=0; m<marker.I; m++ )
@@ -167,7 +169,7 @@ void REXP_joint( RMatrix &data,  RVector &marker, double trait, double env,  dou
         if( d(i, C_FATH)==0 && d(i, C_MOTH)==0 ) {
           // it's a parent
           if( curP>1 ) {
-            cout << "Too many parents in family " << d(i,C_PID) << ", ignoring parents 3 and higher." << endl;
+            Rprintf("Too many parents in family %d, ignoring parents 3 and higher.\n", d(i,C_PID));
           }else{
             if( curP==0 ) {
               p1[0] = (int)d(i,m0);

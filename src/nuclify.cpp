@@ -1,4 +1,5 @@
 // R CMD SHLIB nuclify.cpp datamatrix.cpp rmatrix.cpp fbatdist.cpp random.cpp
+#include <R.h>
 
 #include <limits>  // for quiet_NaN
 
@@ -21,7 +22,7 @@ void strataReduceRemove( int *array, int &arraySize, int elt ) {
   }
 
   // it wasn't found! uh-oh...
-  cout << "strataReduceRemove ERROR -- elt " << elt << " was not found in the array, and so could not be removed!" << endl;
+  Rprintf("strataReduceRemove ERROR -- elt %d was not found in the array, and so could not be removed!\n", elt);
 }
 
 // clearParents just removes the fathid/mothid references (for nuclify)
@@ -82,7 +83,7 @@ extern "C" {
                 double *dataOut, int *dimDataOut,
                 int *failure ) {
     *failure = 0;
-    
+
     // set up the DataMatrix objects
     DataMatrix din, dout;
     din.set( data, dimData );

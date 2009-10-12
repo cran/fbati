@@ -1,5 +1,8 @@
 // DOES NOT HANDLE MISSING GENOTYPE OR PHENOTYPE INFORMATION PROPERLY YET!!!
 
+// g++ -I/usr/share/R/include      -fpic  -O3 -pipe  -g -c fbatge.cpp -o fbatge.o -pedantic
+
+
 // ? Does this code enforce that the extra covariates actually exist?
 
 // The usual includes
@@ -28,7 +31,7 @@ double sum( double* v, int LEN )
   //for( int i=0; i<LEN; i++ )
   //  standardSum += v[i];
   // YLNO GUBED
-  
+
   // some special cases
   if( LEN == 0 ) {
     return( 0.0 );
@@ -37,7 +40,7 @@ double sum( double* v, int LEN )
   }else if( LEN == 2 ){
     return( v[0] + v[1] );
   }
-  
+
   // now on to the general algorithm
   int stepsize = 2;
   while( (stepsize/2) < LEN ){
@@ -49,7 +52,7 @@ double sum( double* v, int LEN )
   }
 
   //cout << "Stable sum = " << v[0] << ", Standard sum = " << standardSum << endl; // DEBUG ONLY
-  
+
   return( v[0] );
 }*/
 
@@ -90,13 +93,13 @@ void fanperms( vector<int> &next, vector< vector<int> > &perm ) {
       perm[n].push_back( next[n] );
     return;
   }
-  
+
   // duplicate the rows in perm
   for( unsigned int n=1; n<next.size(); n++ ) { // note starting at 1, this is correct, as first is already there
     for( unsigned int p=0; p<P; p++ )
       perm.push_back( perm[p] );
   }
-  
+
   // now push on the next;
   for( unsigned int n=0; n<next.size(); n++ )
     for( unsigned int p=0; p<P; p++ )
@@ -108,10 +111,10 @@ void fanpermsw( vector<int> &nextPerm, vector<double> &nextWeight, vector< vecto
   unsigned int P = perm.size();
 
   if( nextPerm.size() != nextWeight.size() ) {
-    cout << "fanpermsw Error, nextPerm.size() != nextWeight.size()" << endl;
+    Rprintf("fanpermsw Error, nextPerm.size() != nextWeight.size()\n");
     return;
   }
-  
+
   // special initial case
   if( perm.size() == 0 ) {
     perm.resize( nextPerm.size() );
@@ -152,9 +155,9 @@ void perm2categories( vector< vector<int> > &perm, vector<int> &curPerm, int cur
       return;
     }
   }
-  
+
   if( nPlace < 1 ) {
-    cout << "perm2categories error, nPlace<1 (" << nPlace << ") when it should not be." << endl;
+    Rprintf("perm2categories error, nPlace<1 (%d) when it should not be.\n", nPlace);
     return;
   }
 
@@ -175,20 +178,19 @@ void perm2categories( vector< vector<int> > &perm, vector<int> &curPerm, int cur
 void printperms( vector< vector<int> > &perm ) {
   for( unsigned int i=0; i<perm.size(); i++ ) {
     for( unsigned int j=0; j<perm[i].size(); j++ )
-      cout << perm[i][j] << " ";
-    cout << endl;
+      Rprintf("%d ", perm[i][j]);
+    Rprintf("\n");
   }
 }//printperms -- DEBUGGED
 void printpermsw( vector< vector<int> > &perm, vector<double> &w ) {
   if( perm.size() != w.size() ) {
-    cout << "printpermsw perm.size()=" << perm.size() << ", but w.size()=" << w.size() << endl;
-    return;
+    Rprintf("printpermsw perm.size()=%d, but w.size()=%d\n", perm.size(), w.size());
   }
 
   for( unsigned int i=0; i<perm.size(); i++ ) {
     for( unsigned int j=0; j<perm[i].size(); j++ )
-      cout << perm[i][j] << " ";
-    cout << w[i] << endl;
+      Rprintf("%d ", perm[i][j]);
+    Rprintf("%d\n", w[i]);
   }
 }//printpermsw -- DEBUGGED
 
@@ -258,14 +260,15 @@ public:
     }//r
     return( s );
   }//MMatrix::toString -- DEBUGGED
-  
+
   void addSelf( MMatrix &rhs ) {
     // verify some preconditions for adding two matrices
     if( nrows()!=rhs.nrows() || ncols()!=rhs.ncols() ) {
-      cout << "MMatrix::add() -- LHS rows=" << nrows() << " != RHS rows=" << rhs.nrows() << " OR LHS cols=" << ncols() << " != RHS cols=" << rhs.ncols() <<  endl;
-      exit(1);
+      Rprintf("MMatrix::add() -- LHS rows=%d != RHS rows=%d OR LHS cols=%d != RHS cols=%d\n", nrows(), rhs.nrows(), ncols(), rhs.ncols());
+      //exit(1);
+      return;
     }//fi
-    
+
     // then add the rhs to this matrix
     for( int r=0; r<nrows(); r++ )
       for( int c=0; c<ncols(); c++ )
@@ -281,8 +284,9 @@ public:
   void subtractSelf( MMatrix &rhs ) {
     // verify some preconditions
     if( nrows()!=rhs.nrows() || ncols()!=rhs.ncols() ) {
-      cout << "MMatrix::add() -- LHS rows=" << nrows() << " != RHS rows=" << rhs.nrows() << " OR LHS cols=" << ncols() << " != RHS cols=" << rhs.ncols() <<  endl;
-      exit(1);
+      Rprintf("MMatrix::substractSelf() -- LHS rows=%d != RHS rows=%d OR LHS cols=%d != RHS cols=%d\n", nrows(), rhs.nrows(), ncols(), rhs.ncols());
+      //exit(1);
+      return;
     }//fi
 
     // then subtract the rhs from this matrix
@@ -296,14 +300,15 @@ public:
     out.subtractSelf( rhs );
     return( out );
   }//MMatrix::subtractSelfC -- SIMPLE
-  
+
   void multiply( MMatrix &rhs, MMatrix &out ) {
     // verify preconditions
     if( ncols() != rhs.nrows() ) {
-      cout << "MMatrix::multiply -- LHS ncols=" << ncols() << " != RHS nrows=" << rhs.nrows() << endl;
-      exit(1);
+      Rprintf("MMatrix::multiply -- LHS ncols=%d != RHS nrows=%d\n", ncols(), rhs.nrows());
+      //exit(1);
+      return;
     }//fi
-    
+
     // then do the multiplication
     out.resize( nrows(), rhs.ncols() );
     for( int r=0; r<nrows(); r++ ) {
@@ -322,7 +327,7 @@ public:
   MMatrix multiplyC( MMatrix rhs ) {
     return( multiply( rhs ) );
   }//MMatrix::multiplyC -- SIMPLE
-  
+
   void multiplySelf( double scalar ) {
     for( int r=0; r<nrows(); r++ )
       for( int c=0; c<ncols(); c++ )
@@ -333,7 +338,7 @@ public:
     out.multiplySelf( scalar );
     return( out );
   }//MMatrix::multiply -- SIMPLE (scalar)
-  
+
   void transpose( MMatrix &out ) {
     out.resize( ncols(), nrows() );
     for( int r=0; r<nrows(); r++ )
@@ -354,12 +359,13 @@ public:
   }//MMatrix::fill -- SIMPLE
 
   MMatrix inv2x2() {
-    if( nrows()!=2 || ncols()!= 2 ) {
-      cout << "MMatrix::inv2x2, not a 2x2 matrix! Dimensions: " << nrows() << ", " << ncols() << endl;
-      exit(1);
-    }
-    
     MMatrix out;
+    if( nrows()!=2 || ncols()!= 2 ) {
+      Rprintf("MMatrix::inv2x2, not a 2x2 matrix! Dimensions: %d, %d\n", nrows(), ncols());
+      //exit(1);
+      return(out);
+    }
+
     out.resize( 2, 2 );
 
     double a=m[0][0], b=m[0][1], c=m[1][0], d=m[1][1];
@@ -373,12 +379,13 @@ public:
   }//MMatrix::inv2x2 - DEBUGGED
 
   MMatrix subMatrix( int rowStart, int rowEnd, int colStart, int colEnd ) {
+    MMatrix out;
     if( rowStart<0 || rowEnd>nrows()-1 || colStart<0 || colEnd>ncols()-1 || rowStart>rowEnd || colStart>colEnd ) {
-      cout << "MMatrix::subMatrix invalid dimensions supplied (rowStart=" << rowStart << ", rowEnd=" << rowEnd << ", colStart=" << colStart << ", colEnd=" << colEnd << "), the dimensions of the matrix are " << nrows() << "x" << ncols() << endl;
-      exit(1);
+      Rprintf("MMatrix::subMatrix invalid dimensions supplied (rowStart=%d, rowEnd=%d, colStart=%d, colEnd=%d), the dimensions of the matrix are %dx%d\n", rowStart, rowEnd, colStart, colEnd, nrows(), ncols());
+      //exit(1);
+      return(out);
     }
 
-    MMatrix out;
     out.resize( rowEnd-rowStart+1, colEnd-colStart+1 );
     for( int r=0; r<out.nrows(); r++ )
       for( int c=0; c<out.ncols(); c++ )
@@ -386,7 +393,7 @@ public:
 
     return( out );
   }//MMatrix subMatrix -- SEMI-SIMPLE
-  
+
   // fills in the matrix easily for use with the debug routine
   void debugFill( int nrows, int ncols ) {
     resize( nrows, ncols );
@@ -394,7 +401,7 @@ public:
       for( int c=0; c<ncols; c++ )
         m[r][c] = r*100 + c;
   }//MMatrix::debugFill -- DEBUGGED
-  
+
   // Tests all major operations
   static void debug() {
     MMatrix m1, m2, m3, out; // we'll add m1 and m2, mult m2 and m3, and transpose m2
@@ -402,19 +409,19 @@ public:
     m2.debugFill( 3, 2 );
     m3.debugFill( 2, 3 );
 
-    cout << "ADDING" << endl << m1.toString() << " AND" << endl << m2.toString() << " YIELDS" << endl;
+    Rprintf("ADDING\n%s\nAND\n%s\nYIELDS\n", m1.toString().c_str(), m2.toString().c_str());
     m1.addSelf( m2 );
-    cout << m1.toString() << endl << endl;
-    
-    cout << "MULTIPLYING" << endl << m2.toString() << "AND" << endl << m3.toString() << "YIELDS" << endl;
+    Rprintf("%s\n\n", m1.toString().c_str());
+
+    Rprintf("MULTIPLYING\n%s\nAND\n%s\nYIELDS\n", m2.toString().c_str(), m3.toString().c_str());
     m2.multiply( m3, out );
-    cout << out.toString() << endl << endl;
+    Rprintf("%s\n\n", out.toString().c_str());
 
-    cout << "TRANSPOSE OF" << endl << m2.toString() << "YIELDS" << endl;
+    Rprintf("TRANSPOSE OF\n%s\nYIELDS\n", m2.toString().c_str());
     m2.transpose( out );
-    cout << out.toString() << endl << endl;
+    Rprintf("%s\n\n", out.toString().c_str());
 
-    cout << "SECOND SET DEBUGGING" << endl << endl;
+    Rprintf("SECOND SET DEBUGGING\n\n");
     double v1[] = {1,2,3,4};
     double v2[] = {101,102,103,104,105,106};
     MMatrix v1m, v2mt, v1v1t, v1v2t;
@@ -422,17 +429,17 @@ public:
     v2mt.createV(v2, 6, true );
     v1v1t.createVVt( v1, 4 );
     v1v2t.createV1V2t( v1, 4, v2, 6 );
-    cout << "V1" << endl << v1m.toString() << endl;
-    cout << "V2" << endl << v2mt.toString() << endl;
-    cout << "V1V1t" << endl << v1v1t.toString() << endl;
-    cout << "v1v2t" << endl << v1v2t.toString() << endl;
+    Rprintf("V1\n%s\n", v1m.toString().c_str());
+    Rprintf("V2\n%s\n", v2mt.toString().c_str());
+    Rprintf("V1V1t\n%s\n", v1v1t.toString().c_str());
+    Rprintf("v1v2t\n%s\n", v1v2t.toString().c_str());
 
     MMatrix tt;
     tt.resize( 2, 2 );
     tt.m[0][0] = 4; tt.m[1][0] = 12; tt.m[1][0] = 13; tt.m[1][1] = 44;
-    cout << "tt" << endl << tt.toString() << endl;
-    cout << "inv(tt)" << endl << tt.inv2x2().toString() << endl;
-    cout << "tt inv(tt)" << endl << tt.multiplyC( tt.inv2x2() ).toString() << endl;
+    Rprintf("tt\n%s\n", tt.toString().c_str());
+    Rprintf("inv(tt)\n%s\n", tt.inv2x2().toString().c_str());
+    Rprintf("tt inv(tt)\n%s\n", tt.multiplyC( tt.inv2x2() ).toString().c_str());
   }//MMatrix::debug -- PASSES
 };//MMatrix -- DEBUGGED!
 
@@ -454,7 +461,7 @@ public:
   /** attaching and detaching **/
   void attach() { GetRNGstate(); }
   void detach() { PutRNGstate(); }
-  
+
   /** Normal routines **/
   // chol is the cholesky decomposition of sigma (from R)
   // p is the dimensions of sigma
@@ -489,7 +496,8 @@ public:
       if( z > -trunc && z < trunc )
         return( z );
     }
-    cout << "Random::rnormTrunc could not ascertain a truncated normal (passed maximal number of tries=" << MAX_TRY << "), continuing anyway..." << endl;
+    //cout << "Random::rnormTrunc could not ascertain a truncated normal (passed maximal number of tries=" << MAX_TRY << "), continuing anyway..." << endl;
+    Rprintf("Random::rnormTrunc count not ascertain a truncated normal (passed maximal number of tries=%d), continuing anyway...\n", MAX_TRY);
     return( z );
   }
 
@@ -524,7 +532,7 @@ public:
         ok = ok && v[i] > -trunc && v[i] < trunc;
       if( ok ) return; // all set!
     }//t
-    cout << "Could not ascertain a truncated normal distribution! Proceeding anyway!!!" << endl;
+    Rprintf("Could not ascertain a truncated normal distribution! Proceeding anyway!!!\n");
   }//Random::mvrnormTrunc -- SEMI-SIMPLE
 
   /** Other random numbers **/
@@ -545,7 +553,7 @@ public:
   // Debugging -- really just the mvrnorm
   void debug() {
     if( cholesky.size() == 0 ) {
-      cout << "You need to call 'setNormalSigma' before calling any multivariate random normal routine." << endl;
+      Rprintf("You need to call 'setNormalSigma' before calling any multivariate random normal routine.\n");
       return;
     }
 
@@ -553,8 +561,8 @@ public:
     vector<double> v;
     mvrnorm( v );
     for( unsigned int i=0; i<v.size(); i++ )
-      cout << v[i] << " ";
-    cout << endl;
+      Rprintf("%d ", v[i]);
+    Rprintf("\n");
 
     // now generate a whole bunch of random numbers, and then print them in such a way that it can be loaded into R, and the correlation matrix checked...
     int N = 500;
@@ -613,12 +621,12 @@ public:
     if( childCovariate.size() < 1 ) return(0);
     return( childCovariate[0].size() );
   }//GFamily::numCovariate -- SIMPLE
-  
+
   vector< vector<int> > genoPerm;
   vector<double> genoPermWeight;
   vector< vector<int> > phenoPerm;
   vector<double> phenoPermWeight;
-  
+
   // GFamily::clear -- SIMPLE
   void clear() {
     parentGeno[0] = parentGeno[1] = GMISS;
@@ -626,13 +634,13 @@ public:
     childTrait.clear();
     childEnvironment.clear();
     childCovariate.clear();
-    
+
     genoPerm.clear();
     genoPermWeight.clear();
     phenoPerm.clear();
     phenoPermWeight.clear();
   }//GFamily::clear -- SIMPLE
-  
+
   // GFamily::toString
   string toString( bool extended=false ) {
     string s;
@@ -648,7 +656,7 @@ public:
       }
       s+=")\n";
     }//i
-    
+
     if( extended ) {
       // prints out the genoPerm (+weight) and phenoPerm (+weight)
       s+=" genoPerm = ";
@@ -666,10 +674,10 @@ public:
       }
       s+="\n";
     }//if(extended)
-    
+
     return( s );
   }//GFamily::toString -- DEBUGGED
-  
+
   // GFamily::normalizeGenoPerm
   void normalizeGenoPerm( bool size=false ) {
     int P = genoPerm.size();
@@ -681,10 +689,10 @@ public:
         genoPermWeight[p] = w;
     }else{
       if( P != (int)genoPermWeight.size() ) {
-        cout << "GFamily::normalizeGenoPerm error, genoPermWeight.size()=" << genoPermWeight.size() << ", but genoPerm.size()=" << genoPerm.size() << "." << endl;
+        Rprintf("GFamily::normalizeGenoPerm error, genoPermWeight.size()=%d, but genoPerm.size()=%d.", genoPermWeight.size(), genoPerm.size());
         return;
       }
-      
+
       double sumw = 0.0;
       for( int p=0; p<P; p++ )
         sumw += genoPermWeight[p];
@@ -692,7 +700,7 @@ public:
         genoPermWeight[p] /= sumw;
     }
   }//GFamily::normalizeGenoPerm -- DEBUGGED
-  
+
   // GFamily::setGenoPerm
   void setGenoPerm() {
     // borrows from Rabinowitz and Laird
@@ -700,19 +708,19 @@ public:
     //perms( childGeno, genoPerm ); // will do some reduntants...? I don't think this is enough
     genoPerm.clear();
     genoPermWeight.clear();
-    
+
     // precursor -- non of the children can have missing genotypes
     for( int c=0; c<numChild(); c++ )
       if( childGeno[c] == GMISS )
-        cout << "GFamily::setGenoPerm() cannot handle when there is missing genotype information in the offspring." << endl;
-    
+        Rprintf("GFamily::setGenoPerm() cannot handle when there is missing genotype information in the offspring.\n");
+
     // first sort the parents
     if( parentGeno[0] > parentGeno[1] ) {
       int temp = parentGeno[0];
       parentGeno[0] = parentGeno[1];
       parentGeno[1] = temp;
     }
-    
+
     if( parentGeno[0] != GMISS ) {
       // parents are both present (remember, sorted, and GMISS = -1)
 
@@ -723,7 +731,7 @@ public:
       }else{
         vector<int> g;    // possible genotypes
         vector<double> w; // weight of the genotypes
-        
+
         if( parentGeno[0]==1 && parentGeno[1]==1 ) {
           g.push_back( 0 ); w.push_back( 0.25 );
           g.push_back( 1 ); w.push_back( 0.5  );
@@ -735,7 +743,7 @@ public:
           g.push_back( 1 ); w.push_back( 0.5 );
           g.push_back( 2 ); w.push_back( 0.5 );
         }else{
-          cout << "GFamily::setGenoPerm() family with parents fell outside of all cases, parentGeno[0]=" << parentGeno[0] << ", parentGeno[1]=" << parentGeno[1] << endl;
+          Rprintf("GFamily::setGenoPerm() family with parents fell outside of all cases, parentGeno[0]=%d, parentGeno[1]=%d\n", parentGeno[1], parentGeno[0]);
         }
 
         for( int c=0; c<numChild(); c++ )
@@ -774,11 +782,11 @@ public:
         // first randomly assign
         vector<int> g;    // possible genotypes
         vector<double> w; // weight of the genotypes
-        
+
         g.push_back( 0 ); w.push_back( 0.25 );
         g.push_back( 1 ); w.push_back( 0.5  );
         g.push_back( 2 ); w.push_back( 0.25 );
-        
+
         vector< vector<int> > genoPermRaw; // contains some that will not pass
         vector<double> genoPermWeightRaw; // contains some that will not pass
         for( int c=0; c<numChild(); c++ )
@@ -826,10 +834,10 @@ public:
         phenoPermWeight[p] = w;
     }else{
       if( P != (int)phenoPermWeight.size() ) {
-        cout << "GFamily::normalizePhenoPerm error, phenoPermWeight.size()=" << phenoPermWeight.size() << ", but phenoPerm.size()=" << phenoPerm.size() << endl;
+        Rprintf("GFamily::normalizePhenoPerm error, phenoPermWeight.size()=%d, but phenoPerm.size()=%d\n", phenoPermWeight.size(), phenoPerm.size());
         return;
       }
-      
+
       // really need to normalize
       double sumw = 0.0;
       for( int p=0; p<P; p++ )
@@ -838,17 +846,17 @@ public:
         phenoPermWeight[p] /= sumw;
     }
   }//GFamily::normalizePhenoPerm -- DEBUGGED
-  
+
   // GFamily::setPhenoPerm
   void setPhenoPerm() {
     // Precursor -- none of the phenotypes can be missing
     for( int c=0; c<numChild(); c++ )
       if( childTrait[c] == PMISS )
-        cout << "GFamily::setPhenoPerm() cannot handle when there is missing phenotype information in the offspring." << endl;
+        Rprintf("GFamily::setPhenoPerm() cannot handle when there is missing phenotype information in the offspring.\n");
 
     phenoPerm.clear();
     phenoPermWeight.clear();
-    
+
     // creats set of all possible phenotype permutations
     //perms( childTrait, phenoPerm );
     //int P = phenoPerm.size();
@@ -858,7 +866,7 @@ public:
 
     // can be done much more efficiently...
     // except what happens with missing phenotypes here? And what happens with missing genotypes in our other code?
-    
+
     int numAffected = 0;
     for( int j=0; j<numChild(); j++ )
       numAffected += childTrait[j];
@@ -883,23 +891,23 @@ public:
     phenoPerm.push_back( childTrait );
     phenoPermWeight.push_back( 1 );
   }//GFamily::setPhenoPermObserved -- SIMPLE
-  
+
   // GFamily::debugPermAddFamily
   void debugPermAddFamily( int pa, int pb, // the parents genotypes
                            int n0, int n1, int n2, // number of each offspring genotype
                            int a0, int a1, int a2, // affection of each offspring genotype
                            bool test=true ) {
     if( a0>n0 || a1>n1 || a2>n2 || a0<0 || a1<0 || a2<0 )
-      cout << "GFamily::debugPermAddFamily invalid input." << endl;
-    
+      Rprintf("GFamily::debugPermAddFamily invalid input.");
+
     clear(); // make sure everything is cleared first!
-    
+
     parentGeno[0] = pa;
     parentGeno[1] = pb;
 
     int n[3] = {n0, n1, n2};
     int a[3] = {a0, a1, a2};
-    
+
     for( int j=0; j<3; j++ ) {
       for( int i=0; i<n[j]; i++ ) {
         childGeno.push_back(j);
@@ -915,10 +923,10 @@ public:
     if( test ) {
       setGenoPerm();
       setPhenoPerm();
-      cout << toString(true) << endl;
+      Rprintf("%s\n", toString(true).c_str());
     }
   }//GFamily::debugPermAddFamily -- DEBUGGED
-  
+
 };//GFamily
 
 
@@ -930,7 +938,7 @@ public:
   vector<GFamily> families;
   enum STRATEGY { GENO, PHENO, ADAPTIVE };
   STRATEGY strategy;
-  
+
   int numFamilies() { return( families.size() ); }
   void resize( unsigned int size ) { families.resize( size ); }
 
@@ -943,7 +951,7 @@ public:
   // for the coding of the parameters...
   static const int X0 = 2;
   static const int X1 = 1;
-  
+
   // GPed::clear
   // clear out all families
   void clear(){
@@ -991,20 +999,22 @@ public:
       }
       break;
     default:
-      cout << "Strategy " << (int)strategy << " has not been enumerated. Likely that 'strategy' was not set before calling, or, far worse, memory is being overwritten." << endl;
-      exit(1);
+      Rprintf("Strategy %d has not been enumerated. Likely that 'strategy' was not set before calling, or, far worse, memory is being overwritten.\n", (int)strategy);
+      //exit(1);
+      return;
       break;
     }
 
     // make sure everyone has something
     for( int i=0; i<numFamilies(); i++ ) {
       if( families[i].genoPerm.size()==0 || families[i].phenoPerm.size()==0 ) {
-        cout << "genoPerm or phenoPerm left completely empty - should at least have the observed in it." << endl;
-        exit(1);
+        Rprintf("genoPerm or phenoPerm left completely empty - should at least have the observed in it.\n");
+        //exit(1);
+        return;
       }
     }
   }//GPed::fillPerms -- SIMPLE
-  
+
   // GPed::setStrategy
   void setStrategy( char *strat ) {
     string strategyStr = strat;
@@ -1017,8 +1027,9 @@ public:
     }else if( strategyStr == "adaptive" ) {
       strategy = ADAPTIVE;
     }else{
-      cout << "GPed::setStrategy not understood, should be 'geno', 'pheno', or 'adaptive'; you supplied '" << strat << "'." << endl;
-      exit(1);
+      Rprintf("GPed::setStrategy not understood, should be 'geno', 'pheno', or 'adaptive'; you supplied ' %d.\n", strat);
+      //exit(1);
+      return;
     }
 
     // AND CALL fillPerms!
@@ -1032,8 +1043,9 @@ public:
     // beta = bge (2), bg (2), be (1), bc (J) [[b0 is not modelled]]
     if( betaLength < 4 ) {
       // verify this precondition
-      cout << "GPed::estEq(...) betaLength=" << betaLength << ", but it must be at least of length 4." << endl;
-      exit(1);
+      Rprintf("GPed::estEq(...) betaLength=%d, but it must be at least of length 4.\n", betaLength);
+      //exit(1);
+      return;
     }
 
     ui.resize( numFamilies(), betaLength );
@@ -1041,8 +1053,10 @@ public:
 
     // loop over families
     for( int i=0; i<numFamilies(); i++ ) {
-      double m[betaLength]; // i.e. the observed
-      double numSum[betaLength];
+      //double m[betaLength]; // i.e. the observed
+      //double numSum[betaLength];
+      vector<double> m; m.resize(betaLength);
+      vector<double> numSum; numSum.resize(betaLength);
       double denSum = 0.0; // scalar
       for( int b=0; b<betaLength; b++ )
         m[b] = numSum[b] = 0.0;
@@ -1066,14 +1080,15 @@ public:
               m[c] += families[i].childCovariate[j][c-5];
         }
       }
-      
+
       // 2) Compute the expected
       // loop over geno perms
       for( unsigned int gp=0; gp<families[i].genoPerm.size(); gp++ ) {
         // loop over pheno perms
         for( unsigned int pp=0; pp<families[i].phenoPerm.size(); pp++ ) {
           // add the current to the expected sum
-          double mStar[betaLength];
+          //double mStar[betaLength];
+          vector<double> mStar; mStar.resize(betaLength);
           for( int b=0; b<betaLength; b++ )
             mStar[b] = 0.0;
           // loop over individuals
@@ -1108,7 +1123,7 @@ public:
       }//gp
 
       //cout << "denSum[" << i << "]=" << denSum << endl;
-      
+
       for( int b=0; b<betaLength; b++ )
         ui.m[i][b] += m[b] - numSum[b] / denSum;
     }//i
@@ -1160,14 +1175,15 @@ public:
       Ai10.fill( 0.0 );
       Ai01t.fill( 0.0 );
       Ai02t.fill(0.0 );
-      
+
       // 2) Compute the expected
       // loop over geno perms
       for( unsigned int gp=0; gp<families[i].genoPerm.size(); gp++ ) {
         // loop over pheno perms
         for( unsigned int pp=0; pp<families[i].phenoPerm.size(); pp++ ) {
           // add the current to the expected sum
-          double mStar[betaLength];
+          //double mStar[betaLength];
+          vector<double> mStar; mStar.resize(betaLength);
           for( int b=0; b<betaLength; b++ )
             mStar[b] = 0.0;
           // loop over individuals
@@ -1187,7 +1203,7 @@ public:
                   mStar[c] += families[i].childCovariate[j][c-5];
             }//fi
           }//j
-          
+
           double weight = families[i].genoPermWeight[gp] * families[i].phenoPermWeight[pp];
 
           double expStuff = 0.0;
@@ -1196,12 +1212,12 @@ public:
           expStuff = exp( expStuff ) * weight;
 
           MMatrix xz;
-          xz.createV( mStar, 2 );
+          xz.createV( (double *)mStar.data(), 2 );
           MMatrix m;
           m.createV( &mStar[2], M );
           MMatrix m_mt;
           m_mt.createVVt( &mStar[2], M );
-          
+
           Ai00 += expStuff;
           Ai11.addSelfC( xz.multiplyC( m.transpose() ).multiply( expStuff ) );
           Ai10.addSelfC( xz.multiply( expStuff ) );
@@ -1215,7 +1231,7 @@ public:
       dbge.addSelfC( Ai11.multiply(Ai00).subtractC( Ai10.multiplyC(Ai01t.transpose()) ).multiply( -1.0/Ai00/Ai00 ) );
       dbnuis.addSelfC( Ai02t.multiply(Ai00).subtractC( Ai01t.multiplyC( Ai01t.transpose() ) ).multiply( -1/Ai00/Ai00 ) );
     }// i
-    
+
     // get the ui matrix
     estEq( beta, betaLength, u );
 
@@ -1266,7 +1282,7 @@ public:
       sumwi.addSelfC( newwi );
       sumwiwit.addSelfC( newwi.multiplyC( newwi.transpose() ) );
     }*/
-    
+
 
     // Number of informative families
     *numInf = 0;
@@ -1296,8 +1312,9 @@ public:
     // beta = bge (2), bg (2), be (1), bc (J) [[b0 is not modelled]]
     if( betaLength < 3 ) {
       // verify this precondition
-      cout << "GPed::estEq_A(...) betaLength=" << betaLength << ", but it must be at least of length 3." << endl;
-      exit(1);
+      Rprintf("GPed::estEq_A(...) betaLength=%d, but it must be at least of length 3.\n", betaLength);
+      //exit(1);
+      return;
     }
 
     ui.resize( numFamilies(), betaLength );
@@ -1305,8 +1322,10 @@ public:
 
     // loop over families
     for( int i=0; i<numFamilies(); i++ ) {
-      double m[betaLength]; // i.e. the observed
-      double numSum[betaLength];
+      //double m[betaLength]; // i.e. the observed
+      //double numSum[betaLength];
+      vector<double> m; m.resize(betaLength);
+      vector<double> numSum; numSum.resize(betaLength);
       double denSum = 0.0; // scalar
       for( int b=0; b<betaLength; b++ )
         m[b] = numSum[b] = 0.0;
@@ -1330,14 +1349,15 @@ public:
               m[c] += families[i].childCovariate[j][c-4];
         }
       }
-     
+
       // 2) Compute the expected
       // loop over geno perms
       for( unsigned int gp=0; gp<families[i].genoPerm.size(); gp++ ) {
         // loop over pheno perms
         for( unsigned int pp=0; pp<families[i].phenoPerm.size(); pp++ ) {
           // add the current to the expected sum
-          double mStar[betaLength];
+          //double mStar[betaLength];
+          vector<double> mStar; mStar.resize(betaLength);
           for( int b=0; b<betaLength; b++ )
             mStar[b] = 0.0;
           // loop over individuals
@@ -1369,7 +1389,7 @@ public:
           denSum += expStuff;
         }//pp
       }//gp
-      
+
       for( int b=0; b<betaLength; b++ )
         ui.m[i][b] += m[b] - numSum[b] / denSum;
     }//i
@@ -1397,14 +1417,15 @@ public:
       Ai10.fill(  0.0 );
       Ai01t.fill( 0.0 );
       Ai02t.fill( 0.0 );
-      
+
       // 2) Compute the expected
       // loop over geno perms
       for( unsigned int gp=0; gp<families[i].genoPerm.size(); gp++ ) {
         // loop over pheno perms
         for( unsigned int pp=0; pp<families[i].phenoPerm.size(); pp++ ) {
           // add the current to the expected sum
-          double mStar[betaLength];
+          //double mStar[betaLength];
+          vector<double> mStar; mStar.resize(betaLength);
           for( int b=0; b<betaLength; b++ )
             mStar[b] = 0.0;
 
@@ -1425,7 +1446,7 @@ public:
                   mStar[c] += families[i].childCovariate[j][c-4];
             }//fi
           }//j
-          
+
           double weight = families[i].genoPermWeight[gp] * families[i].phenoPermWeight[pp];
 
           double expStuff = 0.0;
@@ -1434,12 +1455,12 @@ public:
           expStuff = exp( expStuff ) * weight;
 
           MMatrix xz;
-          xz.createV( mStar, 1 );
+          xz.createV( (double *)mStar.data(), 1 );
           MMatrix m;
           m.createV( &mStar[1], M );
           MMatrix m_mt;
           m_mt.createVVt( &mStar[1], M );
-          
+
           Ai00 += expStuff;
           Ai11.addSelfC( xz.multiplyC( m.transpose() ).multiply( expStuff ) );
           Ai10.addSelfC( xz.multiply( expStuff ) );
@@ -1453,7 +1474,7 @@ public:
       dbge.addSelfC( Ai11.multiply(Ai00).subtractC( Ai10.multiplyC(Ai01t.transpose()) ).multiply( -1.0/Ai00/Ai00 ) );
       dbnuis.addSelfC( Ai02t.multiply(Ai00).subtractC( Ai01t.multiplyC( Ai01t.transpose() ) ).multiply( -1/Ai00/Ai00 ) );
     }// i
-    
+
     // get the ui matrix
     estEq_A( beta, betaLength, u );
 
@@ -1474,7 +1495,7 @@ public:
       for( int c=0; c<M; c++ )
         dbnuisInv.m[r][c] = dbnuis_inv[ r + c*M ];
     //cout << "statCompute_A dbnuisInv" << endl << dbnuisInv.toString() << endl;
-    
+
     MMatrix uge = u.subMatrix( 0, numFamilies()-1, 0, 0 ); // rowstart, rowEnd, colStart, colEnd
     MMatrix ug  = u.subMatrix( 0, numFamilies()-1, 1, M+1-1 );
     MMatrix w = uge.subtractC( dbge.multiplyC( dbnuisInv ).multiplyC( ug.transpose() ).transpose() );
@@ -1502,13 +1523,13 @@ public:
       *chisq1df = sumwi * sumwi / sumwiwit;
     }
   }//GPed::statCompute
-  
+
   // Setup from an external dataset (i.e. the one we want to analyze)
   // GPed::set
   void set( int *pid, int *id, int *idfath, int *idmoth,
             int *geno, int *trait, double *env, int n ) {
     families.clear();
-    
+
     int start = 0;
     vector<int> parents;
     vector<int> children;
@@ -1530,17 +1551,17 @@ public:
         if( children.size() > 0 && !( children.size()==1 && parents.size()<2 ) ) {
           // push into gped structure
           GFamily newFam;
-          
+
           newFam.parentGeno[0] = newFam.parentGeno[1] = GFamily::GMISS;
           for( unsigned int p=0; p<parents.size(); p++ )
             newFam.parentGeno[p] = geno[ parents[p] ];
-          
+
           for( unsigned int c=0; c<children.size(); c++ ) {
             newFam.childGeno.push_back( geno[ children[c] ] );
             newFam.childTrait.push_back( trait[ children[c] ] );
             newFam.childEnvironment.push_back( env[ children[c] ] );
           }//c
-          
+
           families.push_back( newFam );
         }//fi
 
@@ -1579,11 +1600,11 @@ public:
         if( children.size() > 0 && !( children.size()==1 && parents.size()<2 ) ) {
           // push into gped structure
           GFamily newFam;
-          
+
           newFam.parentGeno[0] = newFam.parentGeno[1] = GFamily::GMISS;
           for( unsigned int p=0; p<parents.size(); p++ )
             newFam.parentGeno[p] = geno[ parents[p] ];
-          
+
           for( unsigned int c=0; c<children.size(); c++ ) {
             newFam.childGeno.push_back( geno[ children[c] ] );
             newFam.childTrait.push_back( trait[ children[c] ] );
@@ -1596,7 +1617,7 @@ public:
               newFam.childCovariate.push_back( cCov );
             }
           }//c
-          
+
           families.push_back( newFam );
         }//fi
 
@@ -1620,7 +1641,7 @@ GPed gped; // GPed global object used to communicate with R
 extern "C" {
   void cpp_gped_clear() { gped.clear(); }
   void cpp_gped_print( int *extended ) {
-    cout << gped.toString( *extended != 0 ) << endl;
+    Rprintf("%s\n", gped.toString( *extended != 0 ).c_str());
   }
   void cpp_gped_numCovariates( int *ret ) { *ret = gped.numCovariates(); }
   void cpp_gped_setStrategy( char **strat ) { gped.setStrategy( *strat ); }
@@ -1663,7 +1684,7 @@ public:
   enum LINK { LOG, LOGISTIC }; // see character strings in toString() that correspond
   enum ENV { DICHOTOMOUS, NORMAL }; // ""
   enum GENETIC { ADDITIVE, DOMINANT, RECESSIVE }; // ""
-  
+
   int numParents, numOffspring, numFam;
   int minAffected, maxAffected;
   double afreq; GENETIC geneticModel;
@@ -1696,7 +1717,7 @@ public:
     const char* LINK_STR[] = {"log","logistic"};
     const char* ENV_STR[] = {"dichotomous","normal"};
     const char* GENETIC_STR[] = {"additive","dominant","recessive"};
-    
+
     // creates a string of this object (mostly just for debug purposes)
     string str;
     str = "numParents="+d2s(numParents) + " numOffspring="+d2s(numOffspring)+" numFam="+d2s(numFam) + "\n";
@@ -1736,7 +1757,7 @@ public:
     //vector<int> curPerm;
     //for( int naff=minAffected; naff<=maxAffected; naff++ )
     //  perm2categories( perm, curPerm, 0, naff, 1, 0, numOffspring );
-    
+
     // proband _must_ be affected, so we need to alter the above just a little...?
     perm.clear();
 
@@ -1746,7 +1767,7 @@ public:
     curPerm[0] = 1; // proband must be affected
     for( unsigned int j=1; j<curPerm.size(); j++ )
       curPerm[j] = 0;
-    
+
     for( int naff=minAffected-1; naff<=maxAffected-1; naff++ ) {
       if( naff==0 ) { // will only happen potentially on the first one, so ok
         // then need to just push curPerm on there
@@ -1767,8 +1788,8 @@ public:
     }else if( geneticModel==RECESSIVE ) {
       return( g == 2 );
     }
-    cout << "GESimSub::xcode not ADDITIVE, DOMINANT, or RECESSIVE." << endl;
-    exit(1);
+    Rprintf("GESimSub::xcode not ADDITIVE, DOMINANT, or RECESSIVE.\n");
+    //exit(1);
     return( -999 );
   }//GESimSub::xcode -- SIMPLE
 
@@ -1781,8 +1802,8 @@ public:
     }else if( link==LOGISTIC ) {
       return( exp( mu ) / ( 1 + exp( mu ) ) );
     }
-    cout << "GESimSub::pd link function incorrect(" << link << ")." << endl;
-    exit( 1 );
+    Rprintf("GESimSub::pd link function incorrect(%d).\n", link);
+    //exit( 1 );
     return( 0 );
   }//GESimSub::pd -- SIMPLE
   double pd_cov( int g, double z, double cov ) {
@@ -1793,8 +1814,8 @@ public:
     }else if( link==LOGISTIC ) {
       return( exp( mu ) / ( 1 + exp( mu ) ) );
     }
-    cout << "GESimSub::pd link function incorrect(" << link << ")." << endl;
-    exit( 1 );
+    Rprintf("GESimSub::pd link function incorrect(%d).\n", link);
+    //exit( 1 );
     return( 0 );
   }//GESimSub::pd -- SIMPLE
 
@@ -1816,21 +1837,21 @@ public:
       pr[2] = pd( 2, -envCutoff );
       pr[3] = pd( 0, -envCutoff );
     }else{
-      cout << "GESimSub::setImportanceSampling, env type does not exist." << endl;
+      Rprintf("GESimSub::setImportanceSampling, env type does not exist.\n");
     }
 
     // compute the max (for affected) / min (for unaffected) of an offspring
     double mmax = pr[0];
     double mmin = pr[0];
-    
+
     for( int i=1; i<4; i++ ) {
       if( pr[i] < mmin )
         mmin = pr[i];
-      
+
       if( pr[i] > mmax )
         mmax = pr[i];
     }
-    
+
     // now compute the maximum possible under the ascertainment scheme
     double mmax_pd = 0;
     for( unsigned int p=0; p<perm.size(); p++ ) {
@@ -1843,12 +1864,12 @@ public:
           mmax_pdi *= (1-mmin);
         }
       }//j
-      
+
       //if( mmax_pdi > mmax_pd )
       //  mmax_pd = mmax_pdi;
       mmax_pd += mmax_pdi;
     }//p
-    
+
     IMPORTANCE_MAX = mmax_pd;
   }//GESimSub::setImportanceSampling --
 
@@ -1862,7 +1883,7 @@ public:
             double betaCov, char* distCov, // NEW
             double *phenoCor, double phenoCutoff,
             double markerCor, double markerAfreq,
-            double phenoOR ) { 
+            double phenoOR ) {
     // save all of the arguments
     this->numParents = numParents;
     this->numOffspring = numOffspring;
@@ -1880,8 +1901,9 @@ public:
     }else if( geneticModelString == "recessive" ) {
       this->geneticModel = RECESSIVE;
     }else{
-      cout << "GESimSub genetic model must be 'additive', 'dominant', or 'recessive'. You supplied '" << geneticModel << "'." << endl;
-      exit(1);
+      Rprintf("GESimSub genetic model must be 'additive', 'dominant', or 'recessive'. You supplied '%d'.\n", geneticModel);
+      //exit(1);
+      return;
     }
 
     string linkString = link;
@@ -1890,8 +1912,9 @@ public:
     }else if( linkString=="logit" || linkString == "logistic" ) {
       this->link = LOGISTIC;
     }else{
-      cout << "GESimSub::set link function must be 'log' or 'logit' ('logistic' also accepted); you supplied '" << link << "'." << endl;
-      exit(0);
+      Rprintf("GESimSub::set link function must be 'log' or 'logit' ('logistic' also accepted); you supplied '%d'.\n", link);
+      //exit(0);
+      return;
     }
 
     this->beta.resize( betaLength );
@@ -1917,8 +1940,9 @@ public:
     }else if( distCovString == "normal" ) {
       this->distCov = NORMAL;
     }else{
-      cout << "GESimSub::set distCov must be either 'normal' or 'dichotomous', not '" << distCovString << "'" << endl;
-      exit(1);
+      Rprintf("GESimSub::set distCov must be either 'normal' or 'dichotomous', not '%s'.\n", distCovString.c_str());
+      //exit(1);
+      return;
     }
 
     this->phenoCutoff = phenoCutoff;
@@ -1942,7 +1966,7 @@ public:
     int MAX_TRY = 10000;
     for( int t=0; t<MAX_TRY; t++ ) {
       fam.clear();
-      
+
       // draw up the parents from allele frequencies
       fam.parentGeno[0] = (int)(r.runif()<afreq) + (int)(r.runif()<afreq);
       fam.parentGeno[1] = (int)(r.runif()<afreq) + (int)(r.runif()<afreq);
@@ -1959,7 +1983,7 @@ public:
         }
         fam.childGeno.push_back( childGeno );
       }
-      
+
       // draw up the correlated? environment (childEnvironment)
       if( env==DICHOTOMOUS ) {
         r.mvrnorm( fam.childEnvironment );
@@ -1974,14 +1998,16 @@ public:
       }
 
       // compute the probability of diseased of each offspring
-      double py[ numOffspring ];
+      //double py[ numOffspring ];
+      vector<double> py; py.resize(numOffspring);
       for( int j=0; j<numOffspring; j++ )
         py[j] = pd( fam.childGeno[j], fam.childEnvironment[j] );
-      
+
       // for each possible phenotype combination, compute P( Y | ... )
       // sum these, the result is P( ascertainment criterion | ... )
       double sumpy = 0.0;
-      double prd[ perm.size() ];
+      //double prd[ perm.size() ];
+      vector<double> prd; prd.resize(perm.size());
       for( unsigned int p=0; p<perm.size(); p++ ) {
         prd[p] = 1.0;
         for( unsigned int j=0; j<perm[p].size(); j++ ) {
@@ -1993,11 +2019,12 @@ public:
         }
         sumpy += prd[p];
       }
-      
+
       // divide by importance sampling max, and keep the result if a random uniform is less than this result, otherwise repeat
       if( sumpy/IMPORTANCE_MAX > 1.00001 ) { // allow for a little numerical error to perhaps propagate through here, I guess, although I don't really expect it to?
-        cout << "Importance sampling mistake -- one of the probabilities goes above 1 (" << sumpy/IMPORTANCE_MAX << ")" << endl;
-        exit(1);
+        Rprintf("Importance sampling mistake -- one of the probabilities goes above 1 (%f)\n", sumpy/IMPORTANCE_MAX);
+        //exit(1);
+        return;
       }
       if( r.runif() < sumpy/IMPORTANCE_MAX ) {
         // if found a good one then randomly choose the phenotype
@@ -2027,8 +2054,8 @@ public:
     }// t
 
     // past the number of tries
-    cout << "GESimSub::draw() exceeded maximum possible tries to get a good family, terminating." << endl;
-    exit(1);
+    Rprintf("GESimSub::draw() exceeded maximum possible tries to get a good family, terminating.\n");
+    //exit(1);
   }//GESimSub::draw -- SEMI-DEBUGGED
 
   void inefficientDraw( GFamily &fam ) {
@@ -2052,7 +2079,7 @@ public:
         }
         fam.childGeno.push_back( childGeno );
       }
-      
+
       // draw up the correlated? environment (childEnvironment)
       if( env==DICHOTOMOUS ) {
         r.mvrnorm( fam.childEnvironment );
@@ -2086,8 +2113,8 @@ public:
     }
 
     // hit the maximum number of tries (i.e. it's just going to be way to inefficient)
-    cout << "GeSimSub::inefficientDraw() hit maximum number of tries." << endl;
-    exit(0);
+    Rprintf("GeSimSub::inefficientDraw() hit maximum number of tries.\n");
+    //exit(0);
   }
 
   void inefficientDraw_missedCovariate( GFamily &fam ) {
@@ -2114,7 +2141,7 @@ public:
         }
         fam.childGeno.push_back( childGeno );
       }
-      
+
       // draw up the correlated? environment (childEnvironment)
       if( env==DICHOTOMOUS ) {
         r.mvrnorm( fam.childEnvironment );
@@ -2125,10 +2152,12 @@ public:
       }
 
       // draw up the correlated? missing covariate [[NEW]]
-      double missingCovariate[numOffspring];
+      //double missingCovariate[numOffspring];
+      vector<double> missingCovariate; missingCovariate.resize(numOffspring);
       if( distCov==DICHOTOMOUS ) {
-        cout << "missing dichotomous covariate not yet supported" << endl;
-        exit(1);
+        Rprintf("missing dichotomous covariate not yet supported\n");
+        //exit(1);
+        return;
       }else if( distCov==NORMAL ) {
         for( int j=0; j<numOffspring; j++ )
           missingCovariate[j] = r.rnormTrunc(1.64);
@@ -2154,12 +2183,12 @@ public:
     }
 
     // hit the maximum number of tries (i.e. it's just going to be way to inefficient)
-    cout << "GeSimSub::inefficientDraw() hit maximum number of tries." << endl;
-    exit(0);
+    Rprintf("GeSimSub::inefficientDraw() hit maximum number of tries.\n");
+    //exit(0);
   }
   void inefficientDraw_phenoCor( GFamily &fam ) {
     //cout << "PHENOTYPIC CORRELATION " << "phenoCor=" << phenoCor << "phenoCutoff=" << phenoCutoff << endl; exit(1);
-    
+
     int MAX_TRY = 100000;
     for( int t=0; t<MAX_TRY; t++ ) {
       fam.clear();
@@ -2180,7 +2209,7 @@ public:
         }
         fam.childGeno.push_back( childGeno );
       }
-      
+
       // draw up the correlated? environment (childEnvironment)
       if( env==DICHOTOMOUS ) {
         r.mvrnorm( fam.childEnvironment );
@@ -2202,7 +2231,7 @@ public:
         traitTemp[j] += beta[1]*x*z + beta[2]*x + beta[3]*z;
         fam.childTrait[j] = (int)(traitTemp[j] >= phenoCutoff);
       }
-      
+
       // does Y satisfy the ascertainment criterion?
       if( fam.childTrait[0] != 1 )
         continue; // first child must be affected
@@ -2218,9 +2247,9 @@ public:
     }
 
     // hit the maximum number of tries (i.e. it's just going to be way to inefficient)
-    cout << "GeSimSub::inefficientDraw_phenoCor() hit maximum number of tries." << endl;
-    exit(0);
-    
+    Rprintf("GeSimSub::inefficientDraw_phenoCor() hit maximum number of tries.\n");
+    //exit(0);
+
   }
   void inefficientDraw_markerCor( GFamily &fam ) {
     //cout << "MARKER CORRELATION markerCor=" << markerCor << " markerAfreq=" << markerAfreq << endl; exit(1);
@@ -2228,7 +2257,7 @@ public:
     int MAX_TRY = 100000;
 
     double afreqMarker = markerAfreq; // ah, well, then...
-    
+
     // preliminary calculations
     double pmc[2][2];
     double d = sqrt( markerCor * afreq * (1-afreq) * afreqMarker * (1-afreqMarker) );
@@ -2240,8 +2269,9 @@ public:
     for( int a=0; a<2; a++ ) {
       for( int b=0; b<2; b++ ) {
         if( pmc[a][b] < 0 || pmc[a][b] > 1 ) {
-          cout << "Marker correlation too high, cannot be a distribution. Reduce markerCorrelation." << endl;
-          exit(1);
+          Rprintf("Marker correlation too high, cannot be a distribution. Reduce markerCorrelation.\n");
+          //exit(1);
+          return;
         }
       }
     }
@@ -2268,10 +2298,15 @@ public:
         fam.parentGeno[0] = parentsM[0] + parentsM[1];
         fam.parentGeno[1] = parentsM[2] + parentsM[3];
       }
-      
+
       // draw up the children using Mendel's laws
-      int childM1[numOffspring], childC1[numOffspring];
-      int childM2[numOffspring], childC2[numOffspring];
+      //int childM1[numOffspring], childC1[numOffspring];
+      //int childM2[numOffspring], childC2[numOffspring];
+      vector<double> childM1, childC1, childM2, childC2;
+      childM1.resize(numOffspring);
+      childC1.resize(numOffspring);
+      childM2.resize(numOffspring);
+      childC2.resize(numOffspring);
       fam.childGeno.resize(numOffspring);
       for( int j=0; j<numOffspring; j++ ) {
         if( r.runif() < 0.5 ) {
@@ -2281,7 +2316,7 @@ public:
           childM1[j] = parentsM[1];
           childC1[j] = parentsC[1];
         }
-        
+
         if( r.runif() < 0.5 ) {
           childM2[j] = parentsM[2];
           childC2[j] = parentsC[2];
@@ -2292,7 +2327,7 @@ public:
 
         fam.childGeno[j] = childM1[j] + childM2[j];
       }
-      
+
       // draw up the correlated? environment
       if( env==DICHOTOMOUS ) {
         r.mvrnorm( fam.childEnvironment );
@@ -2321,10 +2356,10 @@ public:
         return; // SUCCESS!
       }
     }
-    
+
     // hit the maximum number of tries (i.e. it's just going to be way to inefficient)
-    cout << "GeSimSub::inefficientDraw() hit maximum number of tries." << endl;
-    exit(0);
+    Rprintf("GeSimSub::inefficientDraw() hit maximum number of tries.\n");
+    //exit(0);
   }//
 
   double solveORc( double w, double y, double p ) {
@@ -2337,7 +2372,7 @@ public:
 
     double x = 1-w;
     double z = 1-y;
-    
+
     double A = p - 1;
     double B = z - w - x*p - z*p;
     double C = p*x*z;
@@ -2349,17 +2384,18 @@ public:
 
     return( c );
   }//originally debugged in R Code
-  
+
   void inefficientDraw_phenoOR( GFamily &fam ) {
     //cout << "phenoOR = " << phenoOR << endl;
     //exit(1);
-    
+
     int MAX_TRY = 100000;
     if( numOffspring!=2 || minAffected!=1 || maxAffected!=1 ) {
-      cout << "Currently phenoOR only works for numOffspring==2, minAffected==1, maxAffected==1." << endl;
-      exit(1);
+      Rprintf("Currently phenoOR only works for numOffspring==2, minAffected==1, maxAffected==1.\n");
+      //exit(1);
+      return;
     }
-    
+
     for( int t=0; t<MAX_TRY; t++ ) {
       fam.clear();
 
@@ -2379,7 +2415,7 @@ public:
         }
         fam.childGeno.push_back( childGeno );
       }
-      
+
       // draw up the correlated? environment (childEnvironment)
       if( env==DICHOTOMOUS ) {
         r.mvrnorm( fam.childEnvironment );
@@ -2405,10 +2441,10 @@ public:
     }
 
     // hit the maximum number of tries (i.e. it's just going to be way to inefficient)
-    cout << "GeSimSub::inefficientDraw() hit maximum number of tries." << endl;
-    exit(0);
+    Rprintf("GeSimSub::inefficientDraw() hit maximum number of tries.\n");
+    //exit(0);
   }
-  
+
 
   // GeSimSub::draw
   void draw() {
@@ -2445,19 +2481,19 @@ public:
 class GESim {
 public:
   vector<GESimSub> simSub;
-  
+
   // Completely clears it out
   void clear() {
     simSub.clear();
   }//GEsim::clear -- SIMPLE
-  
+
   string toString() {
     string str;
     for( unsigned int s=0; s<simSub.size(); s++ )
       str += simSub[s].toString() + "\n";
     return( str );
   }//GESim::toString -- SIMPLE
-  
+
   //
   // First set, before things are simulated
   // copied from GESimSub
@@ -2470,7 +2506,7 @@ public:
             double betaCov, char* distCov, // NEW
             double *phenoCor, double phenoCutoff,
             double markerCor, double markerAfreq,
-            double phenoOR ) { 
+            double phenoOR ) {
     GESimSub simSubNew;
     simSubNew.set( numParents, numOffspring, numFam,
                    minAffected, maxAffected,
@@ -2484,12 +2520,12 @@ public:
                    phenoOR );
     simSub.push_back( simSubNew );
   }//GESim::set -- SIMPLE
-  
+
   // for simulations
   void draw() {
     // empty out the gped
     gped.clear();
-    
+
     // push on each type of simulation (i.e. could be a mixture of 50/50 trios and sibpairs...)
     for( unsigned int s=0; s<simSub.size(); s++ )
       simSub[s].draw();
@@ -2506,7 +2542,7 @@ public:
 GESim gesim; // GESim global object - used to communicate with R
 extern "C" {
   void cpp_gesim_print() {
-    cout << gesim.toString() << endl;
+    Rprintf("%s\n", gesim.toString().c_str());
   }
   // set up for data generation
   // multiple calls allow for multiple different family designs
@@ -2520,7 +2556,7 @@ extern "C" {
                       double* betaCov, char** distCov, // NEW
                       double* phenoCor, double* phenoCutoff,
                       double* markerCor, double *markerAfreq,
-                      double* phenoOR ) { 
+                      double* phenoOR ) {
     gesim.set( *numParents, *numOffspring, *numFam,
                *minAffected, *maxAffected,
                *afreq, *geneticModel,
@@ -2559,7 +2595,7 @@ int main() {
   vector<int> permAddi;
   permAddi.push_back( 1 );
   permAddi.push_back( 2 );
-  
+
   fanperms( permAddi, perm );
   permAddi.push_back( 3 );
   fanperms( permAddi, perm );
@@ -2614,7 +2650,7 @@ int main() {
   f.debugPermAddFamily( 2,2, 0,0,1, 0,0,1 );
 
   int GMISS = GFamily::GMISS;
-  
+
   cout << "#######################" << endl;
   cout << "GFamily tests, sibpairs" << endl;
   f.debugPermAddFamily( GMISS,GMISS, 2,0,0, 1,0,0 );
