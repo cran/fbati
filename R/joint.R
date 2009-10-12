@@ -97,7 +97,8 @@ fbatj <- function( ped=NULL, phe=NULL,
       if( is.null(ares) ) {
         ares <- res
       }else{
-        ares <- rbind( res, ares )
+        ##ares <- rbind( res, ares )
+        ares <- rbind( ares, res )
       }
     }
     return( ares )
@@ -157,11 +158,20 @@ fbatj <- function( ped=NULL, phe=NULL,
   NN <- length(marker)
   a <- rep( as.double(0), NN )
   b <- matrix( as.double(0), nrow=NN, ncol=NN )
+  numInf <- rep( as.double(0), 1 )   ## This doesn't work with multi-marker mode yet...
   as.matrix( data )
-  results <- REXP_joint( as.matrix(data), marker-1, traitCols-1, envCols-1, model, a, b )
+  results <- REXP_joint( as.matrix(data), marker-1, traitCols-1, envCols-1, model, a, b, numInf )
 
   a <- results$a
   b <- matrix( results$b, nrow=NN, ncol=NN )
+  numInf <- results$numInf
+  #print( results )
+
+  ## Main effect would almost come for free (debugging -- it is correct at least!)
+  #print( "length(marker)" )
+  #print( length(marker) )
+  #print( "ME Result = " )
+  #print( a[1]^2 / b[1,1] )
 
   #print( "IDEALLY WE WANT TO DO SOMETHING LIKE df=rank(b)." )
   ##rank <- qr(b)$rank
@@ -221,5 +231,5 @@ fbatj <- function( ped=NULL, phe=NULL,
   pvalue <- pchisq( stat, df=rank, lower.tail=FALSE )
   if( length(markerNames) > 1 )
     return( data.frame( stat=stat, pvalue=pvalue, rank=rank ) )
-  return( data.frame( marker=markerNames, stat=stat, pvalue=pvalue, rank=rank ) )
+  return( data.frame( marker=markerNames, numInf=numInf, stat=stat, pvalue=pvalue, rank=rank ) )
 }

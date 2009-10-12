@@ -56,16 +56,25 @@ mergePhePed <- function( ped, phe ) {
 #}
 
 ## New c++ code does this a lot faster
-nuclifyMerged <- function( data ) {
-  OUT_MAXSIZE <- nrow(data)*2 ## Actually should be fine for _all_ datasets?
+nuclifyMerged <- function( data, OUT_MULT=2 ) {
+  OUT_MAXSIZE <- nrow(data)*OUT_MULT ## Actually should be fine for _all_ datasets?
 
   dataOut <- matrix(as.double(0),nrow=OUT_MAXSIZE,ncol=ncol(data))
   ##dataOutDim <- as.integer(dim(dataOut))
   dataOutDim <- as.integer( c( dim(dataOut)[1], dim(dataOut)[2] ) ) ## Bug in R?, see strataReduce
-  .C( "nuclify",
-      as.double(as.matrix(data)), as.integer(dim(data)),
-      dataOut, dataOutDim,
-      DUP=FALSE, NAOK=TRUE )
+  failure <- as.integer(0)
+  .C("nuclify",
+     as.double(as.matrix(data)), as.integer(dim(data)),
+     dataOut, dataOutDim, failure,
+     DUP=FALSE, NAOK=TRUE )
+
+  if(failure == 1) {
+    ## output isn't big enough! not the best implementation...
+    if(OUT_MULT > 100)
+      cat("Probable error in nuclification unless there are really strange nuclear families.\n")
+      
+    return(nuclifyMerged(data=data, OUT_MULT=OUT_MULT*2))
+  }
 
   #print( "nuclifyMerged" )
   #print( dataOutDim )

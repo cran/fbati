@@ -11,14 +11,15 @@
   \code{nuclify} chops instead a `ped' and `phe' object separately.
 }
 \usage{
-mergePhePed( ped, phe )
-nuclifyMerged( data )
-nuclify( ped, phe )
+mergePhePed(ped, phe)
+nuclifyMerged(data, OUT_MULT=2)
+nuclify(ped, phe)
 }
 \arguments{
   \item{ped}{Object from \code{(f)read.ped} or \code{as.ped}.}
   \item{phe}{Object from \code{(f)read.phe} or \code{as.phe}.}
   \item{data}{\code{data.frame} containing required data, or formed from merging a pedigree and phenotype object together. The first columns of it must be as in a `ped' object, while the next can be in any order representing marker or phenotype information.}
+  \item{OUT_MULT}{Hint for size of output, doesn't matter if wrong.}
 }
 \details{
   \code{mergePhePed} and \code{nuclifyMerged} both return data.frame objects. \code{nuclify} returns a list that contains the `phe' object and the `ped' object with those respective names (see pbatR documentation, both objects extend data.frame objects, and can be used for the most part as if data.frame objects). When the data is nuclified, the parents of the nuclified families parents are lost.

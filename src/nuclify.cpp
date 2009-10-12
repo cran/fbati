@@ -76,8 +76,13 @@ int pushEmptyRow( DataMatrix &dout, int doutI, int newPid, int id, int sex ) {
 // up to 100 sibs (or newPid fails)
 extern "C" {
   // Chops pedigrees up into nuclear families
+  // failure=0 == success
+  // failure=1 == indicates the output isn't large enough (suggest doubling it, which is what the R code does in a recursive fashion)
   void nuclify( double *data, int *dimData,
-                double *dataOut, int *dimDataOut ) {
+                double *dataOut, int *dimDataOut,
+                int *failure ) {
+    *failure = 0;
+    
     // set up the DataMatrix objects
     DataMatrix din, dout;
     din.set( data, dimData );
@@ -126,20 +131,26 @@ extern "C" {
           // the father, inserting one if not in the pedigree
           if( idfathRow != -1 ) {
             curRow = pushDataRow( din, idfathRow, dout, curRow, newPid, true );
+            if(curRow == dout.R) {*failure = 1; return;}
           }else{
             curRow = pushEmptyRow( dout, curRow, newPid, idfath, SEX_MALE );
+            if(curRow == dout.R) {*failure = 1; return;}
           }
 
           // the mother, ""
           if( idmothRow != -1 ) {
             curRow = pushDataRow( din, idmothRow, dout, curRow, newPid, true );
+            if(curRow == dout.R) {*failure = 1; return;}
           }else{
             curRow = pushEmptyRow( dout, curRow, newPid, idmoth, SEX_FEMALE );
+            if(curRow == dout.R) {*failure = 1; return;}
           }
 
           // and all of their children
-          for( int ch=0; ch<numSibs; ch++ )
+          for( int ch=0; ch<numSibs; ch++ ) {
             curRow = pushDataRow( din, sibs[ch], dout, curRow, newPid );
+            if(curRow == dout.R) {*failure = 1; return;}
+          }
 
           newPid++;
         }

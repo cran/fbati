@@ -57,6 +57,4 @@ fbatcStrategyStepLatex( res, digits=4, ffile="", preamble=FALSE, build=preamble,
 	
 	\code{stepR}, \code{markersChosenR}: (model-free test) results similar to \code{step} and \code{markersChosen}.
 }
-\examples{
-}
 \keyword{interface}

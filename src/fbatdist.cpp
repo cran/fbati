@@ -219,6 +219,72 @@ bool pG( int gP1, int gP2, // parental mating type
   return(false);
 }
 
+// Ugh! What the hell am I doing! I'm rewriting code
+/*
+bool pGG( int gP1, int gP2,
+          int nAA, int nAB, int nBB,
+          double pg[3], double pgg[3][3] ) {
+  // swap gP1 and gP2 if gP1 is missing
+  if( gP1==gMiss ) {
+    gP1 = gP2;
+    gP2 = gMiss;
+  }
+
+  // zero everything
+  pg[0] = pg[1] = pg[2] = 0.0;
+  pgg[0][0] = pgg[0][1] = pgg[0][2] = pgg[1][0] = pgg[1][1] = pgg[1][2] = pgg[2][0] = pgg[2][1] = pgg[2][2] = 0.0;
+  
+  // fill in the univariate
+  if( !pG( gP1, gP2,  nAA, nAB, nBB,  pg ) )
+    return( false );
+
+  int n = nAA + nAB + nBB;
+  
+  if( gP1!=gMiss ) {
+    // neither parent is missing
+    for( int g1=gAA; g1<=gBB; g1++ )
+      for( int g2=gAA; g2<=gBB; g2++ )
+        pgg[g1][g2] = pg[g1] * pg[g2];
+    return( true );
+  }else{
+    // one or both parents are missing (doesn't matter)
+    if( first(nAA,nAB,nBB) ) {
+      pgg[gAA][gAA] = 1.0;
+      return( true );
+    }
+    if( second(nAA,nAB,nBB) ) {
+      pgg[gAB][gAB] = 1.0;
+      return( true );
+    }
+    if( third(nAA,nAB,nBB) ) {
+      pgg[gBB][gBB] = 1.0;
+      return( true );
+    }
+    if( first_second(nAA,nAB,nBB) ) {
+      pgg[gAA][gAA] = nAA*(nAA-1) / (n*(n-1));
+      pgg[gAB][gAB] = nAB*(nAB-1) / (n*(n-1));
+      pgg[gAA][gAB] = pgg[gAB][gAA] = nAA*nAB/(n*(n-1)); // ? div by 2 ??
+      return( true );
+    }
+    if( second_third(nAA,nAB,nBB) ) {
+      pgg[gBB][gBB] = nBB*(nBB-1) / (n*(n-1));
+      pgg[gAB][gAB] = nAB*(nAB-1) / (n*(n-1));
+      pgg[gBB][gAB] = pgg[gAB][gBB] = nBB*nAB/(n*(n-1)); // ? div by 2 ??
+      return( true );
+    }
+    if( first_third(nAA,nAB,nBB) || all(nAA,nAB,nBB) ) {
+      pgg[gAA][gAA] = pgg[gBB][gBB] = ( pow(4,n-1) - pow(3,n-1) ) / ( pow(4,n)-2*pow(3,n)+pow(2,n) );
+      pgg[gAA][gAB] = pgg[gAB][gAA] = pgg[gBB][gAB] = pgg[gAB][gBB] = 2 * pgg[gAA][gAA];
+      pgg[gAA][gBB] = pgg[gBB][gAA] = pow(4,n-2) / ( pow(4,n) - 2*pow(3,n) + pow(2,n) );
+      pgg[gAB][gAB] = ( pow(4,n-1) - 8*pow(3,n-2) + pow(2,n) ) / ( pow(4,n) - 2*pow(3,n) + pow(2,n) );
+    }
+  }
+  
+  return( true );
+}
+*/
+
+
 // allele code
 int gCode( int a, int b )
 {
@@ -372,6 +438,7 @@ bool pGG( int gP1, int gP2, // parental mating type
   }
 
   double n = nAA + nAB + nBB;
+  //cout << "pGG n=" << n << " nAA=" << nAA << " nAB=" << nAB << " nBB=" << nBB << endl;
 
   // NOTE: unspecified genotypes are 0!
   for( int i=0; i<9; i++ )
@@ -496,9 +563,15 @@ bool pGG( int n,
           int *p1, int *p2, // parental alleles
           int *ca, int *cb, // childrens alleles
           double pgg[9] ) { // output parameter, prob of each genotype
+
+  //cout << "pGG n=" << n << " p1=" << p1[0] << p1[1] << " p2=" << p2[0] << p2[1];
+  //for( int i=0; i<n; i++ ) cout << "c" << i << "=" << ca[i] << cb[i];
+  //cout << endl;
+          
   int nG[3] = {0,0,0};
   for( int i=0; i<n; i++ )
-    nG[ gCode( ca[i], cb[i] ) ]++;
+    if( ca[i]!=0 && cb[i]!=0 ) // NEW 06.24.2009
+      nG[ gCode( ca[i], cb[i] ) ]++;
 
   return( pGG( gCode(p1[0],p1[1]), gCode(p2[0],p2[1]),
           nG[0], nG[1], nG[2],
@@ -552,12 +625,56 @@ double fbat_Si( int n,
                 double &fbat_Vi, // variance of what calculating
                 double offset,
                 int nPhenotyped ) { // hack for power
+  // get rid of individuals who are missing a trait (y) or have bad genotypes; this is the easy way to do this!:
+  int ngenopheno = 0;
+  double y_genopheno[n]; int ca_genopheno[n], cb_genopheno[n];
+  int ngeno = 0;
+  int ca_geno[n], cb_geno[n];
+  for( int j=0; j<n; j++ ) {
+    if( ca[j]!=0 && cb[j]!=0 ) {
+      if( !isnan(y[j]) ) {
+        y_genopheno[ngenopheno] = y[j];
+        ca_genopheno[ngenopheno] = ca[j];
+        cb_genopheno[ngenopheno] = cb[j];
+        ngenopheno++;
+      }else{
+        ca_geno[ngeno] = ca[j];
+        cb_geno[ngeno] = cb[j];
+        ngeno++;
+      }
+    }
+  }//j
+  if( ngenopheno==0 ) {
+    fbat_Vi = 0.0;
+    return(0.0);
+  }
+  for( int j=0; j<ngenopheno; j++ ) {
+    y[j] = y_genopheno[j];
+    ca[j] = ca_genopheno[j];
+    cb[j] = cb_genopheno[j];
+  }
+  for( int j=0; j<ngeno; j++ ) {
+    y[j+ngenopheno] = -99999; //offset; // debatable.... -- no, really screw things up if used
+    ca[j+ngenopheno] = ca_geno[j];
+    cb[j+ngenopheno] = cb_geno[j];
+  }
+  n = ngenopheno + ngeno;
+// end of get rid of bad individuals
+                
   double pg[3];
   if( !pG( n,  p1, p2,  ca, cb,  pg ) ) {
     cout << "really did fail..." << endl;
     fbat_Vi = 0.0;
     return( 0.0 );
   }
+
+  // otherwise we've got multiple offspring
+  // -- ugh!!! This needs to be before we then chop off the pheno... ahhhHHHH!!!
+  double pgg[9];
+  if( n>1 && nPhenotyped>1 )
+    pGG( n,  p1, p2,  ca, cb,  pgg );
+  
+  n = ngenopheno; // NEW NEW OY VAY!!!!
 
   double exj = 0;
   int g;
@@ -573,8 +690,7 @@ double fbat_Si( int n,
   }
 
   // now the variance
-
-  // we've got a special case if there is only one child...
+  // we've got a special case if there is only one child... (power hack)
   if( n==1 || nPhenotyped==1 ) {
     fbat_Vi = 0.0;
     // E(X^2)
@@ -591,9 +707,11 @@ double fbat_Si( int n,
     }
   }
 
-  // otherwise we've got multiple offspring
-  double pgg[9];
-  pGG( n,  p1, p2,  ca, cb,  pgg );
+  // used to calculate Pgg here, but that needed to be moved to the top!!!
+  //cout << "Pgg" << endl
+  //  << pgg[0] << " " << pgg[1] << " " << pgg[2] << endl
+  //  << pgg[3] << " " << pgg[4] << " " << pgg[5] << endl
+  //  << pgg[6] << " " << pgg[7] << " " << pgg[8] << endl;
 
 #ifdef DEBUG_FBATDIST
   double pgg_sum=0.0;
@@ -611,7 +729,8 @@ double fbat_Si( int n,
   // The coding from the paper works fine for the variance
   //  so long as there is _more_ than one offspring!
   double sumTj=0;
-  for( j=0; j<n && j<nPhenotyped; j++ ) sumTj += (y[j]-offset);
+  for( j=0; j<n && j<nPhenotyped; j++ )
+    sumTj += (y[j]-offset);
 
   // the first term
   fbat_Vi = 0.0;
@@ -621,6 +740,7 @@ double fbat_Si( int n,
       fbat_Vi += xCode(g1,model)*xCode(g2,model)
         *( pgg[ggConvert(g1,g2)] - pg[g1]*pg[g2] );
   fbat_Vi *= sumTj*sumTj;
+  
 
   // the second term
   for( j=0; j<n && j<nPhenotyped; j++ ) {
@@ -639,8 +759,231 @@ double fbat_Si( int n,
   // and that computes the variance!
   //fbat_Vi = Si * Si; // just for a test...
 
+  //cout << "fbatdist.cpp Si=" << Si << " Vi=" << fbat_Vi << endl;
+
   return( Si );
 }
+
+
+// A rewrite specially formatted to calculate the joint G, GxE case
+void fbat_Si_joint_G_GE( int n,
+                         int *p1, int *p2, // parental alleles
+                         int *ca, int *cb, // childrens alleles
+                         double *y, double *z,  // childrens trait, environmental information
+                         int model,        // genetic model (a/d/r)
+                         double &Si0, double &Si1, // sum Tj(Xj - E[Xj|s])
+                         double &Vi00, double &Vi01, double &Vi10, double &Vi11, // variance of what calculating
+                         double offset,
+                         int nPhenotyped ) { // hack for power
+  Si0 = Si1 = Vi00 = Vi01 = Vi10 = Vi11 = 0.0;
+
+  // get rid of individuals who are missing a trait (y) or have bad genotypes; this is the easy way to do this!:
+  int ngenopheno = 0;
+  double y_genopheno[n], z_genopheno[n]; int ca_genopheno[n], cb_genopheno[n];
+  int ngeno = 0;
+  int ca_geno[n], cb_geno[n];
+  for( int j=0; j<n; j++ ) {
+    if( ca[j]!=0 && cb[j]!=0 ) {
+      if( !isnan(y[j]) && !isnan(z[j]) ) {
+        y_genopheno[ngenopheno] = y[j];
+        z_genopheno[ngenopheno] = z[j];
+        ca_genopheno[ngenopheno] = ca[j];
+        cb_genopheno[ngenopheno] = cb[j];
+        ngenopheno++;
+      }else{
+        ca_geno[ngeno] = ca[j];
+        cb_geno[ngeno] = cb[j];
+        ngeno++;
+      }
+    }
+  }//j
+  if( ngenopheno==0 ) {
+    // everything was already zeroed out on entry
+    return;
+  }
+  for( int j=0; j<ngenopheno; j++ ) {
+    y[j] = y_genopheno[j];
+    z[j] = z_genopheno[j];
+    ca[j] = ca_genopheno[j];
+    cb[j] = cb_genopheno[j];
+  }
+  for( int j=0; j<ngeno; j++ ) {
+    y[j+ngenopheno] = -99999; //offset; // debatable.... -- no, really screw things up if used
+    ca[j+ngenopheno] = ca_geno[j];
+    cb[j+ngenopheno] = cb_geno[j];
+  }
+  n = ngenopheno + ngeno;
+  // end of get rid of bad individuals
+
+  double pg[3];
+  if( !pG( n,  p1, p2,  ca, cb,  pg ) ) {
+    cout << "really did fail..." << endl;
+    // everything was already zeroed out
+    return;
+  }
+
+  // otherwise we've got multiple offspring
+  // -- ugh!!! This needs to be before we then chop off the pheno... ahhhHHHH!!!
+  double pgg[9];
+  if( n>1 && nPhenotyped>1 )
+    pGG( n,  p1, p2,  ca, cb,  pgg );
+
+  n = ngenopheno; // NEW NEW OY VAY!!!!
+
+  double exj = 0;
+  int g;
+  for( g=0; g<3; g++ )
+    exj += pg[g] * xCode( g, model );
+
+  int j;
+  for( j=0; j<n && j<nPhenotyped; j++ ) {
+    // (X-E(X|S))*Y
+    double temp = ( xCode( ca[j], cb[j], model ) - exj );
+    Si0 += (y[j]-offset) * temp;
+    Si1 += (y[j]-offset) * z[j] * temp;
+  }
+
+  // now the variance
+  // we've got a special case if there is only one child... (power hack)
+  if( n==1 || nPhenotyped==1 ) {
+    double Vi = 0.0;
+    // E(X^2)
+    for( int g=0; g<3; g++ ) {
+      double x = xCode(g,model);
+      Vi += x*x*pg[g];
+    }
+    // - E(X)^2
+    Vi -= exj*exj;
+    Vi00 = Vi * (y[0]-offset)*(y[0]-offset);
+    Vi01 = Vi * (y[0]-offset)*(y[0]-offset) * z[0];
+    Vi10 = Vi01;
+    Vi11 = Vi * (y[0]-offset)*(y[0]-offset) * z[0] * z[0];
+
+    if( n==1 || nPhenotyped==1 ) {
+      return;
+    }
+  }
+
+  // Removed DEBUG_FBAT piece (it's debugged in the main effects test...)
+/*
+  // OK, completely rewrite this piece -- ignore the formula in the paper,
+  //  and just do it the brute force way...
+  double VXi = 0.0;
+  double covXi = 0.0;
+  double E_Xi = 0.0;
+  double E_Xisq = 0.0;
+  
+  for( int g=0; g<3; g++ ) {
+    double x = xCode(g,model);
+    E_Xi += x * pg[g];
+    E_Xisq += x * x * pg[g];
+  }
+  VXi = E_Xisq - E_Xi*E_Xi;
+  
+  double E_XiXj = 0.0;
+  for( int g1=0; g1<3; g1++ )
+    for( int g2=0; g2<3; g2++ )
+      E_XiXj += xCode(g1,model) * xCode(g2,model) * pgg[ggConvert(g1,g2)];
+  covXi = E_XiXj - E_Xi*E_Xi;
+  
+  for( int j0=0; j0<n && j0<nPhenotyped; j0++ ) {
+    for( int j1=0; j1<n && j1<nPhenotyped; j1++ ) {
+      double temp = 0.0;
+      if( j0==j1 ) {
+        temp = VXi;
+      }else{
+        temp = covXi;
+      }
+      
+      double Tij0 = (y[j0] - offset) * (y[j1] - offset);
+      double Tij1 = Tij0 * z[j0] * z[j1];
+
+      Vi00 += Tij0 * Tij0 * temp;
+      Vi01 += Tij0 * Tij1 * temp;
+      Vi10 += Tij1 * Tij0 * temp;
+      Vi11 += Tij1 * Tij1 * temp;
+    }
+  }
+
+  // and that should do it???
+*/
+
+  // The coding from the paper works fine for the variance
+  //  so long as there is _more_ than one offspring!
+  /*
+  double sumTj00=0;
+  double sumTj01=0;
+  double sumTj10=0;
+  double sumTj11=0;
+  for( j=0; j<n && j<nPhenotyped; j++ ) {
+    double temp = (y[j]-offset) * (y[j]-offset);
+    sumTj00 += temp;
+    sumTj01 += temp * z[j];
+    sumTj10 += temp * z[j];
+    sumTj11 += temp * z[j] * z[j];
+  }
+
+  // the first term
+  double Vi = 0.0;
+  int g1, g2;
+  for( g1=0; g1<3; g1++ )
+    for( g2=0; g2<3; g2++ )
+      Vi += xCode(g1,model)*xCode(g2,model)
+        *( pgg[ggConvert(g1,g2)] - pg[g1]*pg[g2] );
+  //fbat_Vi *= sumTj*sumTj;
+  Vi00 = sumTj00 * Vi;
+  Vi01 = sumTj01 * Vi;
+  Vi10 = sumTj10 * Vi;
+  Vi11 = sumTj11 * Vi;
+  */
+
+
+
+  // The coding ... redo!
+  double sumTj0 = 0.0;
+  double sumTj1 = 0.0;
+  for( j=0; j<n && j<nPhenotyped; j++ ) {
+    sumTj0 += (y[j]-offset);
+    sumTj1 += (y[j]-offset) * z[j];
+  }
+  double Vi = 0.0;
+  int g1, g2;
+  for( g1=0; g1<3; g1++ )
+    for( g2=0; g2<3; g2++ )
+      Vi += xCode(g1,model)*xCode(g2,model)
+        *( pgg[ggConvert(g1,g2)] - pg[g1]*pg[g2] );
+  Vi00 = Vi * sumTj0 * sumTj0;
+  Vi01 = Vi * sumTj0 * sumTj1;
+  Vi10 = Vi * sumTj1 * sumTj0;
+  Vi11 = Vi * sumTj1 * sumTj1;
+
+  // the second term
+  for( j=0; j<n && j<nPhenotyped; j++ ) {
+    double sum = 0.0; // jth term sum over g, g~ -- really x-exs
+    for( g1=0; g1<3; g1++ ) {
+      sum += pow((double)xCode(g1,model),2)*pg[g1];
+      for( g2=0; g2<3; g2++ ) {
+        sum -= xCode(g1,model)*xCode(g2,model) * pgg[ggConvert(g1,g2)];
+      }
+    }
+
+    double temp = (y[j]-offset) * (y[j]-offset);
+    double sum00 = sum * temp;
+    double sum01 = sum * temp * z[j];
+    double sum10 = sum * temp * z[j];
+    double sum11 = sum * temp * z[j] * z[j];
+
+    Vi00 += sum00;
+    Vi01 += sum01;
+    Vi10 += sum10;
+    Vi11 += sum11;
+  }
+
+
+  // and that computes the variance!
+}
+
+
 
 
 #ifdef LOOKUP_COMPARE

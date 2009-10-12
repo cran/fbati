@@ -2,6 +2,9 @@ export(
   fbati,
   fbatj,
   fbatc,
+  fbatge,
+  fbatme,
+  fbatgeAll,
 
   mergePhePed,
   nuclifyMerged,

@@ -336,6 +336,7 @@ condGeneFBATControl_estEqNuis <-
       DUP=FALSE, NAOK=TRUE )
 
   ret_lhs <- matrix( ret_lhs, ncol=nc2, byrow=FALSE )
+  #ret_lhs <- matrix( ret_lhs, ncol=nc2 )
 
   #cat( "ret_lhs\n" ); print( ret_lhs );
   #cat( "ret_rhs\n" ); print( ret_rhs );
@@ -479,11 +480,42 @@ condGeneFBATControl_estEq <-
 
   #cat( "pvalue=", pvalue, "\n")
 
-  numInf <- rep( 0, na )
-  for( k1 in 1:na )
-    numInf[k1] <- sum( abs(ret_uij[,k1]) >= sqrt(.Machine$double.eps), na.rm=TRUE )
+  #numInf <- rep( 0, na )
+  #for( k1 in 1:na )
+  #  numInf[k1] <- sum( abs(ret_uij[,k1]) >= sqrt(.Machine$double.eps), na.rm=TRUE )
+  #
+  #return( list( pvalue=pvalue, rank=rank, numInf=paste(numInf,collapse=",") ) )
 
-  return( list( pvalue=pvalue, rank=rank, numInf=paste(numInf,collapse=",") ) )
+  #numInf_na <- rep(0,na)
+  #for( k1 in 1:na )
+  #  numInf_na[k1] <- sum( abs(ret_uij[,k1]) >= sqrt(.Machine$double.eps), na.rm=TRUE )
+  #numInf_nc <- rep(0,nc2)
+  #for( k1 in 1:nc2 )
+  #  numInf_nc[k1] <- sum( abs(ret_uij[,k1+na]) >= sqrt(.Machine$double.eps), na.rm=TRUE )
+  #  
+  #return( list( pvalue=pvalue, rank=rank, numInf=paste( paste(numInf_na,collapse=","), paste(numInf_nc,collapse=","), sep="|" ) ) )
+
+  numInf <- ""
+  for( ki in 1:na ) {
+    temp <- sum( abs(ret_uij[,k1]) >= sqrt(.Machine$double.eps), na.rm=TRUE )
+    if( k1!=na ) {
+      numInf <- paste(numInf, temp, sep=",")
+    }else{
+      numInf <- as.character(temp)
+    }
+  }
+  for( k1 in 1:nc ) {
+    temp1 <- sum( abs(ret_uij[,(k1-1)*2+1]) >= sqrt(.Machine$double.eps), na.rm=TRUE )
+    temp2 <- sum( abs(ret_uij[,(k1-1)*2+2]) >= sqrt(.Machine$double.eps), na.rm=TRUE )
+    temp <- paste( "(", temp1, ",", temp2, ")", sep="" )
+    if( k1==1 ) {
+      numInf <- paste( numInf, temp, sep="|" )
+    }else{
+      numInf <- paste( numInf, temp, sep="," )
+    }
+  }
+
+  return( list( pvalue=pvalue, rank=rank, numInf=numInf ) )
 }
 
 #void condGeneFBATControl_dUdBc(
@@ -2185,7 +2217,7 @@ condGeneP3 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
       varModel <- condGeneFBATControl_varContsModel( referenceVarExpl, betaEst )
       #varModel <- condGeneFBATControl_varContsMean( referenceVarExpl, 0 ) ## DEBUGGING ONLY!!!
       #cat( "varModel after nuis update", varModel, "\n" )
-      varExpl <- 1 - varModel / varMean 
+      varExpl <- 1 - varModel / varMean
       if( verbose ) { cat( "Nuisance iteration ", i, ", varExpl=", varExpl, ", betaEst=", sep="" ); print(bc); }
     }
 
@@ -2210,7 +2242,7 @@ condGeneP3 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
   if( verbose ) { cat( "condGeneP3 bc " ); print( bc ); }
 
   for( i in 1:NUISANCE_ITER ) {
-    #condGeneFBATControl_estEqNuisUpdate( conditionReference, bc )
+#    condGeneFBATControl_estEqNuisUpdate( conditionReference, bc )
     condGeneFBATControl_estEqNuisUpdate2( conditionReference, bc )
     bc <- condGeneFBATControl_estEqNuis( conditionReference, offset=0.0 )
     if( verbose ) { cat( "Nuisance iteration ", i, ", bc=", sep="" ); print(bc); }
@@ -2475,7 +2507,9 @@ condGeneP4 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
   #print(dim(ucc))
   #print(dim(uc))
 
-  umcMat <- um - t(  umc %*% solve.svd( svd(ucc), t(uc) )  )## ??
+  ## MAJOR CHANGE MAJOR CHANGE
+  ##umcMat <- um  - t(  umc %*% solve.svd( svd(ucc), t(uc) )  )## ??
+  umcMat <- um  + t(  umc %*% solve.svd( svd(ucc), t(uc) )  )## ??
 
   #print( "condGeneP umcMat" )
   #print( umcMat )
@@ -2499,9 +2533,28 @@ condGeneP4 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
   }
 
   ## inf fams added 02.29.2009
-  numInf <- rep( 0, A )
-  for( k1 in 1:A )
-    numInf[k1] <- sum( abs(umcMat[,k1]) >= sqrt(.Machine$double.eps), na.rm=TRUE )
+  #numInf <- rep( 0, A )
+  #for( k1 in 1:A )
+  #  numInf[k1] <- sum( abs(umcMat[,k1]) >= sqrt(.Machine$double.eps), na.rm=TRUE )
+  numInf <- ""
+  for( k1 in 1:A ) {
+    temp <- sum(abs(um[,k1])>=sqrt(.Machine$double.eps),na.rm=TRUE)
+    if( k1!=A ) {
+      numInf <- paste(numInf, temp, sep=",")
+    }else{
+      numInf <- as.character(temp)
+    }
+  }
+  for( k1 in 1:C ) {
+    temp1 <- sum(abs(uc[,k1])>=sqrt(.Machine$double.eps), na.rm=TRUE)
+    temp2 <- sum(abs(uc[,k1+C])>=sqrt(.Machine$double.eps), na.rm=TRUE)
+    temp <- paste( "(", temp1, ",", temp2, ")", sep="" )
+    if( k1==1 ) {
+      numInf <- paste( numInf, temp, sep="|" )
+    }else{
+      numInf <- paste( numInf, temp, sep="," )
+    }
+  }
 
   if( verbose ) {
     print( "condGeneP Pairwise u, uu" )
@@ -2564,8 +2617,11 @@ condGeneP4 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
 
   #############
   ## Return! ##
-  return( data.frame( pvalue=pvalue, rank=rank, numInf=paste(numInf,collapse=","),
-                      pvalueR=pvalueR, rankR=rankR, numInfR=paste(numInfR,collapse=",") ) )
+      return( data.frame( pvalue=pvalue, rank=rank,
+                      #numInf=paste(numInf,collapse=","),
+                      numInf=numInf,
+                      pvalueR=pvalueR, rankR=rankR, numInfR=paste(numInfR,collapse=","),
+                      stringsAsFactors=FALSE) )
 }
 
 
@@ -2773,7 +2829,8 @@ condGeneR <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
   if( is.null(offset) ) offset <- NA
   return( data.frame( trait=trait, traitType=traitType,
                       offset=offset,
-                      pvalueR=pvalueR, rankR=rankR, numInfR=paste(numInfR,collapse=",")  ) )
+                      pvalueR=pvalueR, rankR=rankR, numInfR=as.character(paste(numInfR,collapse=",")),
+                      stringsAsFactors=FALSE) )
 }
 
 

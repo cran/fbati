@@ -24,6 +24,11 @@ fbatcStrategyStepLaunch <- function() {
   return(invisible())
 }
 
+fbatgeLaunch <- function() {
+  fbatge()
+  return(invisible())
+}
+
 launchpad <- function() {
   library( fbati )  ## loads pbatR, fgui
 
@@ -34,6 +39,9 @@ launchpad <- function() {
 
   fguiNewMenu( c("fbati","FBAT-I"), fbatiLaunch )
   fguiNewMenu( c("fbati","FBAT-J"), fbatjLaunch )
+  fguiNewMenu( c("fbati","SEPARATOR") )
   fguiNewMenu( c("fbati","FBAT-C"), fbatcLaunch )
   fguiNewMenu( c("fbati","FBAT-C Stepwise"), fbatcStrategyStepLaunch )
+  fguiNewMenu( c("fbati","SEPARATOR") )
+  fguiNewMenu( c("fbati","FBAT-GxE"), fbatgeLaunch )
 }

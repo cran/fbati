@@ -58,6 +58,35 @@ fbatc <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe),
   if( traitType=="auto" )
     traitType <- resolveTraitType( phe=phe, trait=trait )
 
+  ## 04.28.2009 NEW, safety precautions for linking the vile trait
+  ## - first merge together the pedigree and phenotype object (taken largely from 'nuclify' code)
+  data <- mergePhePed( ped, phe )
+  ncolped <- ncol(ped)
+  ped <- data[, 1:ncolped]
+  phe <- data[, c(1,2,(ncolped+1):ncol(data))]
+  ## - Find the analyzing and conditioning markers
+  markers <- sort(match( c(paste(c(markerAnalyze,markerCondition),".a",sep=""),
+                           paste(c(markerAnalyze,markerCondition),".b",sep="")),
+                         names(ped)))
+  ####print( markers )
+  ## -- pull out only the useful markers into the pedigree object
+  ped <- ped[ , c(1:6, markers) ]
+  keep <- rep(TRUE,nrow(ped))
+  for( i in 7:ncol(ped) )
+    keep <- keep & ped[,i]!=0
+  ped <- ped[ keep, ]
+  phe <- phe[ keep, ]
+  ## Now sort by 1) pid, 2) is.na(trait) / trait==2 or 1
+  if( trait=="AffectionStatus" ) {
+    ord <- order( ped$pid, ped$AffectionStatus, na.last=TRUE, decreasing=c(FALSE,TRUE) )
+  }else{
+    ord <- order( ped$pid, phe[[trait]], na.last=TRUE, decreasing=c(FALSE,TRUE) )
+  }
+  ped <- ped[ ord, ]
+  phe <- phe[ ord, ]
+  data <- mergePhePed( ped=ped, phe=phe )
+  ## WEN 04.28.2009
+  
   ## Now call the routines
   if( traitType=="binary" ) {
     res <- condGeneP4( ped=ped, phe=phe, data=data,
@@ -72,7 +101,7 @@ fbatc <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe),
 
     res <- cbind( markerAnalyze=paste(markerAnalyze,collapse=","),
                   markerCondition=paste(markerCondition,collapse=","),
-                  res )
+                  res, stringsAsFactors=FALSE )
     return( res ) ## 01/03/09
   }
 
@@ -103,9 +132,9 @@ fbatc <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe),
                       verbose=verbose,
                       FBAT=FBAT,
                       compVarExpl=compVarExpl )
-  res <- cbind( res, pvalue=res2$pvalue, rank=res2$rank, numInf=res2$numInf )
+  res <- cbind( res, pvalue=res2$pvalue, rank=res2$rank, numInf=res2$numInf, stringsAsFactors=FALSE )
   if( compVarExpl )
-    res <- cbind( res, varExpl=res2$varExpl )
+    res <- cbind( res, varExpl=res2$varExpl, stringsAsFactors=FALSE )
 
   return( res )
 }

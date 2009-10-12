@@ -12,7 +12,8 @@
 
 extern "C" {
   void nuclify( double *data, int *dimData,
-                double *dataOut, int *dimDataOut );
+                double *dataOut, int *dimDataOut,
+                int *failure );
   void strataReduce( double *data, int *dimData,
                      double *dataOut, int *dimDataOut,
                      int *pEnvCol, int *pm0, int *pm1,

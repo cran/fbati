@@ -110,6 +110,8 @@ fbatDataframe <- function( fbatLines, numTraits, debug=FALSE ) {
   df <- strsplit( fbatLines[dfLines], split="  *" )
   df <- data.frame( t( data.frame( df, stringsAsFactors=FALSE ) ), stringsAsFactors=FALSE )
   row.names(df) <- NULL
+  if( ncol(df) == length(dfNames)-1 )
+    dfNames <- dfNames[-6] ## Stupid, stupid, wretched, evil, FBAT! AHHHHHH!!!
   names( df ) <- dfNames
 
   ## Old code -- we get factors here...

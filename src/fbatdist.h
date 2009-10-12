@@ -72,6 +72,10 @@ bool pG( int n,
          int *ca, int *cb, // childrens alleles
          double pg[3] ); // output parameter, prob of each genotype
 
+bool pGG( int gP1, int gP2,
+          int nAA, int nAB, int nBB,
+          double pg[3], double pgg[3][3] ); // ouput parameters, prob of each genotype, and joint prob of the genotypes
+
 // addition for fbati extension (gXe work)
 // returns the hash to the group which is given by
 //  <xcode(p1)+1><xcode(p2)+1><nAA><nAB><nBB>, where p1<=p2
@@ -106,5 +110,15 @@ double fbat_Si( int n,
                 double &fbat_Vi,   // variance of what calculating
                 double offset,
                 int nPhenotyped  ); // hack for pbatR power sims
+
+void fbat_Si_joint_G_GE( int n,
+                         int *p1, int *p2, // parental alleles
+                         int *ca, int *cb, // childrens alleles
+                         double *y, double *z,  // childrens trait, environmental information
+                         int model,        // genetic model (a/d/r)
+                         double &Si0, double &Si1, // sum Tj(Xj - E[Xj|s])
+                         double &Vi00, double &Vi01, double &Vi10, double &Vi11, // variance of what calculating
+                         double offset,
+                         int nPhenotyped ); // hack for power
 
 #endif
