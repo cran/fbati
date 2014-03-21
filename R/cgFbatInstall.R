@@ -6,7 +6,7 @@ RTOOLS.URL <- paste( RTOOLS.HOME, RTOOLS, sep="" )
 SH.EXE <- "C:/Rtools/bin/sh.exe"
 
 permission <- function( msg ) {
-  library( tcltk )
+  ##library( tcltk )
   res <- tkmessageBox(message=msg,icon="question",type="yesno",default="yes")
   return( tclvalue(res) == "yes" )
 }
@@ -94,7 +94,7 @@ fbat.install <- function( exePath=NULL ) {
       ## Make it pass codetools check
       assign( "zip.unpack", function() { stop("zip.unpack only available in windows.") } )
     }
-    
+
     if( isWindows() ) {
       ##zip.file.extract( paste(fbat.extrapath(),fbat.exename(),sep=""), "fbat.zip" )
       ## CAUSES CODETOOLS ERROR, I DO NOT KNOW HOW TO FIX THIS

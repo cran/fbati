@@ -63,16 +63,19 @@ nuclifyMerged <- function( data, OUT_MULT=2 ) {
   ##dataOutDim <- as.integer(dim(dataOut))
   dataOutDim <- as.integer( c( dim(dataOut)[1], dim(dataOut)[2] ) ) ## Bug in R?, see strataReduce
   failure <- as.integer(0)
-  .C("nuclify",
+  res = .C("nuclify",
      as.double(as.matrix(data)), as.integer(dim(data)),
      dataOut, dataOutDim, failure,
-     DUP=FALSE, NAOK=TRUE )
+     DUP=TRUE, NAOK=TRUE) #DUP=FALSE, NAOK=TRUE )
+  dataOut = res[[3]]
+  dataOutDim = res[[4]]
+  failure = res[[5]]
 
   if(failure == 1) {
     ## output isn't big enough! not the best implementation...
     if(OUT_MULT > 100)
       cat("Probable error in nuclification unless there are really strange nuclear families.\n")
-      
+
     return(nuclifyMerged(data=data, OUT_MULT=OUT_MULT*2))
   }
 
@@ -119,13 +122,15 @@ strataReduce <- function( data, envCol, m0, m1=m0+1, maxSib=3 ) {
   ##dataOutDim <- as.integer(c(5,9))
   dataOutDim <- as.integer( c( dim(dataOut)[1], dim(dataOut)[2] ) ) ## Bug in R?
 
-  .C( "strataReduce",
+  res = .C( "strataReduce",
       as.double(as.matrix(data)), as.integer(dim(data)),
       dataOut, dataOutDim,
       as.integer(envCol-1),
       as.integer(m0-1), as.integer(m1-1),
       as.integer(maxSib),
-      DUP=FALSE, NAOK=TRUE )
+      DUP=TRUE, NAOK=TRUE) #DUP=FALSE, NAOK=TRUE )
+  dataOut = res[[3]]
+  dataOutDim = res[[4]]
 
   if( dataOutDim[1] == 0 )
     return(NULL)

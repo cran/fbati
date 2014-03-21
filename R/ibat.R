@@ -243,7 +243,7 @@ mbind <- function( group1, group2 ) {
 ## DEBUG
 ibat.R.debug <- function()
 {
-  library( pbatR )
+  ##library( pbatR )
   dyn.load( "src/ibat.so" ) ## unix way
   source( "R/fbati.R" )
   source( "R/datamatrix.R" )

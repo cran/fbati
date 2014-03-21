@@ -15,7 +15,7 @@ as.gped <- function( ped ) {
   mnames <- ped.markerNames(ped)
   for( m in 1:length(mnames) ) {
     #if( debug ) cat( "genotypeCode marker", mnames[m], "\n" )
-    
+
     ## compute locations of the markers in the ped
     c1 <- 6 + m*2 - 1  ## location of first marker
     c2 <- 6 + m*2      ## location of second marker
@@ -23,7 +23,7 @@ as.gped <- function( ped ) {
     ## get the alleles
     alleles <- sort(  setdiff( unique(c(ped[[c1]],ped[[c2]])), 0 )  )
     #if( debug ) { cat( "Alleles " ); print( alleles ); }
-    
+
     if( length(alleles) > 2 )
       stop( "Only works with biallelic markers." )
 
@@ -87,13 +87,13 @@ mrroot3 <- function( f, ## the function
                     ... ) {
   ## New 02/18/2009, first try multiroot
   try( {
-    require( rootSolve )
+    ##require( rootSolve )
     res <- multiroot( f=f, start=initial, maxiter=MAXITER, rtol=TOL, atol=TOL, ctol=TOL, useFortran=FALSE, ... )
     return( res$root )
   }, silent=!verbose )
 
   if( verbose ) print( "multiroot failed." )
-  
+
   ## for storing the best result
   best <- NULL
 
@@ -160,7 +160,7 @@ mrroot3 <- function( f, ## the function
   warning( msg )
 
   print( best$par )
-  
+
   ## and still return the best
   ##return( best )
   return( best$par )
@@ -181,7 +181,7 @@ cpp_rn_setNormalSigma <- function( sigma ) {
   cholesky <- chol(sigma)
   print( cholesky )
   p <- nrow(sigma)
-  .C("cpp_rn_setNormalSigma", as.double(cholesky), as.integer(p), DUP=FALSE )
+  .C("cpp_rn_setNormalSigma", as.double(cholesky), as.integer(p), DUP=TRUE) #DUP=FALSE )
   return( invisible() )
 }
 cpp_rn_debug <- function() { .C("cpp_rn_debug") }
@@ -208,8 +208,9 @@ cpp_gped_print <- function( extended=0 ) {
 }
 cpp_gped_numCovariates <- function() {
   numCov <- as.integer(0)
-  .C( "cpp_gped_numCovariates", numCov, DUP=FALSE )
-  return( numCov )
+  res = .C( "cpp_gped_numCovariates", numCov, DUP=TRUE) #DUP=FALSE )
+  #return( numCov )
+  return(res[[1]])
 }
 cpp_gped_setStrategy <- function( strategy="adaptive" ) {
   ## strategy \in geno, pheno, adaptive
@@ -219,9 +220,10 @@ cpp_gped_setStrategy <- function( strategy="adaptive" ) {
 cpp_gped_estEq <- function( beta ) {
   ## C++ code will crash the whole program if beta is the wrong size
   u <- as.double( rep( 0, length(beta) ) )
-  .C( "cpp_gped_estEq", as.double(beta), as.integer(length(beta)), u, DUP=FALSE )
+  res = .C( "cpp_gped_estEq", as.double(beta), as.integer(length(beta)), u, DUP=TRUE) #DUP=FALSE )
   ####cat( "u" ); print( u );
-  return( u )
+  #return( u )
+  return(res[[3]])
 }
 cpp_gped_estEq_zeroGE <- function( beta ) {
   uExtra <- cpp_gped_estEq( c( 0, 0, beta ) )
@@ -251,13 +253,16 @@ cpp_gped_statPrecompute <- function( beta ) {
   if( M == 0 ) return( NULL )
   beta <- c( 0, 0, beta ) ## push in the zeros that were there for the ge stuff
   dbnuis <- as.double( matrix( 0, nrow=M, ncol=M ) )
-  .C( "cpp_gped_statPrecompute", as.double(beta), as.integer(length(beta)), dbnuis, DUP=FALSE )
+  res = .C( "cpp_gped_statPrecompute", as.double(beta), as.integer(length(beta)), dbnuis, DUP=TRUE) #DUP=FALSE )
+  dbnuis = res[[3]]
   return( matrix( dbnuis, nrow=M, ncol=M ) )
 }
 cpp_gped_statCompute <- function( dbNuisInv ) {
   stat <- as.double(0.0)
   numInf <- as.integer(0)
-  .C( "cpp_gped_statCompute", dbNuisInv, stat, numInf, DUP=FALSE )
+  res = .C( "cpp_gped_statCompute", dbNuisInv, stat, numInf, DUP=TRUE )#DUP=FALSE )
+  stat = res[[2]]
+  numInf = res[[3]]
   pvalue <- pchisq( stat, 2, lower.tail=FALSE )
   attr( pvalue, "numInf" ) <- numInf
   return( pvalue ) ## chi-squared distribution with 2 degrees of freedom
@@ -266,7 +271,7 @@ cpp_gped_statCompute <- function( dbNuisInv ) {
 testBetaGE <- function( strategy="adaptive" ) {
   ## First set the strategy
   cpp_gped_setStrategy( strategy=strategy )
-  
+
   ## First solve for the nuisance parameter
   beta <- solveBeta( strategy=strategy, includeGE=FALSE )
   #print( "solved for beta" )
@@ -294,7 +299,7 @@ testBetaGE <- function( strategy="adaptive" ) {
 
   #solve.svd <- getFromNamespace( "solve.svd", "fbati" )
   pvalue <- cpp_gped_statCompute( solve.svd( svd( dbnuis ) ) )
-  
+
   return( pvalue );
 }
 
@@ -304,13 +309,16 @@ cpp_gped_statPrecompute_A<- function( beta ) {
   if( M == 0 ) return( NULL )
   beta <- c( 0, beta ) ## push in the zeros that were there for the ge stuff
   dbnuis <- as.double( matrix( 0, nrow=M, ncol=M ) )
-  .C( "cpp_gped_statPrecompute_A", as.double(beta), as.integer(length(beta)), dbnuis, DUP=FALSE )
+  res = .C( "cpp_gped_statPrecompute_A", as.double(beta), as.integer(length(beta)), dbnuis, DUP=TRUE ) #DUP=FALSE )
+  dbnuis = res[[3]]
   return( matrix( dbnuis, nrow=M, ncol=M ) )
 }
 cpp_gped_statCompute_A<- function( dbNuisInv ) {
   stat <- as.double(0.0)
   numInf <- as.integer(0)
-  .C( "cpp_gped_statCompute_A", dbNuisInv, stat, numInf, DUP=FALSE )
+  res = .C( "cpp_gped_statCompute_A", dbNuisInv, stat, numInf, DUP=TRUE) #DUP=FALSE )
+  stat = res[[2]]
+  numInf = res[[3]]
   pvalue <- pchisq( stat, 1, lower.tail=FALSE )
   attr( pvalue, "numInf" ) <- numInf
   return( pvalue ) ## chi-squared distribution with 2 degrees of freedom
@@ -319,7 +327,7 @@ cpp_gped_statCompute_A<- function( dbNuisInv ) {
 testBetaGE_A <- function( strategy="adaptive" ) {
   ## First set the strategy
   cpp_gped_setStrategy( strategy=strategy )
-  
+
   ## First solve for the nuisance parameter -- tricky, does not need _A designation!
   beta <- solveBeta( strategy=strategy, includeGE=FALSE )
   ####cat( "testBetaGE_A beta\n" );  print( beta );
@@ -376,7 +384,7 @@ cpp_gped_set <- function( pid, id, fathid, mothid,
                          geno, trait, env ) {
   .C( "cpp_gped_set",
      as.integer(pid), as.integer(id), as.integer(fathid), as.integer(mothid),
-     as.integer(geno), as.integer(trait), as.double(env), as.integer(length(pid)), DUP=FALSE )
+     as.integer(geno), as.integer(trait), as.double(env), as.integer(length(pid)), DUP=TRUE) #DUP=FALSE )
   return( invisible() )
 }
 cpp_gped_set_C<- function( pid, id, fathid, mothid,
@@ -392,7 +400,7 @@ cpp_gped_set_C<- function( pid, id, fathid, mothid,
 
   .C( "cpp_gped_set_C",
      as.integer(pid), as.integer(id), as.integer(fathid), as.integer(mothid),
-     as.integer(geno), as.integer(trait), as.double(env), as.double(as.matrix(cov)), as.integer(nCov), as.integer(length(pid)), DUP=FALSE )
+     as.integer(geno), as.integer(trait), as.double(env), as.double(as.matrix(cov)), as.integer(nCov), as.integer(length(pid)), DUP=TRUE) #DUP=FALSE )
   return( invisible() )
 }
 fbatge.internal <- function( gped, phe, geno, trait="AffectionStatus", env="env", strategy="adaptive", model="codominant" ) {
@@ -422,7 +430,7 @@ fbatge.internal <- function( gped, phe, geno, trait="AffectionStatus", env="env"
   }
 
   ####print( cbind( gped[,c(1:4,genoLoc)], t=traitValue, e=phe[,envLoc] ) )
-  
+
   ## Eliminate any missing data, do it to the phe, the ped, _and_ the trait
   ## TODO TODO TODO TODO TODO TODO TODO:
   ## --> Ideally, under the 'geno' strategy, we would set missing genotype information
@@ -445,7 +453,7 @@ fbatge.internal <- function( gped, phe, geno, trait="AffectionStatus", env="env"
 
   ####cat( "\n\n\nAFTER REMOVING MISSING IN R CODE" )
   ####print( cbind( gped[,c(1:4,genoLoc)], t=traitValue, e=phe[,envLoc] ) )
-  
+
   ## Now set it
   ## TOCHECK: is it fathid or idfath?
   cpp_gped_set( gped$pid, gped$id, gped$idfath, gped$idmoth,
@@ -500,7 +508,7 @@ fbatge.internal_C<- function( gped, phe, geno, cov=NULL, trait="AffectionStatus"
   is.na.cov <- rep( FALSE, nrow(phe) )
   for( cCol in covLoc )
     is.na.cov <- is.na.cov | is.na(phe[[cCol]])
-    
+
   kill <- ( is.na(gped[[geno]]) | is.na(traitValue) | is.na(gped[[envLoc]]) | is.na.cov ) & gped$idmoth!=0 & gped$idfath!=0
   keep <- !kill
   gped <- gped[keep,]
@@ -519,12 +527,12 @@ fbatge.internal_C<- function( gped, phe, geno, cov=NULL, trait="AffectionStatus"
 
   #cat( "\n\n\nAFTER REMOVING MISSING IN R CODE" )
   #print( cbind( gped[,c(1:4,genoLoc)], t=traitValue, e=phe[,envLoc], phe[,covLoc] ) ); stop(); ## DEBUG ONLY
-  
+
   ## Now set it
   ## TOCHECK: is it fathid or idfath?
   cpp_gped_set_C( gped$pid, gped$id, gped$idfath, gped$idmoth,
                  gped[[geno]], traitValue, phe[[envLoc]], phe[,covLoc] )
-  #cat( "DAMN COVARIATES", cpp_gped_numCovariates() ); stop(); 
+  #cat( "DAMN COVARIATES", cpp_gped_numCovariates() ); stop();
   #cpp_gped_print(); stop(); ## DEBUG
 
   ## Then run the analysis!
@@ -572,7 +580,7 @@ cpp_gesim_set <- function( numParents=2, numOffspring=1, numFam=500,
   #print( pheno.cholesky )
   #print( phenoCutoff )
   #print( markerCor )
-  
+
   .C("cpp_gesim_set",
      as.integer(numParents), as.integer(numOffspring), as.integer(numFam),
      as.integer(minAffected), as.integer(maxAffected),
@@ -585,7 +593,7 @@ cpp_gesim_set <- function( numParents=2, numOffspring=1, numFam=500,
      as.double(markerCor), as.double(markerAfreq),
      as.double(phenoOR),
      DUP=TRUE) ## Character vars must be duplicated. OK then.
-  
+
   return( invisible() )
 }
 
@@ -629,7 +637,7 @@ estEqDebug <- function() {
   bg <- 0.25
   be <- 0.5
   beta <- c(b0,bge,bg,be)
-  
+
   set.seed(13)
   #cpp_gesim_set(numFam=500,beta=beta) ## Trios
   cpp_gesim_set( beta=beta, numOffspring=2, minAffected=1, maxAffected=1, numParents=0 ) ## DSP's
@@ -653,7 +661,7 @@ estEqDebug2 <- function() {
   bg <- 0.25
   be <- 0.5
   beta <- c(b0,bge,bg,be)
-  
+
   set.seed(13)
   cpp_gesim_set( beta=beta, numOffspring=2, minAffected=1, maxAffected=1, numParents=0, link="logit", numFam=500 ) ## DSP's
   cpp_gesim_print()

@@ -3,7 +3,7 @@
 # uni <- function( ped, phe, alpha=1, trait="trait", debug=TRUE, tempPrefix="temp_", FBATEXE="~/bin/fbat"  ) {
 #   univariateFilter <- getFromNamespace( "univariateFilter", "fbati" )
 #   #fbatShell <- getFromNamespace( "fbatShell", "fbati" )
-# 
+#
 #   numMarkers <- (ncol(ped) - 6) / 2
 #   markers <- ped.markerNames(ped)
 #   res <- univariateFilter( ped=ped, phe=phe, markers=markers, trait=trait, alpha=alpha/numMarkers, tempPrefix=tempPrefix, FBATEXE=FBATEXE )
@@ -117,7 +117,7 @@ fbatgeAllFunc <- function( ped, phe, env, trait="AffectionStatus", print_results
 updateFbatgeAllGUI <- function( arg ) {
   if( arg=="ped" ) {
     pedfile <- guiGetValue(1)
-    ped <- read.ped( pedfile )
+    ## ped <- read.ped( pedfile )  ## 02/20/2014 codetools
 
     #possibleMarkers <- ped.markerNames( ped )
     #setListElements( "geno", sort(possibleMarkers) )

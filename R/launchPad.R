@@ -30,7 +30,7 @@ fbatgeLaunch <- function() {
 }
 
 launchpad <- function() {
-  library( fbati )  ## loads pbatR, fgui
+  ##library( fbati )  ## loads pbatR, fgui
 
   fguiNewMenu( c("pbatR","PBAT"), pbat )
   fguiNewMenu( c("pbatR","SEPARATOR") )

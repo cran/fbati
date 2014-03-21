@@ -1,5 +1,7 @@
 #include "fbati.h"
 
+#include <R.h>
+
 #include <iostream>
 using namespace std;
 
@@ -18,7 +20,7 @@ double sum( double* v, int LEN )
 {
   // some special cases
   if( LEN == 0 ) {
-    return( NAN );
+    return(R_NaN); //( NAN );
   }else if( LEN == 1 ){
     return( v[0] );
   }else if( LEN == 2 ){

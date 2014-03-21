@@ -314,7 +314,7 @@ public:
 	double xCode(int phase, unsigned int index, char allele, XCODE code) {
 		// addition for missing (also changed return type of function to double, rather than int)
 		if (ha[phase][index] == 0 || hb[phase][index] == 0)
-			return (NAN);
+      return (R_NaN); // (NAN);
 
 		switch (code) {
 		case ADDITIVE:
@@ -337,7 +337,7 @@ public:
 	double genotype(int phase, unsigned int index, char allele1, char allele2) {
 		// addition for missing (also changed return type of function to double, rather than int)
 		if (ha[phase][index] == 0 || hb[phase][index] == 0)
-			return (NAN);
+			return (R_NaN); //(NAN);
 
 		return ((int) ((ha[phase][index] == allele1 && hb[phase][index]
 				== allele2) || (ha[phase][index] == allele2 && hb[phase][index]

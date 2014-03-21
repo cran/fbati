@@ -183,7 +183,7 @@ fbatShellCorrelation <- function( fbatCmd="hapfreq -r", ... ) {
 ## DEBUG
 fbatShell.debug <- function() {
   source( "../cgFbat/cgFbatCode.R" ) ## for programControl
-  library( pbatR )
+  ## library( pbatR )
   ped <- fread.ped( "../results/analyze/fbatDatasets/data/CAMP" )
   phe <- fread.phe( "../results/analyze/fbatDatasets/data/CAMPZ" )
   print( "Pedigree names" )

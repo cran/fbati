@@ -91,7 +91,7 @@ fbati2 <- function( xmxbar, zmzbar, group, iter=1000, debug=FALSE ){
 
   ## then call the C function for speed.
   pvalue <- as.double(0.0);
-  .C( "fbati",
+  res = .C( "fbati",
       pvalue,
 
       as.integer(length(group)),
@@ -101,7 +101,8 @@ fbati2 <- function( xmxbar, zmzbar, group, iter=1000, debug=FALSE ){
 
       as.integer(iter),
 
-      DUP=FALSE );
+      DUP=TRUE); #DUP=FALSE );
+  pvalue = res[[1]] ## 03/21/2014 <-- Make sure that this works!
 
   #print( pvalue )
 

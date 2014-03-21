@@ -9,14 +9,14 @@ univariateFilter <- function( ped, phe, markers, trait="trait", alpha=0.05, temp
   res <- fbatShell( ped=ped, phe=phe, trait=trait, model="a", markers=markers, tempPrefix=tempPrefix, FBATEXE=FBATEXE )
   res$P <- as.numeric(res$P)
   markers <- intersect(  markers,  unique( res$Marker[res$P<alpha] )  )
-  
+
   #print( res )
   #stop()
-  
+
   ## If simulating, just return the markers
   if( sim )
     return( markers )
-  
+
   ## Otherwise return the univariate results as well
   wh <- seq( from=1, to=nrow(res), by=2 )
   afreq <- as.numeric(res$afreq[wh])
@@ -31,11 +31,11 @@ correlationOrder <- function( m ) {
   #print( nrow(m) )
   n <- nrow(m)
   if( n==1 ) return( 1 )  ## special case
-  
+
   ## Zap lower triangle
   for( r in 1:n )
     m[r,1:r] <- NA
-  
+
   ## Find the maximum
   w <- which( m == max(m,na.rm=TRUE) )[1]
   wc <- floor( (w-1)/n ) + 1
@@ -45,10 +45,10 @@ correlationOrder <- function( m ) {
   #print( wc )
   #print( m[wr,wc] )
   #stop()
-  
+
   #print( "m" )
   #print( m )
-  
+
   #print( "notchosen" )
   neworder <- c( wr, wc )
   #print( "neworder" )
@@ -58,7 +58,7 @@ correlationOrder <- function( m ) {
   while( length(neworder) != n ) {
     notchosen <- setdiff(1:n,neworder)
     #print( notchosen )
-    
+
     ## Find maximum correlated with front
     maxFront <- NA
     maxFrontValue <- -999
@@ -72,10 +72,10 @@ correlationOrder <- function( m ) {
     if( is.na(maxFront) ) stop("correlationOrder infinite loop!")
     neworder <- c( maxFront, neworder )
   }
-  
+
   #print( "neworder final" )
   #print( neworder )
-  
+
   return( neworder )
 }
 
@@ -88,20 +88,20 @@ correlationOrder.debug <- function() {
 fbatcStrategyStepUp <- function( ped, phe, markers=ped.markerNames(ped), trait="trait", traitType="auto", alphaMMarker=0.05, alphaStep=alphaMMarker, sortByCorrelation=TRUE, tempPrefix="temp_", sim=FALSE, debug=FALSE ) {
   fbat.install()
   sh.install()
-  FBAT <- fbat.exename()
+  #FBAT <- fbat.exename()  ## 02/20/2014 codetools
   FBATEXE <- fbat.exename()
 
   ## First compute the multi-marker pvalue
   mmarkerPvalue <- fbatShellMM( ped=ped, phe=phe, markers=markers, trait=trait, FBATEXE=FBATEXE, tempPrefix=tempPrefix ) ########################
-  
+
   if( mmarkerPvalue > alphaMMarker ) {
     ## No reason to go further
     if( sim )
       return( c( marker="", markerR="" ) )
-    
+
     return( list( mmarkerPvalue=mmarkerPvalue ) )
   }
-  
+
   ## Sort by the correlation?
   if( !sim & sortByCorrelation ) {
     ## Resort markers by correlation
@@ -109,8 +109,8 @@ fbatcStrategyStepUp <- function( ped, phe, markers=ped.markerNames(ped), trait="
     neworder <- correlationOrder( corr )
     markers <- markers[ neworder ]
   }
-  
-  
+
+
   ### Compute the correlation of the markers
   #correlation <- fbatShellCorrelation( ped=ped, markers=markers, FBATEXE=FBATEXE, tempPrefix=tempPrefix )
   ## Compute the correlation of the markers (05.04.2009)
@@ -120,7 +120,7 @@ fbatcStrategyStepUp <- function( ped, phe, markers=ped.markerNames(ped), trait="
       correlation <- fbatShellCorrelation( ped=ped, markers=markers, FBATEXE=FBATEXE, tempPrefix=tempPrefix ) #####################
     }, silent=TRUE )
   }
-  
+
   ## Then compute the univariate results
   univariate <- univariateFilter( ped=ped, phe=phe, markers=markers, trait=trait, alpha=alphaStep, tempPrefix=tempPrefix, sim=FALSE, FBATEXE=FBATEXE )
   ## univariate$univariateResults is what we want
@@ -128,28 +128,28 @@ fbatcStrategyStepUp <- function( ped, phe, markers=ped.markerNames(ped), trait="
 
   if( debug )
     print( univariate ) ## DEBUG ONLY
-  
+
   ## find the most significant marker (May also want to make sure enough informative families...)
   wh <- which( univariate$pvalue == min(univariate$pvalue,na.rm=TRUE) )
   if( length(wh) > 1 ) wh <- wh[1]
-  
+
   markersChosen <- markersChosenR <- NULL
   step <- stepR <- list()
   if( length(wh)==1 && univariate$pvalue[wh] < alphaStep ) {
     markersChosen <- markersChosenR <- univariate$marker[wh]
-    
+
     done <- doneR <- FALSE
     while( !done || !doneR ) {
       ## Are the robust and nonrobust the same, or do we need to do them differently?
       same <- length(markersChosen)==length(markersChosenR) && all( markersChosen==markersChosenR )
-      
+
       ## Run the analysis on each of the markers
       markersA <- as.list(  setdiff( markers, markersChosen )  )
       markersC <- rep( list(markersChosen), length(markersA) )
-      
+
       markersAR <- as.list(  setdiff( markers, markersChosenR )  )
       markersCR <- rep( list(markersChosenR), length(markersAR) )
-      
+
       pvalue <- rep(1,length(markersA)); names(pvalue) <- markersA;
       pvalueR <- rep(1,length(markersAR)); names(pvalueR) <- markersAR;
       #numInf <- rep(0,length(markersA)); names(numInf) <- markersA;
@@ -157,7 +157,7 @@ fbatcStrategyStepUp <- function( ped, phe, markers=ped.markerNames(ped), trait="
       numInf <- rep("",length(markersA)); names(numInf) <- markersA;
       numInfR <- rep("",length(markersAR)); names(numInfR) <- markersAR;
       varExpl <- rep(NA,length(markersA)); names(varExpl) <- markersA; ## 01/03/09
-     
+
       if( debug ) {
         print( "markersA" )
         print( markersA )
@@ -168,7 +168,7 @@ fbatcStrategyStepUp <- function( ped, phe, markers=ped.markerNames(ped), trait="
         print( "markersCR" )
         print( markersCR )
       }
-      
+
       if( !done ) {
         for( m in 1:length(markersA) ) {
           try( {
@@ -188,9 +188,9 @@ fbatcStrategyStepUp <- function( ped, phe, markers=ped.markerNames(ped), trait="
                   pvalueR[m] <- temp$pvalueR
                   ##numInfR[m] <- as.numeric(as.character(temp$numInfR))
                   numInfR[m] <- temp$numInfR
-                } 
+                }
               } )
-          
+
         }
       }
       if( !doneR && !same ) {
@@ -210,7 +210,7 @@ fbatcStrategyStepUp <- function( ped, phe, markers=ped.markerNames(ped), trait="
               })
         }
       }
-      
+
       ## Now see if we should add any other markers, or if we are done!
       if( !done ) {
         step[[length(step)+1]] <- list( pvalue=pvalue, numInf=numInf, markersAnalyze=markersA, markersCondition=markersC, varExpl=varExpl )
@@ -234,7 +234,7 @@ fbatcStrategyStepUp <- function( ped, phe, markers=ped.markerNames(ped), trait="
       }
     }
   }
-  
+
   res <- list( mmarkerPvalue=mmarkerPvalue, correlation=correlation, univariate=univariate, step=step, markersChosen=markersChosen, stepR=stepR, markersChosenR=markersChosenR )
   class(res) <- c("fbatcSStep","list")
   return( res )
@@ -250,7 +250,7 @@ fbatcStrategyStepLatex <- function( res, digits=4, ffile="", preamble=FALSE, bui
   if( ( is.character(ffile) && ffile=="" ) || !is.character(ffile) ) {
     if( build ) build <- FALSE  ## Maybe print a message?
   }
-  
+
   ## Allow us to dump to disk as well, stick this in every cat piece
   filename <- ffile  ## In case we wan't to compile the file
   print( filename )
@@ -270,13 +270,13 @@ fbatcStrategyStepLatex <- function( res, digits=4, ffile="", preamble=FALSE, bui
     if( is.character(filename) && filename!="" )
       ccat( "\\section*{", filename, "}\n\n", sep="" )
   }
-  
+
   ## Print the multimarker p-value
   ccat( "Multimarker P-value = ", fn(res$mmarkerPvalue), "\n\n", sep="" )
-  
+
   print( res )
   print( str(res) )
-  
+
   #if( length(res) > 1 ) {
   if( !is.null(res$correlation) && !is.null(res$univariate) ) {
     ## format the numbers properly
@@ -284,7 +284,7 @@ fbatcStrategyStepLatex <- function( res, digits=4, ffile="", preamble=FALSE, bui
     ##res$univariate[,2:3] <- fn( res$univariate[,2:3] )
     res$univariate[[2]] <- fn( res$univariate[[2]] )
     res$univariate[[4]] <- fn( res$univariate[[4]] )  ## 12/10/2008
-  
+
     ## output the univariate results
     ccat( "\\begin{table}\n" )
     ccat( "  \\begin{tabular}{cccc}\n" )
@@ -295,7 +295,7 @@ fbatcStrategyStepLatex <- function( res, digits=4, ffile="", preamble=FALSE, bui
     ccat( "  \\end{tabular}\n" )
     ccat( "  \\caption{Univariate results.}\n" )
     ccat( "\\end{table}\n\n\n" )
-    
+
     ## output the correlation matrix
     n <- nrow(res$correlation)
     ccat( "\\begin{table}\n" )
@@ -312,7 +312,7 @@ fbatcStrategyStepLatex <- function( res, digits=4, ffile="", preamble=FALSE, bui
     ccat( "  \\end{tabular}\n" )
     ccat( "  \\caption{Correlation matrix.}\n")
     ccat( "\\end{table}\n\n\n" )
-    
+
     ## Helper function to output the results
     outstep <- function( step, pvalueHeader="pvalue", caption="" ) {
       if( length(step) == 0 ) return()
@@ -321,7 +321,7 @@ fbatcStrategyStepLatex <- function( res, digits=4, ffile="", preamble=FALSE, bui
       ##if( !is.na(step[[1]]$varExpl[1]) )
       if( !is.null(step[[1]]$varExpl) && !is.na(step[[1]]$varExpl[1]) )
         useVarExpl <- TRUE
-      
+
       ccat( "\\begin{table}\n" )
       if( is.null(step[[1]]$stepType) ) {
         if( !useVarExpl ) {
@@ -342,9 +342,9 @@ fbatcStrategyStepLatex <- function( res, digits=4, ffile="", preamble=FALSE, bui
       }
       ccat( "    \\hline\n" )
       ccat( "    \\hline\n" )
-      
+
       #print( str(step) )
-      
+
       markerCondStrPrev <- ""
       markerAnalStrPrev <- ""
       for( s in 1:length(step) ) {
@@ -358,14 +358,14 @@ fbatcStrategyStepLatex <- function( res, digits=4, ffile="", preamble=FALSE, bui
               ccat( "     & " )
             }
           }
-          
+
           markerCondStr <- paste( step[[s]]$markersCondition[[i]], collapse="," )
           if( markerCondStrPrev=="" || markerCondStr!=markerCondStrPrev ) {
             markerCondStrPrev <- markerCondStr
           }else{
             markerCondStr <- ""
           }
-          
+
           markerAnalStr <- paste( step[[s]]$markersAnalyze[[i]], collapse="," )
           if( markerAnalStrPrev=="" || markerAnalStr!=markerAnalStrPrev ) {
             markerAnalStrPrev <- markerAnalStr
@@ -381,27 +381,27 @@ fbatcStrategyStepLatex <- function( res, digits=4, ffile="", preamble=FALSE, bui
         }
         if( s!=length(step) ) ccat( "    \\hline\n")
       }
-      
+
       ccat( "  \\end{tabular}\n" )
       ccat( "  \\caption{",caption,"}\n" )
       ccat( "\\end{table}\n\n" )
     }
-    
+
     ## And output the results
     outstep( res$step, pvalueHeader="FBAT-C Model", caption="FBAT-C model-based stepwise result." );
     ccat( "Model-based markers chosen:" ); ccat( paste(res$markersChosen,collapse=", ") ); ccat( "\n\n" );
-    
+
     outstep( res$stepR, pvalueHeader="FBAT-C Robust", caption="FBAT-C robust stepwise result." );
     ccat( "Model-free markers chosen:" ); ccat( paste(res$markersChosenR,collapse=", ") ); ccat( "\n\n" );
   }
-    
+
   ## Close the file if necessary
   if( preamble ) {
     ccat( "\\end{document}\n")
     close(ffile)
     ffile <- NULL
   }
-  
+
   ## And maybe build (only linux)
   if( build ) {
     system( paste( "pdflatex", filename ) )
@@ -476,7 +476,7 @@ print.fbatcSStep <- function( x, ... ) {
   outstep( x$step, pvalueHeader="FBAT-C Model" )
   cat( "Model-based markers chosen:\n" )
   cat( paste(x$markersChosen,collapse=","), "\n\n" )
-  
+
   cat( "FBAT-C robust stepwise result:\n" )
   outstep( x$stepR, pvalueHeader="FBAT-C Robust" )
   cat( "Model-free markers chosen:\n" )
@@ -493,15 +493,15 @@ fbatcStrategyStepDown <- function( ped, phe, markers=ped.markerNames(ped), marke
 
   ## First compute the multi-marker pvalue
   mmarkerPvalue <- fbatShellMM( ped=ped, phe=phe, markers=markers, trait=trait, FBATEXE=FBATEXE, tempPrefix=tempPrefix )
-  
+
   if( mmarkerPvalue > alphaMMarker ) {
     ## No reason to go further
     if( sim )
       return( list( marker="", markerR="" ) )
-    
+
     return( list( mmarkerPvalue=mmarkerPvalue ) )
   }
-  
+
   ## Sort by the correlation?
   if( !sim & sortByCorrelation ) {
     ## Resort markers by correlation
@@ -509,8 +509,8 @@ fbatcStrategyStepDown <- function( ped, phe, markers=ped.markerNames(ped), marke
     neworder <- correlationOrder( corr )
     markers <- markers[ neworder ]
   }
-  
-  
+
+
   ### Compute the correlation of the markers
   #correlation <- fbatShellCorrelation( ped=ped, markers=markers, FBATEXE=FBATEXE, tempPrefix=tempPrefix )
   ## Compute the correlation of the markers (05.04.2009)
@@ -520,19 +520,19 @@ fbatcStrategyStepDown <- function( ped, phe, markers=ped.markerNames(ped), marke
       correlation <- fbatShellCorrelation( ped=ped, markers=markers, FBATEXE=FBATEXE, tempPrefix=tempPrefix ) #####################
     }, silent=TRUE )
   }
-  
+
   ## Then compute the univariate results
   univariate <- univariateFilter( ped=ped, phe=phe, markers=markers, trait=trait, alpha=alphaStep, tempPrefix=tempPrefix, sim=FALSE, FBATEXE=FBATEXE )
   ## univariate$univariateResults is what we want
   univariate <- univariate$univariateResults
-  
+
   if( debug )
     print( univariate ) ## DEBUG ONLY
-  
+
   ## If there aren't any univariate significant results, then do we bother?
   #if( sum(univariate$pvalue<alphaStep) == 0 )
   #  return( list( mmarkerPvalue=mmarkerPvalue, univariate=univariate, correlation=correlation ) )
-  
+
   step <- stepR <- list()
 
   done <- length(markersChosen)==0
@@ -557,27 +557,27 @@ fbatcStrategyStepDown <- function( ped, phe, markers=ped.markerNames(ped), marke
         next
       }
     }
-    
+
     ## Are the robust and nonrobust the same, or do we need to do them differently?
     same <- length(markersChosen)==length(markersChosenR) && all( markersChosen==markersChosenR )
-    
+
     ## Run the analysis on each of the markers
     markersA <- as.list(markersChosen)
     markersC <- c()
     for( m in rrange(1,length(markersA)) )
       markersC[[m]] <- setdiff( markersChosen, markersA[[m]] )
-    
+
     markersAR <- markersChosenR
     markersCR <- c()
     for( m in rrange(1,length(markersAR)) )
       markersCR[[m]] <- setdiff( markersChosenR, markersAR[[m]] )
-    
+
     pvalue <- rep(1,length(markersA)); names(pvalue) <- markersA;
     pvalueR <- rep(1,length(markersAR)); names(pvalueR) <- markersAR;
     numInf <- rep("",length(markersA)); names(numInf) <- markersA;
     numInfR <- rep("",length(markersAR)); names(numInfR) <- markersAR;
     varExpl <- rep(NA,length(markersA)); names(varExpl) <- markersA;
-    
+
     if( debug ) {
       print( "markersA" )
       print( markersA )
@@ -588,7 +588,7 @@ fbatcStrategyStepDown <- function( ped, phe, markers=ped.markerNames(ped), marke
       print( "markersCR" )
       print( markersCR )
     }
-    
+
     if( !done ) {
       for( m in 1:length(markersA) ) {
         try( {
@@ -606,9 +606,9 @@ fbatcStrategyStepDown <- function( ped, phe, markers=ped.markerNames(ped), marke
               if( same && !doneR ) {
                 pvalueR[m] <- temp$pvalueR
                 numInfR[m] <- temp$numInfR #as.numeric(as.character(temp$numInfR))
-              } 
+              }
             } )
-        
+
       }
     }
     if( !doneR && !same ) {
@@ -628,7 +628,7 @@ fbatcStrategyStepDown <- function( ped, phe, markers=ped.markerNames(ped), marke
             })
       }
     }
-    
+
     ## Now see if we should add any other markers, or if we are done!
     if( !done ) {
       step[[length(step)+1]] <- list( pvalue=pvalue, numInf=numInf, markersAnalyze=markersA, markersCondition=markersC, varExpl=varExpl )
@@ -651,7 +651,7 @@ fbatcStrategyStepDown <- function( ped, phe, markers=ped.markerNames(ped), marke
       }
     }
   }
-  
+
   res <- list( mmarkerPvalue=mmarkerPvalue, correlation=correlation, univariate=univariate, step=step, markersChosen=markersChosen, stepR=stepR, markersChosenR=markersChosenR )
   class(res) <- c("fbatcSStep","list")
   return( res )
@@ -660,7 +660,7 @@ fbatcStrategyStepDown <- function( ped, phe, markers=ped.markerNames(ped), marke
 fbatcStrategyStep <- function( ped=NULL, phe=NULL, markers=ped.markerNames(ped), trait="trait", traitType="auto", alphaMMarker=0.05, alphaStep=alphaMMarker, sortByCorrelation=TRUE, tempPrefix="temp_", sim=FALSE, debug=FALSE ) {
   if( is.null(ped) )
     return( fbatcSSFuncGUI() )
-  
+
   ## First do step-up routine
   if( debug ) cat( "*** fbatcStrategyStepUp ***\n")
   up <- fbatcStrategyStepUp( ped=ped, phe=phe, markers=markers, trait=trait, traitType=traitType, alphaMMarker=alphaMMarker, alphaStep=alphaStep, sortByCorrelation=sortByCorrelation, tempPrefix=tempPrefix, sim=sim, debug=debug )
@@ -673,7 +673,7 @@ fbatcStrategyStep <- function( ped=NULL, phe=NULL, markers=ped.markerNames(ped),
   #up$markersChosenR <- markers[1:2]
   down <- fbatcStrategyStepDown( ped=ped, phe=phe, markersChosen=up$markersChosen, markersChosenR=up$markersChosenR, trait=trait, traitType=traitType, alphaMMarker=alphaMMarker, alphaStep=alphaStep, sortByCorrelation=sortByCorrelation, tempPrefix=tempPrefix, sim=sim, debug=debug )
   if( debug ) cat( "fbatcStrategy -- putting results together...\n")
-  
+
   ## Now put those results together...
   step <- list()
   ########print( "up" )
@@ -687,7 +687,7 @@ fbatcStrategyStep <- function( ped=NULL, phe=NULL, markers=ped.markerNames(ped),
     step[[length(step)+1]] <- down$step[[i]]
     step[[length(step)]]$stepType <- "down"
   }
-  
+
   stepR <- list()
   for( i in rrange(1,length(up$stepR)) ) {
     stepR[[length(stepR)+1]] <- up$stepR[[i]]
@@ -697,7 +697,7 @@ fbatcStrategyStep <- function( ped=NULL, phe=NULL, markers=ped.markerNames(ped),
     stepR[[length(stepR)+1]] <- down$stepR[[i]]
     stepR[[length(stepR)]]$stepType <- "down"
   }
-  
+
   res <- list( mmarkerPvalue=up$mmarkerPvalue, correlation=up$correlation, univariate=up$univariate, step=step, markersChosen=down$markersChosen, stepR=stepR, markersChosenR=down$markersChosenR )
   class(res) <- c("fbatcSStep","list")
   return( res )
@@ -734,9 +734,9 @@ updateFbatcSSFunc <- function( arg ) {
     guiSetValue( 2, phename )
     arg <- "phe"
   }
-  
+
   if( arg=="phe" ) {
-    phefile <- guiGetValue(2)
+    ##phefile <- guiGetValue(2)  ## 02/20/2014 codetools...
     phe <- NULL
     try( phe <- read.phe(guiGetValue(2)), silent=TRUE )
     if( !is.null(phe) ) {
@@ -777,8 +777,8 @@ latexFbatcSSFunc <- function() {
 }
 
 fbatcSSFuncGUI <- function() {
-  require( fgui )
-  
+  ##require( fgui )
+
   gui( fbatcSSFunc,
       argFilename=list(ped=NULL,phe=NULL),
       argFilter=list(ped="{{Pedigree file} {.ped}}", phe="{{Phenotype file} {.phe}}"),

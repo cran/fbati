@@ -25,23 +25,23 @@ condGeneFBATControl_load <- function( filename ) {
 }
 
 condGeneFBATControl_free <- function( reference ) {
-  .C( "condGeneFBATControl_free", as.integer(reference), DUP=FALSE )
+  .C( "condGeneFBATControl_free", as.integer(reference), DUP=TRUE ) #DUP=FALSE )
 }
 
 condGeneFBATControl_print <- function( reference ) {
-  .C( "condGeneFBATControl_print", as.integer(reference), DUP=FALSE )
+  .C( "condGeneFBATControl_print", as.integer(reference), DUP=TRUE ) #DUP=FALSE )
 }
 
 condGeneFBATControl_linkTrait <- function( reference, pid, trait ) {
   #print( reference )
   #print( head( pid ) )
   #print( head( trait ) )
-  .C( "condGeneFBATControl_linkTrait", as.integer(reference), as.integer(pid), as.double(trait), as.integer(length(pid)), DUP=FALSE, NAOK=TRUE )
+  .C( "condGeneFBATControl_linkTrait", as.integer(reference), as.integer(pid), as.double(trait), as.integer(length(pid)), DUP=TRUE, NAOK=TRUE) #DUP=FALSE, NAOK=TRUE )
 }
 
 condGeneFBATControl_numFam <- function( reference ) {
   ret <- as.integer( 0 );
-  res <- .C( "condGeneFBATControl_numFam", as.integer(reference), ret, DUP=FALSE )
+  res <- .C( "condGeneFBATControl_numFam", as.integer(reference), ret, DUP=TRUE ) #DUP=FALSE )
   ##cat( "n =", res[[2]], "\n" ) ## DEBUG ONLY
   return( res[[2]] )
 }
@@ -49,20 +49,24 @@ condGeneFBATControl_numFam <- function( reference ) {
 condGeneFBATControl_proportionInformative <- function( reference ) {
   informative <- as.double(-1)
   ##res <- .C( "condGeneFBATControl_proportionInformative", as.integer(reference), informative, DUP=FALSE )  ## codetools fun
-  .C( "condGeneFBATControl_proportionInformative", as.integer(reference), informative, DUP=FALSE )
-  return( informative )
+  #.C( "condGeneFBATControl_proportionInformative", as.integer(reference), informative, DUP=FALSE )
+  #return( informative )
+  res = .C( "condGeneFBATControl_proportionInformative", as.integer(reference), informative, DUP=TRUE )
+  return(res[[2]])
 }
 
 condGeneFBATControl_removeUnphased <- function( reference ) {
   ##cat( "# Families before removing unphased:", condGeneFBATControl_numFam( reference ), "\n" )
-  .C( "condGeneFBATControl_removeUnphased", as.integer(reference), DUP=FALSE )
+  .C( "condGeneFBATControl_removeUnphased", as.integer(reference), DUP=TRUE ) #DUP=FALSE )
   ##cat( "# Families after removing unphased:", condGeneFBATControl_numFam( reference ), "\n" )
 }
 
 ## for qtl
 condGeneFBATControl_centerTrait <- function( reference, center=0, mean=TRUE ) {
-  .C( "condGeneFBATControl_centerTrait", as.integer(reference), as.double(center), as.integer(mean), DUP=FALSE )
-  return( center ) ## should be the mean computed by the function
+  #.C( "condGeneFBATControl_centerTrait", as.integer(reference), as.double(center), as.integer(mean), DUP=FALSE )
+  #return( center ) ## should be the mean computed by the function
+  res = .C( "condGeneFBATControl_centerTrait", as.integer(reference), as.double(center), as.integer(mean), DUP=TRUE )
+  return(res[[2]])
 }
 
 ## binary trait
@@ -86,7 +90,7 @@ condGeneFBATControl_uimc <-
 
   #cat( "condGeneFBATControl_uimc before .C\n" )
 
-  .C( "condGeneFBATControl_uimc",
+  res = .C( "condGeneFBATControl_uimc",
       as.integer(reference),
       as.double(bm), as.double(bc0), as.double(bc1),
       as.integer(analyze_allele_index), as.integer(length(analyze_allele_index)),
@@ -94,14 +98,19 @@ condGeneFBATControl_uimc <-
       as.integer(onlyComputeConditional),
       ret_analyze,
       ret_conditional0, ret_conditional1,
-      DUP=FALSE, NAOK=TRUE )
+      DUP=TRUE, NAOK=TRUE ) #DUP=FALSE, NAOK=TRUE )
   ##return( list( ret_analyze=ret_analyze, ret_conditional0=ret_conditional0, ret_conditional1=ret_conditional1 ) )
 
   #cat( "condGeneFBATControl_uimc after .C\n" )
 
-  return( list( analyze=matrix(ret_analyze,nrow=n),
-                conditional0=matrix(ret_conditional0,nrow=n),
-                conditional1=matrix(ret_conditional1,nrow=n) ) )
+  #return( list( analyze=matrix(ret_analyze,nrow=n),
+  #              conditional0=matrix(ret_conditional0,nrow=n),
+  #              conditional1=matrix(ret_conditional1,nrow=n) ) )
+  return(list(
+    analyze=matrix(res[[10]], nrow=n),
+    conditional0=matrix(res[[1]], nrow=n),
+    conditional1=matrix(res[[1]], nrow=n)))
+
 }
 
 condGeneFBATControl_uimc_nuis <-
@@ -170,15 +179,16 @@ condGeneFBATControl_imc <-
 
   ret_I <- as.double( rep( 0, R^2 ) )
 
-  .C( "condGeneFBATControl_imc",
+  res = .C( "condGeneFBATControl_imc",
       as.integer(reference),
       as.double(bm), as.double(bc0), as.double(bc1),
       as.integer(analyze_allele_index), as.integer(length(analyze_allele_index)),
       as.integer(conditional_allele_index), as.integer(length(conditional_allele_index)),
       ret_I,
-      DUP=FALSE, NAOK=TRUE )
+      DUP=TRUE, NAOK=TRUE ) ##DUP=FALSE, NAOK=TRUE )
 
-  return( matrix( ret_I, nrow=R ) )
+  #return( matrix( ret_I, nrow=R ) )
+  return(matrix(res[[9]], nrow=R))
 }
 
 condGeneFBATControl_robustStat <-
@@ -191,14 +201,15 @@ condGeneFBATControl_robustStat <-
   na <- length(analyze_allele_index)
   ret_analyze <- as.double( rep( 0, n*na ) )
 
-  .C( "condGeneFBATControl_robustStat",
+  res = .C( "condGeneFBATControl_robustStat",
       as.integer( reference ),
       as.integer(analyze_allele_index), as.integer(length(analyze_allele_index)),
       as.integer(conditional_allele_index), as.integer(length(conditional_allele_index)),
       ret_analyze,
-      DUP=FALSE, NAOK=TRUE )
+      DUP=TRUE, NAOK=TRUE) #DUP=FALSE, NAOK=TRUE )
 
-  return( matrix( ret_analyze, nrow=n ) )
+  #return( matrix( ret_analyze, nrow=n ) )
+  return(matrix(res[[6]], nrow=n))
 }
 
 condGeneFBATControl_contsUimc <-
@@ -220,7 +231,7 @@ condGeneFBATControl_contsUimc <-
   if( length(beta) != R )
     beta <- c( rep(0, R-length(beta)), beta )
 
-  .C( "condGeneFBATControl_contsUimc",
+  res = .C( "condGeneFBATControl_contsUimc",
       as.integer(reference),
       as.double(alpha), as.double(sigma), as.double(beta),
       as.integer(analyze_allele_index), as.integer(length(analyze_allele_index)),
@@ -229,9 +240,10 @@ condGeneFBATControl_contsUimc <-
       as.integer(onlyComputeConditional),
       as.integer(ignoreBtX),
       ret_b,
-      DUP=FALSE, NAOK=TRUE )
+      DUP=TRUE, NAOK=TRUE ) #DUP=FALSE, NAOK=TRUE )
 
-  return( matrix( ret_b, nrow=n ) )
+  #return( matrix( ret_b, nrow=n ) )
+  return(matrix(res[[11]], nrow=n))
 }
 
 condGeneFBATControl_contsUimc_nuis <-
@@ -287,16 +299,17 @@ condGeneFBATControl_contsImc <-
   #print( as.double(alpha) )
   #print( as.double(sigma) )
   #print( as.double(beta) )
-  .C( "condGeneFBATControl_contsImc",
+  res = .C( "condGeneFBATControl_contsImc",
       as.integer(reference),
       as.double(alpha), as.double(sigma), as.double(beta),
       as.integer(analyze_allele_index), as.integer(length(analyze_allele_index)),
       as.integer(conditional_allele_index), as.integer(length(conditional_allele_index)),
       as.integer(ignoreBtX),
       ret_I,
-      DUP=FALSE, NAOK=TRUE )
+      DUP=TRUE, NAOK=TRUE) #DUP=FALSE, NAOK=TRUE )
 
-  return( matrix( ret_I, nrow=R ) )
+  #return( matrix( ret_I, nrow=R ) )
+  return(matrix(res[[10]], nrow=R))
 }
 
 condGeneFBATControl_numInfFam <-
@@ -304,10 +317,11 @@ condGeneFBATControl_numInfFam <-
 
   numInf <- as.integer(0)
 
-  .C( "condGeneFBATControl_numInfFam",
+  res = .C( "condGeneFBATControl_numInfFam",
       as.integer(reference), numInf,
-      DUP=FALSE )
-  return( numInf )
+      DUP=TRUE ) #DUP=FALSE )
+  #return( numInf )
+  return(res[[2]])
 } ## condGeneFBATControl_numInfFam
 
 condGeneFBATControl_pids <-
@@ -315,10 +329,11 @@ condGeneFBATControl_pids <-
 
   n <- condGeneFBATControl_numFam( reference )
   pid <- as.integer( rep( 0, n ) )
-  .C( "condGeneFBATControl_pids",
+  res = .C( "condGeneFBATControl_pids",
       as.integer(reference), pid,
-      DUP=FALSE )
-  return( pid )
+      DUP=TRUE ) #DUP=FALSE )
+  #return( pid )
+  return(res[[2]])
 }
 
 condGeneFBATControl_estEqNuis <-
@@ -329,11 +344,13 @@ condGeneFBATControl_estEqNuis <-
   ret_lhs <- as.double( rep(0,nc2*nc2) )
   ret_rhs <- as.double( rep(0,nc2) )
 
-  .C( "condGeneFBATControl_estEqNuis",
+  res = .C( "condGeneFBATControl_estEqNuis",
       as.integer(referenceCondition), as.integer(length(referenceCondition)),
       as.double(offset),
       ret_lhs, ret_rhs,
-      DUP=FALSE, NAOK=TRUE )
+      DUP=TRUE, NAOK=TRUE ) #DUP=FALSE, NAOK=TRUE )
+  ret_lhs = res[[4]]
+  ret_rhs = res[[5]]
 
   ret_lhs <- matrix( ret_lhs, ncol=nc2, byrow=FALSE )
   #ret_lhs <- matrix( ret_lhs, ncol=nc2 )
@@ -360,7 +377,7 @@ condGeneFBATControl_estEqNuisUpdate <-
   .C( "condGeneFBATControl_estEqNuisUpdate",
       as.integer(referenceCondition), as.integer(length(referenceCondition)),
       as.double(bc),
-      DUP=FALSE )
+      DUP=TRUE)#DUP=FALSE )
   return( invisible() ) ## no return
 }
 
@@ -369,7 +386,7 @@ condGeneFBATControl_estEqNuisUpdate2 <-
   .C( "condGeneFBATControl_estEqNuisUpdate2",
       as.integer(referenceCondition), as.integer(length(referenceCondition)),
       as.double(bc),
-      DUP=FALSE )
+      DUP=TRUE) #DUP=FALSE )
   return( invisible() ) ## no return
 }
 
@@ -389,12 +406,15 @@ condGeneFBATControl_estEq <-
   ret_xcxc <- as.double( rep(0, nc2*nc2) )
 
   ## Call the C Code
-  .C( "condGeneFBATControl_estEq",
+  res = .C( "condGeneFBATControl_estEq",
       as.integer(referenceAnalyze), as.integer(length(referenceAnalyze)),
       as.integer(referenceCondition), as.integer(length(referenceCondition)),
       as.double(bc),  as.double(offset),
       ret_uij, ret_xmxc, ret_xcxc,
-      DUP=FALSE, NAOK=TRUE )
+      DUP=TRUE, NAOK=TRUE) #DUP=FALSE, NAOK=TRUE )
+  ret_uij = res[[7]]
+  ret_xmxc = res[[8]]
+  ret_xcxc = res[[9]]
 
   ## Form the matrix
   ret_uij <- matrix( ret_uij, nrow=np )
@@ -492,7 +512,7 @@ condGeneFBATControl_estEq <-
   #numInf_nc <- rep(0,nc2)
   #for( k1 in 1:nc2 )
   #  numInf_nc[k1] <- sum( abs(ret_uij[,k1+na]) >= sqrt(.Machine$double.eps), na.rm=TRUE )
-  #  
+  #
   #return( list( pvalue=pvalue, rank=rank, numInf=paste( paste(numInf_na,collapse=","), paste(numInf_nc,collapse=","), sep="|" ) ) )
 
   numInf <- ""
@@ -542,7 +562,7 @@ condGeneFBATControl_dUdBc <-
   ret_c <- as.double( rep(0,nc2*nc2) )
 
   ## Call the function
-  .C( "condGeneFBATControl_dUdBc",
+  ret = .C( "condGeneFBATControl_dUdBc",
       as.integer(referenceAnalyze), as.integer(length(referenceAnalyze)),
       as.integer(referenceCondition), as.integer(length(referenceCondition)),
       as.integer(analyzeAlleleIndex), as.integer(length(analyzeAlleleIndex)),
@@ -550,7 +570,10 @@ condGeneFBATControl_dUdBc <-
       as.integer(conditionAlleleIndex2), as.integer(length(conditionAlleleIndex2)),
       as.double(bc),
       ret_m, ret_c,
-      DUP=FALSE )
+      DUP=TRUE) #DUP=FALSE )
+  ret_m = ret[[12]]
+  ret_c = ret[[13]]
+
 
   umc <- matrix( ret_m, nrow=na, ncol=nc2 )
   ucc <- matrix( ret_c, nrow=nc2, ncol=nc2 )
@@ -560,45 +583,48 @@ condGeneFBATControl_dUdBc <-
 condGeneFBATControl_varExplConts <-
     function( reference, betaEst ) {
   ret_varExpl <- as.double(0.0)
-  .C( "condGeneFBATControl_varExplConts",
+  res = .C( "condGeneFBATControl_varExplConts",
       as.integer(reference), as.integer(length(reference)),
       as.double(betaEst),
       ret_varExpl,
-      DUP=FALSE )
-  return( ret_varExpl )
+      DUP=TRUE ) #DUP=FALSE )
+  #return( ret_varExpl )
+  return(res[[4]])
 }
 
 condGeneFBATControl_varContsMean <-
     function( reference, betaEst ) {
   ret_var <- as.double(0.0)
-  .C( "condGeneFBATControl_varContsMean",
+  res = .C( "condGeneFBATControl_varContsMean",
       as.integer(reference), as.integer(length(reference)),
       as.double(betaEst),
       ret_var,
-      DUP=FALSE )
-  return( as.double(ret_var) )
+      DUP=TRUE ) #DUP=FALSE )
+  #return( as.double(ret_var) )
+  return(res[[4]])
 }
 condGeneFBATControl_varContsModel <-
     function( reference, betaEst ) {
   ret_var <- as.double(0.0)
-  .C( "condGeneFBATControl_varContsModel",
+  res = .C( "condGeneFBATControl_varContsModel",
       as.integer(reference), as.integer(length(reference)),
       as.double(betaEst),
       ret_var,
-      DUP=FALSE )
-  return( ret_var )
+      DUP=TRUE) #DUP=FALSE )
+  #return( ret_var )
+  return(res[[4]])
 }
 
 
 condGeneFBATControl_backupTrait <- function( reference ) {
   .C( "condGeneFBATControl_backupTrait",
       as.integer(reference), as.integer(length(reference)),
-      DUP=FALSE)
+      DUP=TRUE)#DUP=FALSE)
 }
 condGeneFBATControl_restoreTrait <- function( reference ) {
   .C( "condGeneFBATControl_restoreTrait",
       as.integer(reference), as.integer(length(reference)),
-      DUP=FALSE)
+      DUP=TRUE)#DUP=FALSE)
 }
 
 
@@ -1069,7 +1095,7 @@ condGene <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     bc <- NULL
     if( verbose ) cat( "About to try multiroot.\n" )
     try({
-      require( rootSolve )
+      ##require( rootSolve )
       bcSolve <- multiroot( f=condGeneFBATControl_uimc_nuis, start=initial, maxiter=1000, rtol=TOL, atol=TOL, ctol=TOL, useFortran=FALSE, reference=reference, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE )
       bc <- bcSolve$root
     }, silent=TRUE )
@@ -1123,7 +1149,7 @@ condGene <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     bcSolve <- NULL
 
     try( {
-      require( rootSolve )
+      ##require( rootSolve )
       bcSolve <- multiroot( f=condGeneFBATControl_contsUimc_nuis, start=initial, maxiter=100, rtol=TOL, atol=TOL, ctol=TOL, useFortran=FALSE, reference=reference, alpha=alpha, sigma=sigma, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE )
       bc <- bcSolve$root
     }, silent=TRUE )
@@ -1397,7 +1423,7 @@ condGeneP <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     initial <- rep( 0, 2*length(markerCondition) )
     bcSolve <- NULL
     try({
-      require( rootSolve )
+      ##require( rootSolve )
       bcSolve <- multiroot( f=condGeneFBATControl_uimc_nuis, start=initial, maxiter=100, rtol=TOL, atol=TOL, ctol=TOL, useFortran=FALSE, reference=reference, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE ) ## onlyComputeConditional irrelevant here...
       bc <- bcSolve$root
     }, silent=TRUE )
@@ -1440,7 +1466,7 @@ condGeneP <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     initial <- rep( 0, 2*length(conditional_allele_index) )
     bcSolve <- NULL
     try( {
-      require( rootSolve )
+      ##require( rootSolve )
       bcSolve <- multiroot( f=condGeneFBATControl_contsUimc_nuis, start=initial, maxiter=100, rtol=TOL, atol=TOL, ctol=TOL, useFortran=FALSE, reference=reference, alpha=alpha, sigma=sigma, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE, ignoreBtX=ignoreBtX )
       bc <- bcSolve$root
     }, silent=TRUE )
@@ -2193,11 +2219,11 @@ condGeneP3 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     ##cat( "COMPVAREXPL BEGIN\n" )
 
     referenceVarExpl <- c( analyzeReference, conditionReference )
-    
+
     ## Compute the variance of the mean
     #varMean <- condGeneFBATControl_varContsMean( referenceVarExpl, 0 ) ##betaEst ) -- not really used...
     #cat( "VARMEAN ORIG", varMean, "\n" )
-    
+
     ## Backup the trait, since we're going to modify it
     condGeneFBATControl_backupTrait( referenceVarExpl );
 
@@ -2206,7 +2232,7 @@ condGeneP3 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     if( verbose ) { cat( "betaEst for varExpl: " ); print( betaEst ); }
     varModel <- condGeneFBATControl_varContsModel( referenceVarExpl, betaEst )
     varExpl <- 1 - varModel / varMean
-    
+
     if( verbose ) { cat( "Nuisance iteration ", 0, ", varExpl=", varExpl, ", betaEst=", sep="" ); print(betaEst); }
 
     for( i in 1:NUISANCE_ITER ) {
@@ -2227,11 +2253,11 @@ condGeneP3 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     ## Compute the variance of the mean
     varMean <- condGeneFBATControl_varContsMean( referenceVarExpl, 0 ) ##betaEst ) -- not really used...
     #cat( "VARMEAN ORIG (SUB)", varMean, "\n" )
-    
-		#varExpl <- 1 - varModel / varMean 
-		
+
+		#varExpl <- 1 - varModel / varMean
+
 		varExpl <- varModel
-    
+
     ##cat( "COMPVAREXPL END\n" )
   }
   #compVarExpl <- TRUE
@@ -2416,7 +2442,7 @@ condGeneP4 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
   bcSolve <- NULL
   ##bcSolve <- mrroot2( f=condGeneFBATControl_uimc_nuis, initial=initial, reference=reference, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE, MAXITER=MAXITER, TOL=TOL, verbose=verbose )
   try({
-        require( rootSolve )
+        ##require( rootSolve )
         bcSolve <- multiroot( f=condGeneFBATControl_uimc_nuis, start=initial, maxiter=100, rtol=TOL, atol=TOL, ctol=TOL, useFortran=FALSE, reference=referenceC, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index2, onlyComputeConditional=TRUE, verbose=verbose ) ## onlyComputeConditional irrelevant here...
         bc <- bcSolve$root
       }, silent=TRUE )
@@ -2590,7 +2616,7 @@ condGeneP4 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
   numInfR <- rep( 0, A )
   for( k1 in 1:A )
     numInfR[k1] <- sum( abs(umcRMat[,k1]) >= sqrt(.Machine$double.eps), na.rm=TRUE )
-  
+
   pvalueR <- 1
   rankR <- 1
   try( {

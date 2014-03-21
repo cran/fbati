@@ -19,6 +19,8 @@ export(
 
 import( tcltk )
 import( pbatR )
+import( fgui )
+import( rootSolve )
 
 S3method( print, fbatcSStep )
 

@@ -14,12 +14,19 @@ dataComputeGroupG <- function( pheped,
   numFamilies <- as.integer(0)
 
   ## call the C routine
-  .C( "dataComputeGroupG",
+  res = .C( "dataComputeGroupG",
       as.double(as.matrix(pheped)), dim(pheped),
       as.integer(m0pos-1), as.integer(m1pos-1),
       groups,  g0, g1, g2,
       affected_index, affected_index_size,  numFamilies,
-      DUP=FALSE, NAOK=TRUE );
+      DUP=TRUE, NAOK=TRUE); #DUP=FALSE, NAOK=TRUE );
+  groups = res[[5]]
+  g0 = res[[6]]
+  g1 = res[[7]]
+  g2 = res[[8]]
+  affected_index = res[[9]]
+  affected_index_size = res[[10]]
+  numFamilies = res[[11]]
 
   ## NEED to add 1 to affected index!
   return( list( groupsG=data.frame( groups=groups, g0=g0, g1=g1, g2=g2 ),
@@ -27,7 +34,7 @@ dataComputeGroupG <- function( pheped,
 }
 
 datamatrix.R.debug <- function() {
-  library( pbatR )
+  ##library( pbatR )
   dyn.load( "src/ibat.so" ) ## unix way
   ped <- read.ped( "test", sym=FALSE ) ## coded 1/2
   ped[ped$id==3,]$AffectionStatus <- 2
