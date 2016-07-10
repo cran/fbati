@@ -234,7 +234,7 @@ extern "C" {
           childRowSize++;
 
           if( din(i,C_AFF)==2                  // affected
-              && !isnan(din(i,envCol))         // environment
+              && !ISNAN(din(i,envCol))         // environment
               && din(i,m0)!=0 && din(i,m1)!=0 // genotyped
           ){
             //cout << "affected, env present, genotyped: " << i << endl;

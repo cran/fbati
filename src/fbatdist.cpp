@@ -646,7 +646,7 @@ double fbat_Si( int n,
   vector<int> cb_geno; cb_geno.resize(n);
   for( int j=0; j<n; j++ ) {
     if( ca[j]!=0 && cb[j]!=0 ) {
-      if( !isnan(y[j]) ) {
+      if( !ISNAN(y[j]) ) {
         y_genopheno[ngenopheno] = y[j];
         ca_genopheno[ngenopheno] = ca[j];
         cb_genopheno[ngenopheno] = cb[j];
@@ -804,7 +804,7 @@ void fbat_Si_joint_G_GE( int n,
   vector<int> cb_geno; cb_geno.resize(n);
   for( int j=0; j<n; j++ ) {
     if( ca[j]!=0 && cb[j]!=0 ) {
-      if( !isnan(y[j]) && !isnan(z[j]) ) {
+      if( !ISNAN(y[j]) && !ISNAN(z[j]) ) {
         y_genopheno[ngenopheno] = y[j];
         z_genopheno[ngenopheno] = z[j];
         ca_genopheno[ngenopheno] = ca[j];

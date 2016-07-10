@@ -1113,7 +1113,7 @@ public:
 			ret_analyze[aa] = 0.0;
 
 		for (unsigned int j = 0; j < observed.size(); j++) {
-			if (!isnan(trait[j])) {
+			if (!ISNAN(trait[j])) {
 				double weight = 0.0;
 				//double ex[analyze_allele_index_size];
         vector<double> ex; ex.resize(analyze_allele_index_size);
@@ -1147,7 +1147,7 @@ public:
 					ret_analyze[aa] += trait[j] * (g[observed[j]].xCode(0,
 							analyze_allele_index[aa], 2, ADDITIVE) - ex[aa]);
 				} // aa
-			} // !isnan(...)
+			} // !ISNAN(...)
 		} // j
 	} // robustStat
 
@@ -1178,7 +1178,7 @@ public:
 			int analyze_allele_index_size, int *conditional_allele_index,
 			int conditional_allele_index_size, bool ignoreBtX) {
 		//
-		if (isnan(trait[j]))
+		if (ISNAN(trait[j]))
 			return (0.0);
 
 		if (ignoreBtX)
@@ -1193,7 +1193,7 @@ public:
       //bool ignoreBtX, double *res) {
     int R = analyze_allele_index_size + conditional_allele_index_size * 2;
 
-		if (isnan(trait[j])) {
+		if (ISNAN(trait[j])) {
 			for (int r = 0; r < R; r++)
 				res[r] = 0.0;
 			return;
@@ -1215,12 +1215,12 @@ public:
 		//
 		int R = analyze_allele_index_size + conditional_allele_index_size * 2;
 
-		if (isnan(trait[j])) {
+		if (ISNAN(trait[j])) {
 			int Rsq = R * R;
 			for (int r = 0; r < Rsq; r++)
 				res[r] = 0.0;
 			return;
-		} // isnan(...)
+		} // ISNAN(...)
 
 		for (int k1 = 0; k1 < R; k1++) {
 			for (int k2 = 0; k2 < R; k2++) {
@@ -1540,7 +1540,7 @@ public:
 		// somewhat inefficient code to do this... but it isn't what is really taking the most time (i.e. other optimizations would probably be better)
 		for( unsigned int iped = 0; iped < ped.size(); iped++) {
 			for( unsigned int ipid = 0; (int)ipid < n; ipid++)
-				if ( (int)ped[iped].pid == pid[ipid]) // && !isnan(trait[ipid]) ) // added second piece 7/28/2008
+				if ( (int)ped[iped].pid == pid[ipid]) // && !ISNAN(trait[ipid]) ) // added second piece 7/28/2008
 					ped[iped].trait.push_back(trait[ipid]);
 		} // iped
 
@@ -1566,8 +1566,8 @@ public:
 
 			for (unsigned int p = 0; p < ped.size(); p++) {
 				for (unsigned int j = 0; j < ped[p].trait.size(); j++) {
-                                        if (!isnan(ped[p].trait[j])) {
-//                                        if ( !isnan(ped[p].trait[j]) && ped[p].g[j].genotype(0,0,1,1)==1 ) {
+                                        if (!ISNAN(ped[p].trait[j])) {
+//                                        if ( !ISNAN(ped[p].trait[j]) && ped[p].g[j].genotype(0,0,1,1)==1 ) {
 						*center += ped[p].trait[j];
 						count++;
 					}
@@ -1648,7 +1648,7 @@ public:
 					conditional_allele_index_size, (double *)Iplus.data());
 
 			for (int r = 0; r < Rsq; r++)
-				if (!isnan(Iplus[r]))
+				if (!ISNAN(Iplus[r]))
 					I[r] += Iplus[r];
 		}
 	} // imc
@@ -1713,7 +1713,7 @@ public:
 					conditional_allele_index_size, ignoreBtX, (double *)temp_ret_I.data());
 
 			for (int rr = 0; rr < Rsq; rr++)
-				if (!isnan(temp_ret_I[rr]))
+				if (!ISNAN(temp_ret_I[rr]))
 					ret_I[rr] += temp_ret_I[rr];
 		}
 	} // contsImc
@@ -2005,7 +2005,7 @@ void condGeneFBATControl_estEqNuis(
 					}// gg
 
 					// is the trait set?
-					if( !traitSet && !isnan(ped->trait[j]) ) {
+					if( !traitSet && !ISNAN(ped->trait[j]) ) {
 						eij = ped->trait[ j ];
 						//if( !qtl ) eij *= exp( - (*offset) );
 						traitSet = true;
@@ -2102,7 +2102,7 @@ void condGeneFBATControl_estEqNuisUpdate(
 					xijc[c*2+1] = ped->g[ ped->observed[j] ].genotype( 0, 0, 1, 2 );
 
 					// is the trait set?
-					if( !traitSet && !isnan(ped->trait[j]) ) {
+					if( !traitSet && !ISNAN(ped->trait[j]) ) {
 						eij = ped->trait[ j ];
 						traitSet = true;
 					}//fi( !traitSet )
@@ -2378,7 +2378,7 @@ void condGeneFBATControl_estEqNuisUpdate2(
 					xijc[c*2+1] = ped->g[ ped->observed[j] ].genotype( 0, 0, 1, 2 );
 
 					// is the trait set?
-					if( !traitSet && !isnan(ped->trait[j]) ) {
+					if( !traitSet && !ISNAN(ped->trait[j]) ) {
 						eij = ped->trait[ j ];
 						traitSet = true;
 					}//fi( !traitSet )
@@ -2507,7 +2507,7 @@ void condGeneFBATControl_estEq(
 
           // NO -- this should _NOT_ be done, as it's only adjusted for the conditioning alleles
 					// set the trait?
-					if( !traitSet && !isnan(ped->trait[j]) ) {
+					if( !traitSet && !ISNAN(ped->trait[j]) ) {
 						eij = ped->trait[j];
 						traitSet = true;
 						if(!qtl)
@@ -2542,8 +2542,8 @@ void condGeneFBATControl_estEq(
 					}// gg
 
 					// is the trait set?
-          //if( !traitSet && !isnan(ped->trait[j]) ) {
-          if( !isnan(ped->trait[j]) ) {
+          //if( !traitSet && !ISNAN(ped->trait[j]) ) {
+          if( !ISNAN(ped->trait[j]) ) {
 						eij = ped->trait[ j ];
 						if( !qtl ) eij *= exp( - (*offset) );
 						traitSet = true;
@@ -2558,7 +2558,7 @@ void condGeneFBATControl_estEq(
 					eij -= bc[cc]*xijc[cc];
 
 				// across the analyze alleles, compute uij
-				if( !isnan(eij) ) {
+				if( !ISNAN(eij) ) {
 					for( int a=0; a<na; a++ )
 						ret_uij[ i + a*np ] += ( xija[a] - exija[a] ) * eij;
 					// across the condition alleles
@@ -2569,12 +2569,12 @@ void condGeneFBATControl_estEq(
 					// -- a little overkill? Really should be able to just get away with the first one...
 					//for( int a=0; a<na; a++ ) {
 					//	Pedigree *ped = &data[referenceAnalyze[a]].ped[i];
-					//	if( !isnan(ped->trait[j]) )
+					//	if( !ISNAN(ped->trait[j]) )
 					//		ped->trait[j] = eij;
 					//}
 					//for( int c=0; c<nc; c++ ) {
 					//	Pedigree *ped = &data[referenceCondition[c]].ped[i];
-					//	if( !isnan(ped->trait[j]) )
+					//	if( !ISNAN(ped->trait[j]) )
 					//		ped->trait[j] = eij;
 					//}
 					// NOITIDDA HCAORPPA PETS OWT ROF
@@ -2589,7 +2589,7 @@ void condGeneFBATControl_estEq(
 						for( int cc2=0; cc2<nc2; cc2++ )
 							ret_xcxc[ cc1 + cc2*nc2 ] += - ( xijc[cc1] - exijc[cc1] ) * xijc[cc2]; // symmetric? -- NO!
 							//ret_xcxc[ cc2 + cc1*nc2 ] += - ( xijc[cc1] - exijc[cc1] ) * xijc[cc2]; // symmetric? -- NO!
-				}// fi(!isnan(eij))
+				}// fi(!ISNAN(eij))
 			}//fi( traitSet )
 		}// j
 	}// i
@@ -3043,7 +3043,7 @@ void condGeneFBATControl_varExplConts(
 		// go across each offspring
 		for( unsigned int j=0; j<noff; j++ ) {
 			double y = data[ reference[0] ].ped[i].trait[j];
-			if( !isnan(y) ) {
+			if( !ISNAN(y) ) {
 				ymean += y;
 				ymeanCount++;
 			}
@@ -3074,7 +3074,7 @@ void condGeneFBATControl_varExplConts(
 			// go across each offspring
 			for( int j=0; j<noff; j++ ) {
 				double y = data[ reference[0] ].ped[i].trait[j];
-				if( !isnan(y) && ped->g[ped->observed[j]].genotype(0,0,geno_a[g],geno_b[g])==1 ) {
+				if( !ISNAN(y) && ped->g[ped->observed[j]].genotype(0,0,geno_a[g],geno_b[g])==1 ) {
 					ym += y;
 					ymCount++;
 				}
@@ -3122,7 +3122,7 @@ void condGeneFBATControl_varExplConts(
 			if( informative ) {
 				// finally compute the variance pieces
 				double y = data[ reference[0] ].ped[i].trait[j];
-				if( !isnan(y) ) {
+				if( !ISNAN(y) ) {
 					//ymean += y;
 					varModel += ( y - bx ) * ( y - bx );
 					varMean  += ( y - ymean ) * ( y - ymean );
@@ -3205,7 +3205,7 @@ void condGeneFBATControl_varContsMean(
 
 			if( informative ) {
 				double y = data[reference[0]].ped[i].trait[j];
-				if( !isnan(y) ) {
+				if( !ISNAN(y) ) {
 					//cout << "y = " << y << endl;
 					ymean += y;
 					good_i.push_back(i);
@@ -3283,7 +3283,7 @@ void condGeneFBATControl_varContsModel(
 			if( informative ) {
 				// finally compute the variance pieces
 				double y = data[reference[0]].ped[i].trait[j];
-				if( !isnan(y) )
+				if( !ISNAN(y) )
 					varModel += ( y - bx ) * ( y - bx );
 			}// fi(informative)
 		}// j

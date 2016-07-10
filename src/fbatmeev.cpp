@@ -72,7 +72,7 @@ void REXP_fbatmeev(RMatrix &data, RVector &marker,  double trait, double model, 
       tempVec[m/2] = 0.0;
       for( int j=0; j<curC; j++ ) {
         double txmex = y[j] * ( xCode( ca[j], cb[j], (int)model ) - ex );
-        if( !isnan(txmex) && !isnan(cEnv[j]) && ca[j]!=0 && cb[j]!=0 ) {
+        if( !ISNAN(txmex) && !ISNAN(cEnv[j]) && ca[j]!=0 && cb[j]!=0 ) {
           tempVec[m/2] += txmex;
         }
       }//j
