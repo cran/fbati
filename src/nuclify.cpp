@@ -79,7 +79,7 @@ extern "C" {
   // Chops pedigrees up into nuclear families
   // failure=0 == success
   // failure=1 == indicates the output isn't large enough (suggest doubling it, which is what the R code does in a recursive fashion)
-  void nuclify( double *data, int *dimData,
+  void nuclify_cpp( double *data, int *dimData,
                 double *dataOut, int *dimDataOut,
                 int *failure ) {
     *failure = 0;
@@ -107,7 +107,7 @@ extern "C" {
         int numSibs = 0;
         int sibs[NUCLIFY_MAX_SIBS];
         bool validFamily = true;
-        for( int ii=start; ii<=end & validFamily; ii++ ) {
+        for( int ii=start; ii<=end && validFamily; ii++ ) {
           // We actually _want_ when i==ii to fall through...
 
           if( idfath==din(ii,C_FATH) && idmoth==din(ii,C_MOTH) ) {
@@ -132,25 +132,25 @@ extern "C" {
           // the father, inserting one if not in the pedigree
           if( idfathRow != -1 ) {
             curRow = pushDataRow( din, idfathRow, dout, curRow, newPid, true );
-            if(curRow == dout.R) {*failure = 1; return;}
+            if(curRow == (int)dout.R) {*failure = 1; return;}
           }else{
             curRow = pushEmptyRow( dout, curRow, newPid, idfath, SEX_MALE );
-            if(curRow == dout.R) {*failure = 1; return;}
+            if(curRow == (int)dout.R) {*failure = 1; return;}
           }
 
           // the mother, ""
           if( idmothRow != -1 ) {
             curRow = pushDataRow( din, idmothRow, dout, curRow, newPid, true );
-            if(curRow == dout.R) {*failure = 1; return;}
+            if(curRow == (int)dout.R) {*failure = 1; return;}
           }else{
             curRow = pushEmptyRow( dout, curRow, newPid, idmoth, SEX_FEMALE );
-            if(curRow == dout.R) {*failure = 1; return;}
+            if(curRow == (int)dout.R) {*failure = 1; return;}
           }
 
           // and all of their children
           for( int ch=0; ch<numSibs; ch++ ) {
             curRow = pushDataRow( din, sibs[ch], dout, curRow, newPid );
-            if(curRow == dout.R) {*failure = 1; return;}
+            if(curRow == (int)dout.R) {*failure = 1; return;}
           }
 
           newPid++;
@@ -171,7 +171,7 @@ extern "C" {
   //  so data is in nuclear families and the children have
   //  parents, but their parents' parents are marked
   //  as missing
-  void strataReduce( double *data, int *dimData,
+  void strataReduce_cpp( double *data, int *dimData,
                      double *dataOut, int *dimDataOut,
                      int *pEnvCol, int *pm0, int *pm1,
                      int *pMaxSib ) { // new 04/08/2008
@@ -211,7 +211,7 @@ extern "C" {
 
       // find all children and parents locations for current family
       // - basic children/parents loc
-      int childRow[100];   // not actually
+      //int childRow[100];   // not actually
       int childRowSize=0;  //  needed?
       int parentRow[20];
       int parentRowSize=0;
@@ -230,7 +230,7 @@ extern "C" {
             parentRowSize++;
           }
         }else{
-          childRow[childRowSize] = i;
+          //childRow[childRowSize] = i;
           childRowSize++;
 
           if( din(i,C_AFF)==2                  // affected

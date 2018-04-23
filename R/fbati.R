@@ -91,7 +91,7 @@ fbati2 <- function( xmxbar, zmzbar, group, iter=1000, debug=FALSE ){
 
   ## then call the C function for speed.
   pvalue <- as.double(0.0);
-  res = .C( "fbati",
+  res = .C( "fbati_cpp",
       pvalue,
 
       as.integer(length(group)),

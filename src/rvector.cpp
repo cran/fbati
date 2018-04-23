@@ -20,7 +20,8 @@ void RVector::set( double *p_data, int p_dimData )
 double& RVector::operator () (unsigned i)
 {
 #ifdef DEBUG_RVECTOR
-  if( i<0 || i>=I ) {
+  //if( i<0 || i>=I ) { // can't be <0, by unsigned int casting
+  if( i>=I ) {
     Rprintf("Index (%d) is out of range (%d).\n", i, I);
   }
 #endif
@@ -31,7 +32,8 @@ double& RVector::operator () (unsigned i)
 double& RVector::elt( unsigned i )
 {
 #ifdef DEBUG_RVECTOR
-  if( i<0 || i>=I ) {
+  //if( i<0 || i>=I ) {
+  if( i>=I ) {
     Rprintf("Index (%d) is out of range (%d).\n", i, I);
   }
 #endif

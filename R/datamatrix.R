@@ -1,7 +1,7 @@
 ## merge( phe, ped, all.x=TRUE )
 
 ## Only uses the first affected (traces to dataComputeGroupG C function)
-dataComputeGroupG <- function( pheped,
+dataComputeGroupG_R <- function( pheped,
                                m0pos=7, m1pos=m0pos+1 ) { ## R positions... stupid R!!!
   ## create output objects
   n <- nrow(pheped)
@@ -38,7 +38,7 @@ datamatrix.R.debug <- function() {
   dyn.load( "src/ibat.so" ) ## unix way
   ped <- read.ped( "test", sym=FALSE ) ## coded 1/2
   ped[ped$id==3,]$AffectionStatus <- 2
-  print( res <- dataComputeGroupG( ped ) )
+  print( res <- dataComputeGroupG_R( ped ) )
   write.csv( res$groupsG, "debugDatamatrix.csv" )
 }
 ##datamatrix.R.debug()

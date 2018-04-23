@@ -24,4 +24,11 @@ import( rootSolve )
 
 S3method( print, fbatcSStep )
 
-useDynLib(fbati)
+useDynLib(fbati, .registration=TRUE)
+
+
+
+importFrom("stats", "optim", "pchisq", "qnorm", "rnorm", "runif")
+importFrom("utils", "download.file", "getFromNamespace", "str",
+           "write.csv")
+            

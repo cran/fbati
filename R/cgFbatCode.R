@@ -18,35 +18,35 @@ copyFBAT <- function(FBAT="/tmp/th/fbat_2.02c") {
   }
 }
 
-condGeneFBATControl_load <- function( filename ) {
+condGeneFBATControl_load_R <- function( filename ) {
   i = as.integer(0)
   res <- .C("condGeneFBATControl_load", filename, i, DUP=TRUE )
   return( res[[2]] )
 }
 
-condGeneFBATControl_free <- function( reference ) {
+condGeneFBATControl_free_R <- function( reference ) {
   .C( "condGeneFBATControl_free", as.integer(reference), DUP=TRUE ) #DUP=FALSE )
 }
 
-condGeneFBATControl_print <- function( reference ) {
+condGeneFBATControl_print_R <- function( reference ) {
   .C( "condGeneFBATControl_print", as.integer(reference), DUP=TRUE ) #DUP=FALSE )
 }
 
-condGeneFBATControl_linkTrait <- function( reference, pid, trait ) {
+condGeneFBATControl_linkTrait_R <- function( reference, pid, trait ) {
   #print( reference )
   #print( head( pid ) )
   #print( head( trait ) )
   .C( "condGeneFBATControl_linkTrait", as.integer(reference), as.integer(pid), as.double(trait), as.integer(length(pid)), DUP=TRUE, NAOK=TRUE) #DUP=FALSE, NAOK=TRUE )
 }
 
-condGeneFBATControl_numFam <- function( reference ) {
+condGeneFBATControl_numFam_R <- function( reference ) {
   ret <- as.integer( 0 );
   res <- .C( "condGeneFBATControl_numFam", as.integer(reference), ret, DUP=TRUE ) #DUP=FALSE )
   ##cat( "n =", res[[2]], "\n" ) ## DEBUG ONLY
   return( res[[2]] )
 }
 
-condGeneFBATControl_proportionInformative <- function( reference ) {
+condGeneFBATControl_proportionInformative_R <- function( reference ) {
   informative <- as.double(-1)
   ##res <- .C( "condGeneFBATControl_proportionInformative", as.integer(reference), informative, DUP=FALSE )  ## codetools fun
   #.C( "condGeneFBATControl_proportionInformative", as.integer(reference), informative, DUP=FALSE )
@@ -55,14 +55,14 @@ condGeneFBATControl_proportionInformative <- function( reference ) {
   return(res[[2]])
 }
 
-condGeneFBATControl_removeUnphased <- function( reference ) {
+condGeneFBATControl_removeUnphased_R <- function( reference ) {
   ##cat( "# Families before removing unphased:", condGeneFBATControl_numFam( reference ), "\n" )
   .C( "condGeneFBATControl_removeUnphased", as.integer(reference), DUP=TRUE ) #DUP=FALSE )
   ##cat( "# Families after removing unphased:", condGeneFBATControl_numFam( reference ), "\n" )
 }
 
 ## for qtl
-condGeneFBATControl_centerTrait <- function( reference, center=0, mean=TRUE ) {
+condGeneFBATControl_centerTrait_R <- function( reference, center=0, mean=TRUE ) {
   #.C( "condGeneFBATControl_centerTrait", as.integer(reference), as.double(center), as.integer(mean), DUP=FALSE )
   #return( center ) ## should be the mean computed by the function
   res = .C( "condGeneFBATControl_centerTrait", as.integer(reference), as.double(center), as.integer(mean), DUP=TRUE )
@@ -70,13 +70,13 @@ condGeneFBATControl_centerTrait <- function( reference, center=0, mean=TRUE ) {
 }
 
 ## binary trait
-condGeneFBATControl_uimc <-
+condGeneFBATControl_uimc_R <-
   function( reference,
             bm, bc0, bc1,
             analyze_allele_index, conditional_allele_index,
             onlyComputeConditional=TRUE ) {
   ##
-  n <- condGeneFBATControl_numFam( reference )
+  n <- condGeneFBATControl_numFam_R( reference )
   if( n==0 ) stop( "No informative families." );
   na <- length(analyze_allele_index)
   nc <- length(conditional_allele_index)
@@ -113,7 +113,7 @@ condGeneFBATControl_uimc <-
 
 }
 
-condGeneFBATControl_uimc_nuis <-
+condGeneFBATControl_uimc_nuis_R <-
   function( beta,
             reference,
             analyze_allele_index, conditional_allele_index,
@@ -142,7 +142,7 @@ condGeneFBATControl_uimc_nuis <-
   #cat( "bc0" ); print( bc0 )
   #cat( "bc1" ); print( bc1 )
 
-  res <- condGeneFBATControl_uimc( reference=reference,
+  res <- condGeneFBATControl_uimc_R( reference=reference,
                                    bm=bm, bc0=bc0, bc1=bc1,
                                    analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index,
                                    onlyComputeConditional=onlyComputeConditional )
@@ -165,7 +165,7 @@ condGeneFBATControl_uimc_nuis <-
   return( ret )
 }
 
-condGeneFBATControl_imc <-
+condGeneFBATControl_imc_R <-
   function( reference,
             bm, bc0, bc1,
             analyze_allele_index, conditional_allele_index ) {
@@ -191,12 +191,12 @@ condGeneFBATControl_imc <-
   return(matrix(res[[9]], nrow=R))
 }
 
-condGeneFBATControl_robustStat <-
+condGeneFBATControl_robustStat_R <-
   function( reference,
             analyze_allele_index,
             conditional_allele_index ) {
   ##
-  n <- condGeneFBATControl_numFam( reference )
+  n <- condGeneFBATControl_numFam_R( reference )
   if( n==0 ) stop( "No informative families." );
   na <- length(analyze_allele_index)
   ret_analyze <- as.double( rep( 0, n*na ) )
@@ -212,7 +212,7 @@ condGeneFBATControl_robustStat <-
   return(matrix(res[[6]], nrow=n))
 }
 
-condGeneFBATControl_contsUimc <-
+condGeneFBATControl_contsUimc_R <-
   function( beta,
             reference,
             alpha, sigma,
@@ -222,7 +222,7 @@ condGeneFBATControl_contsUimc <-
   if( is.null(alpha) ) alpha <- 0
 
   ##
-  n <- condGeneFBATControl_numFam( reference )
+  n <- condGeneFBATControl_numFam_R( reference )
   if( n==0 ) stop( "No informative families." );
   nn <- length(analyze_allele_index) + length(conditional_allele_index)*2
   ret_b <- as.double( rep( 0, n*nn ) )
@@ -246,7 +246,7 @@ condGeneFBATControl_contsUimc <-
   return(matrix(res[[11]], nrow=n))
 }
 
-condGeneFBATControl_contsUimc_nuis <-
+condGeneFBATControl_contsUimc_nuis_R <-
   function( beta,
             reference,
             alpha, sigma,
@@ -260,7 +260,7 @@ condGeneFBATControl_contsUimc_nuis <-
   nn <- length(analyze_allele_index) + length(conditional_allele_index)*2
   if( length(beta) != nn )
     beta <- c( rep(0, nn-length(beta)), beta )
-  res <- condGeneFBATControl_contsUimc( beta=beta, reference=reference, alpha=alpha, sigma=sigma, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE, ignoreBtX=ignoreBtX )
+  res <- condGeneFBATControl_contsUimc_R( beta=beta, reference=reference, alpha=alpha, sigma=sigma, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE, ignoreBtX=ignoreBtX )
 
   ret <- rep( 0, length(beta) )
   for( i in 1:length(beta) )   ## We could make this loop faster...
@@ -278,7 +278,7 @@ condGeneFBATControl_contsUimc_nuis <-
   return( ret[ (length(analyze_allele_index)+1) : length(ret) ] )
 }
 
-condGeneFBATControl_contsImc <-
+condGeneFBATControl_contsImc_R <-
   function( beta,
             reference,
             alpha, sigma,
@@ -312,7 +312,7 @@ condGeneFBATControl_contsImc <-
   return(matrix(res[[10]], nrow=R))
 }
 
-condGeneFBATControl_numInfFam <-
+condGeneFBATControl_numInfFam_R <-
   function( reference ) {
 
   numInf <- as.integer(0)
@@ -324,10 +324,10 @@ condGeneFBATControl_numInfFam <-
   return(res[[2]])
 } ## condGeneFBATControl_numInfFam
 
-condGeneFBATControl_pids <-
+condGeneFBATControl_pids_R <-
   function( reference ) {
 
-  n <- condGeneFBATControl_numFam( reference )
+  n <- condGeneFBATControl_numFam_R( reference )
   pid <- as.integer( rep( 0, n ) )
   res = .C( "condGeneFBATControl_pids",
       as.integer(reference), pid,
@@ -336,7 +336,7 @@ condGeneFBATControl_pids <-
   return(res[[2]])
 }
 
-condGeneFBATControl_estEqNuis <-
+condGeneFBATControl_estEqNuis_R <-
   function( referenceCondition, offset=0 ) { ## if offset is 0, continuous, otherwise, it's the offset.
 
   nc <- length(referenceCondition)
@@ -372,7 +372,7 @@ condGeneFBATControl_estEqNuis <-
   return( bc )
 }
 
-condGeneFBATControl_estEqNuisUpdate <-
+condGeneFBATControl_estEqNuisUpdate_R <-
   function( referenceCondition, bc ) {
   .C( "condGeneFBATControl_estEqNuisUpdate",
       as.integer(referenceCondition), as.integer(length(referenceCondition)),
@@ -381,7 +381,7 @@ condGeneFBATControl_estEqNuisUpdate <-
   return( invisible() ) ## no return
 }
 
-condGeneFBATControl_estEqNuisUpdate2 <-
+condGeneFBATControl_estEqNuisUpdate2_R <-
   function( referenceCondition, bc ) {
   .C( "condGeneFBATControl_estEqNuisUpdate2",
       as.integer(referenceCondition), as.integer(length(referenceCondition)),
@@ -390,14 +390,14 @@ condGeneFBATControl_estEqNuisUpdate2 <-
   return( invisible() ) ## no return
 }
 
-condGeneFBATControl_estEq <-
+condGeneFBATControl_estEq_R <-
   function( referenceAnalyze, referenceCondition, bc, offset=0.0, verbose=FALSE ) {
 
   ## Some useful constants
   na <- length(referenceAnalyze)
   nc <- length(referenceCondition)
   nc2 <- nc * 2
-  np <- condGeneFBATControl_numFam( referenceCondition[1] )
+  np <- condGeneFBATControl_numFam_R( referenceCondition[1] )
   R <- na + nc2
 
   ## The return value, will be transformed into a matrix
@@ -546,7 +546,7 @@ condGeneFBATControl_estEq <-
 #    int *conditionAlleleIndex2, int *conditionAlleleIndexSize2, // for referenceCondition
 #    double *bc,
 #    double *ret_m, double *ret_c ) {
-condGeneFBATControl_dUdBc <-
+condGeneFBATControl_dUdBc_R <-
   function( referenceAnalyze,
       referenceCondition,
       analyzeAlleleIndex, conditionAlleleIndex, # for referenceAnalyze
@@ -580,7 +580,7 @@ condGeneFBATControl_dUdBc <-
   return( list(umc=umc,ucc=ucc) )
 }
 
-condGeneFBATControl_varExplConts <-
+condGeneFBATControl_varExplConts_R <-
     function( reference, betaEst ) {
   ret_varExpl <- as.double(0.0)
   res = .C( "condGeneFBATControl_varExplConts",
@@ -592,7 +592,7 @@ condGeneFBATControl_varExplConts <-
   return(res[[4]])
 }
 
-condGeneFBATControl_varContsMean <-
+condGeneFBATControl_varContsMean_R <-
     function( reference, betaEst ) {
   ret_var <- as.double(0.0)
   res = .C( "condGeneFBATControl_varContsMean",
@@ -603,7 +603,7 @@ condGeneFBATControl_varContsMean <-
   #return( as.double(ret_var) )
   return(res[[4]])
 }
-condGeneFBATControl_varContsModel <-
+condGeneFBATControl_varContsModel_R <-
     function( reference, betaEst ) {
   ret_var <- as.double(0.0)
   res = .C( "condGeneFBATControl_varContsModel",
@@ -616,12 +616,12 @@ condGeneFBATControl_varContsModel <-
 }
 
 
-condGeneFBATControl_backupTrait <- function( reference ) {
+condGeneFBATControl_backupTrait_R <- function( reference ) {
   .C( "condGeneFBATControl_backupTrait",
       as.integer(reference), as.integer(length(reference)),
       DUP=TRUE)#DUP=FALSE)
 }
-condGeneFBATControl_restoreTrait <- function( reference ) {
+condGeneFBATControl_restoreTrait_R <- function( reference ) {
   .C( "condGeneFBATControl_restoreTrait",
       as.integer(reference), as.integer(length(reference)),
       DUP=TRUE)#DUP=FALSE)
@@ -918,7 +918,7 @@ haplotypeDensity <- function( data, markerCol, traitCol, tempPrefix, FBAT="/tmp/
   programControl( program=FBAT, commands=fbatCommands, filename=progContFilename, intern=FALSE, output="/dev/null" )
 
   ## Load in the output
-  reference <- condGeneFBATControl_load( logfile )
+  reference <- condGeneFBATControl_load_R( logfile )
 
   ## Pre-linking in the trait
   ##print( head( ped, n=20 ) )
@@ -947,7 +947,7 @@ haplotypeDensity <- function( data, markerCol, traitCol, tempPrefix, FBAT="/tmp/
 
   ##print( cbind( ped[children,1], traitData[children] ) )
 
-  condGeneFBATControl_linkTrait( reference, ped[children,1], traitData[children] )
+  condGeneFBATControl_linkTrait_R( reference, ped[children,1], traitData[children] )
 
   ## And finally return the reference!
   return( reference )
@@ -1075,7 +1075,7 @@ condGene <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
   reference <- haplotypeDensity( data, c(markerAnalyzeIndex,markerConditionIndex), traitCol, tempPrefix )
   if( verbose ) cat( "Haplotype density read in from FBAT.\n" )
   ##condGeneFBATControl_print( reference ) ## DEBUG
-  numInfFam <- condGeneFBATControl_numInfFam( reference )
+  numInfFam <- condGeneFBATControl_numInfFam_R( reference )
 
   ## Solve for the nuisance parameters
   TOL <- .Machine$double.eps
@@ -1096,13 +1096,13 @@ condGene <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     if( verbose ) cat( "About to try multiroot.\n" )
     try({
       ##require( rootSolve )
-      bcSolve <- multiroot( f=condGeneFBATControl_uimc_nuis, start=initial, maxiter=1000, rtol=TOL, atol=TOL, ctol=TOL, useFortran=FALSE, reference=reference, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE )
+      bcSolve <- multiroot( f=condGeneFBATControl_uimc_nuis_R, start=initial, maxiter=1000, rtol=TOL, atol=TOL, ctol=TOL, useFortran=FALSE, reference=reference, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE )
       bc <- bcSolve$root
     }, silent=TRUE )
     if( is.null(bcSolve) ) {
       if( verbose ) cat( "multiroot failed, falling back on slower convergence method.\n" )
       try({
-        bcSolve <- mrroot( f=condGeneFBATControl_uimc_nuis, initial=initial, reference=reference, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE, ignoreBtX )
+        bcSolve <- mrroot( f=condGeneFBATControl_uimc_nuis_R, initial=initial, reference=reference, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE, ignoreBtX )
         bc <- bcSolve$par
       }, silent=TRUE)
     }
@@ -1115,11 +1115,11 @@ condGene <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
       cat( "Nuisance parameters have been solved for:\n" )
       print( bc0 )
       print( bc1 )
-      cat( "Number of inf fams used: ", condGeneFBATControl_numInfFam(reference), "\n" )
+      cat( "Number of inf fams used: ", condGeneFBATControl_numInfFam_R(reference), "\n" )
     }
 
     ## Model based, empirical variance
-    umc <- condGeneFBATControl_uimc( reference,
+    umc <- condGeneFBATControl_uimc_R( reference,
                                      rep(0,length(analyze_allele_index)), bc0, bc1,
                                      analyze_allele_index, conditional_allele_index,
                                      FALSE )
@@ -1131,14 +1131,14 @@ condGene <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
 
 
     ## Model based, model variance
-    uuModel <- condGeneFBATControl_imc( reference=reference,
+    uuModel <- condGeneFBATControl_imc_R( reference=reference,
                                         bm=rep(0,length(analyze_allele_index)), bc0=bc0, bc1=bc1,
                                         analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index )
   }else{ ## traitType=qtl
     if( verbose ) cat( "Entered qtl specific code.\n" )
     ## First center the qtl by the sample mean
     if( is.null( alpha ) ) {
-      center <- condGeneFBATControl_centerTrait( reference )
+      center <- condGeneFBATControl_centerTrait_R( reference )
       if( verbose ) cat( "QTL center", center, "\n" )
       alpha <- 0
     }
@@ -1150,13 +1150,13 @@ condGene <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
 
     try( {
       ##require( rootSolve )
-      bcSolve <- multiroot( f=condGeneFBATControl_contsUimc_nuis, start=initial, maxiter=100, rtol=TOL, atol=TOL, ctol=TOL, useFortran=FALSE, reference=reference, alpha=alpha, sigma=sigma, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE )
+      bcSolve <- multiroot( f=condGeneFBATControl_contsUimc_nuis_R, start=initial, maxiter=100, rtol=TOL, atol=TOL, ctol=TOL, useFortran=FALSE, reference=reference, alpha=alpha, sigma=sigma, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE )
       bc <- bcSolve$root
     }, silent=TRUE )
     ##cat( "multiroot bcSolve" ); print( bc ); bcSolve <- NULL;
     if( is.null( bcSolve ) ) {
       try( {
-        bcSolve <- mrroot( f=condGeneFBATControl_contsUimc_nuis, initial=initial, reference=reference, alpha=alpha, sigma=sigma, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE )
+        bcSolve <- mrroot( f=condGeneFBATControl_contsUimc_nuis_R, initial=initial, reference=reference, alpha=alpha, sigma=sigma, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE )
         bc <- bcSolve$par
       }, silent=TRUE )
     }
@@ -1164,18 +1164,18 @@ condGene <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     if( verbose ) {
       cat( "bc" )
       print( bc )
-      cat( "Number of inf fams used: ", condGeneFBATControl_numInfFam(reference), "\n" )
+      cat( "Number of inf fams used: ", condGeneFBATControl_numInfFam_R(reference), "\n" )
     }
     ##stop()
 
-    umcMat <- condGeneFBATControl_contsUimc( beta=bc,
+    umcMat <- condGeneFBATControl_contsUimc_R( beta=bc,
                                              reference=reference,
                                              alpha=alpha, sigma=sigma,
                                              analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index,
                                              onlyComputeConditional=FALSE )
 
     ## Model based, model variance
-    uuModel <- condGeneFBATControl_contsImc( beta=bc, reference=reference, alpha=alpha, sigma=sigma, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index )
+    uuModel <- condGeneFBATControl_contsImc_R( beta=bc, reference=reference, alpha=alpha, sigma=sigma, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index )
     ##cat( "Model variance\n" )
     ##print( uuModel )
   }
@@ -1253,7 +1253,7 @@ condGene <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
   ##cat( "rankModel", rankModel, "\n" )
 
   ## Model free, empirical variance
-  umcMat <- condGeneFBATControl_robustStat( reference, analyze_allele_index, conditional_allele_index )
+  umcMat <- condGeneFBATControl_robustStat_R( reference, analyze_allele_index, conditional_allele_index )
   #print( umcMat )
   n <- ncol(umcMat)
   u <- rep( 0, n )
@@ -1278,7 +1278,7 @@ condGene <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
   ##cat( "pvalueRobust", pvalueRobust, "\n" )
 
   ## Free the data!
-  condGeneFBATControl_free( reference )
+  condGeneFBATControl_free_R( reference )
 
   return( data.frame( pvalueEmp=pvalueEmp, rankEmp=rankEmp,
                       pvalueModel=pvalueModel, rankModel=rankModel,
@@ -1410,7 +1410,7 @@ condGeneP <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
   reference <- haplotypeDensity( data, markerConditionIndex, traitCol, tempPrefix )
   ##condGeneFBATControl_print( reference ) ## DEBUG
   ##print( condGeneFBATControl_pids( reference ) ) ## DEBUG
-  n <- condGeneFBATControl_numFam( reference )
+  n <- condGeneFBATControl_numFam_R( reference )
 
   ## Now solve for the nuisance parameters
   bc <- NULL
@@ -1424,13 +1424,13 @@ condGeneP <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     bcSolve <- NULL
     try({
       ##require( rootSolve )
-      bcSolve <- multiroot( f=condGeneFBATControl_uimc_nuis, start=initial, maxiter=100, rtol=TOL, atol=TOL, ctol=TOL, useFortran=FALSE, reference=reference, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE ) ## onlyComputeConditional irrelevant here...
+      bcSolve <- multiroot( f=condGeneFBATControl_uimc_nuis_R, start=initial, maxiter=100, rtol=TOL, atol=TOL, ctol=TOL, useFortran=FALSE, reference=reference, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE ) ## onlyComputeConditional irrelevant here...
       bc <- bcSolve$root
     }, silent=TRUE )
     if( is.null(bcSolve) ) {
       if( verbose ) cat( "multiroot failed, falling back on slower convergence method.\n" )
       try( {
-        bcSolve <- mrroot( f=condGeneFBATControl_uimc_nuis, initial=initial, reference=reference, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE )
+        bcSolve <- mrroot( f=condGeneFBATControl_uimc_nuis_R, initial=initial, reference=reference, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE )
         bc <- bcSolve$par
       }, silent=TRUE );
       if( is.null( bcSolve ) )
@@ -1448,7 +1448,7 @@ condGeneP <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     #                RETURN_BC_ESTIMATE=TRUE,
     #                verbose=verbose ) ## DEBUG ONLY -- KILL ME
     #cat( "bc after" ); print( bc );
-    umcNuis <- condGeneFBATControl_uimc( reference,
+    umcNuis <- condGeneFBATControl_uimc_R( reference,
                                          c(), bc[1:length(conditional_allele_index)], bc[(length(conditional_allele_index)+1):length(bc)],
                                          analyze_allele_index, conditional_allele_index,
                                          FALSE )   ## $conditional0, $conditional1
@@ -1456,7 +1456,7 @@ condGeneP <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
   }else{ ## traitType == qtl
     ## First center the qtl by the sample mean
     if( is.null( alpha ) ) {
-      center <- condGeneFBATControl_centerTrait( reference )
+      center <- condGeneFBATControl_centerTrait_R( reference )
       if( verbose ) cat( "QTL center", center, "\n" )
       alpha <- 0
       CENTER_QTL <- TRUE
@@ -1467,14 +1467,14 @@ condGeneP <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     bcSolve <- NULL
     try( {
       ##require( rootSolve )
-      bcSolve <- multiroot( f=condGeneFBATControl_contsUimc_nuis, start=initial, maxiter=100, rtol=TOL, atol=TOL, ctol=TOL, useFortran=FALSE, reference=reference, alpha=alpha, sigma=sigma, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE, ignoreBtX=ignoreBtX )
+      bcSolve <- multiroot( f=condGeneFBATControl_contsUimc_nuis_R, start=initial, maxiter=100, rtol=TOL, atol=TOL, ctol=TOL, useFortran=FALSE, reference=reference, alpha=alpha, sigma=sigma, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE, ignoreBtX=ignoreBtX )
       bc <- bcSolve$root
     }, silent=TRUE )
     ##cat( "multiroot bcSolve" ); print( bc ); bcSolve <- NULL;
     if( is.null( bcSolve ) ) {
       if( verbose ) cat( "multiroot failed, falling back on slower convergence method.\n" )
       try( {
-        bcSolve <- mrroot( f=condGeneFBATControl_contsUimc_nuis, initial=initial, reference=reference, alpha=alpha, sigma=sigma, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE, ignoreBtX=ignoreBtX )
+        bcSolve <- mrroot( f=condGeneFBATControl_contsUimc_nuis_R, initial=initial, reference=reference, alpha=alpha, sigma=sigma, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE, ignoreBtX=ignoreBtX )
         bc <- bcSolve$par
       }, silent=TRUE )
       if( is.null( bcSolve ) )
@@ -1483,7 +1483,7 @@ condGeneP <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     }
 
     ## only needed for the empirical variance
-    umcNuis <- condGeneFBATControl_contsUimc( beta=bc,
+    umcNuis <- condGeneFBATControl_contsUimc_R( beta=bc,
                                               reference=reference,
                                               alpha=alpha, sigma=sigma,
                                               analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index,
@@ -1492,9 +1492,9 @@ condGeneP <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
   if( verbose ) {
     cat( "bc" )
     print( bc )
-    cat( "Number of inf fams used: ", condGeneFBATControl_numInfFam(reference), "\n" )
+    cat( "Number of inf fams used: ", condGeneFBATControl_numInfFam_R(reference), "\n" )
   }
-  condGeneFBATControl_free( reference ) ## Free the data here
+  condGeneFBATControl_free_R( reference ) ## Free the data here
 
   #############################################
   ## Now handle each of the pairwise fits... ##
@@ -1526,7 +1526,7 @@ condGeneP <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     if( traitType=="binary" ) {
       bc0 <- bc[1:length(conditional_allele_index)]
       bc1 <- bc[(length(conditional_allele_index)+1):length(bc)]
-      umcAddi <- condGeneFBATControl_uimc( reference,
+      umcAddi <- condGeneFBATControl_uimc_R( reference,
                                            rep(0,length(analyze_allele_index)), bc0, bc1,
                                            analyze_allele_index, conditional_allele_index,
                                            FALSE )
@@ -1537,11 +1537,11 @@ condGeneP <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     }else{ ## qtl
       ## First center the qtl by the sample mean
       if( CENTER_QTL ) {
-        center <- condGeneFBATControl_centerTrait( reference )
+        center <- condGeneFBATControl_centerTrait_R( reference )
         if( verbose ) cat( "QTL center (analyze parameter", i, ")", center, "\n" )
       }
 
-      umcAddi <- condGeneFBATControl_contsUimc( beta=bc,
+      umcAddi <- condGeneFBATControl_contsUimc_R( beta=bc,
                                                 reference=reference,
                                                 alpha=alpha, sigma=sigma,
                                                 analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index,
@@ -1553,10 +1553,10 @@ condGeneP <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     ##stop()
 
     ## And the robust statistic piece
-    umcRMat[ , i ] <- condGeneFBATControl_robustStat( reference, analyze_allele_index, conditional_allele_index )
+    umcRMat[ , i ] <- condGeneFBATControl_robustStat_R( reference, analyze_allele_index, conditional_allele_index )
 
     ## And finally free the memory
-    condGeneFBATControl_free( reference )
+    condGeneFBATControl_free_R( reference )
   } ## i
 
   #print( "condGeneP umcMat" )
@@ -1798,7 +1798,7 @@ condGeneP2 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
         if( verbose ) cat( "multiroot failed, falling back on slower convergence method.\n" )
         ## Used to be mrroot, changed to mrroot2 for stability (hopefully) of some results
         try( {
-          bcSolve <- mrroot2( f=condGeneFBATControl_uimc_nuis, initial=initial, reference=reference, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE, MAXITER=MAXITER, TOL=TOL, verbose=verbose )
+          bcSolve <- mrroot2( f=condGeneFBATControl_uimc_nuis_R, initial=initial, reference=reference, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE, MAXITER=MAXITER, TOL=TOL, verbose=verbose )
           bc <- bcSolve$par
         }, silent=!TRUE );
 	##cat( "mrroot bcSolve" ); print( bc ); ## DEBUG ONLY
@@ -1810,7 +1810,7 @@ condGeneP2 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
           bc <- rep(0,length(conditional_allele_index)+length(analyze_allele_index))
         }
       }
-      umcNuis <- condGeneFBATControl_uimc(reference,
+      umcNuis <- condGeneFBATControl_uimc_R(reference,
                                           rep(0,length(analyze_allele_index)), bc[1:length(conditional_allele_index)], bc[(length(conditional_allele_index)+1):length(bc)],
                                           analyze_allele_index, conditional_allele_index,
                                           FALSE )   ## $conditional0, $conditional1
@@ -1820,7 +1820,7 @@ condGeneP2 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     }else{ ## traitType == qtl
       ## First center the qtl by the sample mean
       if( is.null( alpha ) ) {
-        center <- condGeneFBATControl_centerTrait( reference )
+        center <- condGeneFBATControl_centerTrait_R( reference )
         if( verbose ) cat( "QTL center", center, "\n" )
         #alpha <- 0
         #CENTER_QTL <- TRUE
@@ -1839,7 +1839,7 @@ condGeneP2 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
         #if( verbose ) cat( "multiroot failed, falling back on slower convergence method.\n" )
         ## Used to be mrroot
         try( {
-          bcSolve <- mrroot2( f=condGeneFBATControl_contsUimc_nuis, initial=initial, reference=reference, alpha=alpha, sigma=sigma, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE, ignoreBtX=ignoreBtX, MAXITER=MAXITER, TOL=TOL, verbose=verbose )
+          bcSolve <- mrroot2( f=condGeneFBATControl_contsUimc_nuis_R, initial=initial, reference=reference, alpha=alpha, sigma=sigma, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE, ignoreBtX=ignoreBtX, MAXITER=MAXITER, TOL=TOL, verbose=verbose )
           bc <- bcSolve$par
         }, silent=TRUE )
         ##cat( "mrroot bcSolve" ); print( bc ); ## DEBUG ONLY
@@ -1855,7 +1855,7 @@ condGeneP2 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
       ##cat( "mrroot bcSolve" ); print( bc ); ## DEBUG ONLY
 
       ## only needed for the empirical variance
-      umcNuis <- condGeneFBATControl_contsUimc( beta=bc,
+      umcNuis <- condGeneFBATControl_contsUimc_R( beta=bc,
                                                 reference=reference,
                                                 alpha=alpha, sigma=sigma,
                                                 analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index,
@@ -1864,12 +1864,12 @@ condGeneP2 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     if( verbose ) {
       cat( "bc" )
       print( bc )
-      cat( "Number of inf fams used: ", condGeneFBATControl_numInfFam(reference), "\n" )
+      cat( "Number of inf fams used: ", condGeneFBATControl_numInfFam_R(reference), "\n" )
     }
     #cat( "bc " ); print( bc ); ## DEBUG ONLY
 
     ## potentially needs to be sized...
-    numFam <- condGeneFBATControl_numFam( reference )
+    numFam <- condGeneFBATControl_numFam_R( reference )
     if( is.null(umcMat) ) {
       umcMat <- matrix( 0, nrow=numFam, ncol=R )
       umcRMat <- matrix( 0, nrow=numFam, ncol=A )
@@ -1892,19 +1892,19 @@ condGeneP2 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
       ## Ensure that the model-based test doesn't change, just for debug externally
 
       ## Subtract the offset from the trait
-      condGeneFBATControl_centerTrait( reference=reference, center=alpha, mean=FALSE )
+      condGeneFBATControl_centerTrait_R( reference=reference, center=alpha, mean=FALSE )
     }
     #condGeneFBATControl_print( reference ) ## DEBUG
     #stop()
 
     ## And the robust statistic piece
-    umcRMat[ , i ] <- condGeneFBATControl_robustStat( reference, analyze_allele_index, conditional_allele_index )
+    umcRMat[ , i ] <- condGeneFBATControl_robustStat_R( reference, analyze_allele_index, conditional_allele_index )
 
     ## NEW! Get the number informative
-    numInformative <- c( numInformative, condGeneFBATControl_numInfFam( reference ) )
+    numInformative <- c( numInformative, condGeneFBATControl_numInfFam_R( reference ) )
 
     ## And finally free the memory
-    condGeneFBATControl_free( reference )
+    condGeneFBATControl_free_R( reference )
   } ## i
 
   #print( "condGeneP2 umcMat" )
@@ -2185,7 +2185,7 @@ condGeneP3 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     #stop()
     ## and subtract the offset from the trait if qtl
     #if( traitType=="continuous" ) ## Has to be if in here...
-    condGeneFBATControl_centerTrait( reference=analyzeReference[a], center=alpha, mean=TRUE )
+    condGeneFBATControl_centerTrait_R( reference=analyzeReference[a], center=alpha, mean=TRUE )
     #condGeneFBATControl_centerTrait( reference=analyzeReference[a], center=traitOffset, mean=FALSE )
 
     #print( "######################")
@@ -2198,7 +2198,7 @@ condGeneP3 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     conditionReference[a] <- haplotypeDensity( data, markerConditionIndex[a*2-c(0,1)], traitCol, tempPrefix, FBAT=FBAT )
     ## and subtract the offset from the trait if qtl
     #if( traitType=="continuous" )
-    condGeneFBATControl_centerTrait( reference=conditionReference[a], center=alpha, mean=TRUE )
+    condGeneFBATControl_centerTrait_R( reference=conditionReference[a], center=alpha, mean=TRUE )
     #condGeneFBATControl_centerTrait( reference=conditionReference[a], center=traitOffset, mean=FALSE )
 
     #print( "######################")
@@ -2225,22 +2225,22 @@ condGeneP3 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     #cat( "VARMEAN ORIG", varMean, "\n" )
 
     ## Backup the trait, since we're going to modify it
-    condGeneFBATControl_backupTrait( referenceVarExpl );
+    condGeneFBATControl_backupTrait_R( referenceVarExpl );
 
     ## Get an estimate of beta
-    betaEst <- condGeneFBATControl_estEqNuis( referenceVarExpl )
+    betaEst <- condGeneFBATControl_estEqNuis_R( referenceVarExpl )
     if( verbose ) { cat( "betaEst for varExpl: " ); print( betaEst ); }
-    varModel <- condGeneFBATControl_varContsModel( referenceVarExpl, betaEst )
+    varModel <- condGeneFBATControl_varContsModel_R( referenceVarExpl, betaEst )
     varExpl <- 1 - varModel / varMean
 
     if( verbose ) { cat( "Nuisance iteration ", 0, ", varExpl=", varExpl, ", betaEst=", sep="" ); print(betaEst); }
 
     for( i in 1:NUISANCE_ITER ) {
       #condGeneFBATControl_estEqNuisUpdate( referenceVarExpl, betaEst )
-      condGeneFBATControl_estEqNuisUpdate2( referenceVarExpl, betaEst )
-      bc <- condGeneFBATControl_estEqNuis( referenceVarExpl, offset=0.0 )
+      condGeneFBATControl_estEqNuisUpdate2_R( referenceVarExpl, betaEst )
+      bc <- condGeneFBATControl_estEqNuis_R( referenceVarExpl, offset=0.0 )
       #varExpl <- condGeneFBATControl_varExplConts( referenceVarExpl, betaEst )
-      varModel <- condGeneFBATControl_varContsModel( referenceVarExpl, betaEst )
+      varModel <- condGeneFBATControl_varContsModel_R( referenceVarExpl, betaEst )
       #varModel <- condGeneFBATControl_varContsMean( referenceVarExpl, 0 ) ## DEBUGGING ONLY!!!
       #cat( "varModel after nuis update", varModel, "\n" )
       varExpl <- 1 - varModel / varMean
@@ -2248,10 +2248,10 @@ condGeneP3 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     }
 
     ## Now restore the trait back for testing
-    condGeneFBATControl_restoreTrait( referenceVarExpl );
+    condGeneFBATControl_restoreTrait_R( referenceVarExpl );
 
     ## Compute the variance of the mean
-    varMean <- condGeneFBATControl_varContsMean( referenceVarExpl, 0 ) ##betaEst ) -- not really used...
+    varMean <- condGeneFBATControl_varContsMean_R( referenceVarExpl, 0 ) ##betaEst ) -- not really used...
     #cat( "VARMEAN ORIG (SUB)", varMean, "\n" )
 
 		#varExpl <- 1 - varModel / varMean
@@ -2264,13 +2264,13 @@ condGeneP3 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
 
   ## Compute the nuisance parameters
   #condGeneFBATControl_print( conditionReference[1] )
-  bc <- condGeneFBATControl_estEqNuis( conditionReference, offset=0.0 ) ## Offset will need to be 0 for continuous (already subtracted above...)
+  bc <- condGeneFBATControl_estEqNuis_R( conditionReference, offset=0.0 ) ## Offset will need to be 0 for continuous (already subtracted above...)
   if( verbose ) { cat( "condGeneP3 bc " ); print( bc ); }
 
   for( i in 1:NUISANCE_ITER ) {
 #    condGeneFBATControl_estEqNuisUpdate( conditionReference, bc )
-    condGeneFBATControl_estEqNuisUpdate2( conditionReference, bc )
-    bc <- condGeneFBATControl_estEqNuis( conditionReference, offset=0.0 )
+    condGeneFBATControl_estEqNuisUpdate2_R( conditionReference, bc )
+    bc <- condGeneFBATControl_estEqNuis_R( conditionReference, offset=0.0 )
     if( verbose ) { cat( "Nuisance iteration ", i, ", bc=", sep="" ); print(bc); }
   }
   #stop("DEBUG: Updated nuisance parameter.")
@@ -2283,7 +2283,7 @@ condGeneP3 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
 
   ## Compute the test statistic
   ##  -- offset will need to not be zero for dichotomous case
-  res <- condGeneFBATControl_estEq( analyzeReference, conditionReference, bc, offset=0.0, verbose=verbose )
+  res <- condGeneFBATControl_estEq_R( analyzeReference, conditionReference, bc, offset=0.0, verbose=verbose )
   #cat( "condGene result pvalue=", res$pvalue, ", rank=", res$rank, "\n" )
   ##condGeneFBATControl_print( conditionReference[1] )
   ##stop()
@@ -2300,9 +2300,9 @@ condGeneP3 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
 
   ## Can't forget to free the densities then as well...
   for( a in 1:length(analyzeReference) )
-    condGeneFBATControl_free( analyzeReference[a] )
+    condGeneFBATControl_free_R( analyzeReference[a] )
   for( a in 1:length(conditionReference) )
-    condGeneFBATControl_free( conditionReference[a] )
+    condGeneFBATControl_free_R( conditionReference[a] )
 
   ## And return some value
   return( res )
@@ -2428,7 +2428,7 @@ condGeneP4 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
   referenceC <- haplotypeDensity( data, markerConditionIndex, traitCol, tempPrefix, FBAT=FBAT )
   #condGeneFBATControl_print( referenceC ) ## DEBUG
   #print( condGeneFBATControl_pids( referenceC ) ) ## DEBUG
-  n <- condGeneFBATControl_numFam( referenceC )
+  n <- condGeneFBATControl_numFam_R( referenceC )
 
   ## Now solve for the nuisance parameters
   bc <- NULL
@@ -2443,13 +2443,13 @@ condGeneP4 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
   ##bcSolve <- mrroot2( f=condGeneFBATControl_uimc_nuis, initial=initial, reference=reference, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index, onlyComputeConditional=TRUE, MAXITER=MAXITER, TOL=TOL, verbose=verbose )
   try({
         ##require( rootSolve )
-        bcSolve <- multiroot( f=condGeneFBATControl_uimc_nuis, start=initial, maxiter=100, rtol=TOL, atol=TOL, ctol=TOL, useFortran=FALSE, reference=referenceC, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index2, onlyComputeConditional=TRUE, verbose=verbose ) ## onlyComputeConditional irrelevant here...
+        bcSolve <- multiroot( f=condGeneFBATControl_uimc_nuis_R, start=initial, maxiter=100, rtol=TOL, atol=TOL, ctol=TOL, useFortran=FALSE, reference=referenceC, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index2, onlyComputeConditional=TRUE, verbose=verbose ) ## onlyComputeConditional irrelevant here...
         bc <- bcSolve$root
       }, silent=TRUE )
   if( is.null(bcSolve) ) {
     if( verbose ) cat( "multiroot failed, falling back on slower convergence method.\n" )
     try( {
-          bcSolve <- mrroot2( f=condGeneFBATControl_uimc_nuis, initial=initial, reference=referenceC, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index2, onlyComputeConditional=TRUE, verbose=verbose )
+          bcSolve <- mrroot2( f=condGeneFBATControl_uimc_nuis_R, initial=initial, reference=referenceC, analyze_allele_index=analyze_allele_index, conditional_allele_index=conditional_allele_index2, onlyComputeConditional=TRUE, verbose=verbose )
           bc <- bcSolve$par
         }, silent=TRUE );
     if( is.null( bcSolve ) ) {
@@ -2458,7 +2458,7 @@ condGeneP4 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
               pvalueR=1, rankR=0 ) )
     }
   }
-  umcNuis <- condGeneFBATControl_uimc( referenceC,
+  umcNuis <- condGeneFBATControl_uimc_R( referenceC,
       c(), bc[1:length(conditional_allele_index2)], bc[(length(conditional_allele_index2)+1):length(bc)],
       analyze_allele_index, conditional_allele_index2,
       FALSE )   ## $conditional0, $conditional1
@@ -2467,7 +2467,7 @@ condGeneP4 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
   if( verbose ) {
     cat( "bc" )
     print( bc )
-    cat( "Number of inf fams used: ", condGeneFBATControl_numInfFam(referenceC), "\n" )
+    cat( "Number of inf fams used: ", condGeneFBATControl_numInfFam_R(referenceC), "\n" )
   }
 
   #############################################
@@ -2497,7 +2497,7 @@ condGeneP4 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     ## Compute the pieces of the statistic
     bc0 <- bc[1:length(conditional_allele_index)]
     bc1 <- bc[(length(conditional_allele_index)+1):length(bc)]
-    umcAddi <- condGeneFBATControl_uimc( reference,
+    umcAddi <- condGeneFBATControl_uimc_R( reference,
         rep(0,length(analyze_allele_index)), bc0, bc1,
         analyze_allele_index, conditional_allele_index,
         FALSE )
@@ -2514,12 +2514,12 @@ condGeneP4 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     ##stop()
 
     ## And the robust statistic piece
-    umcRMat[ , i ] <- condGeneFBATControl_robustStat( reference, analyze_allele_index, conditional_allele_index )
+    umcRMat[ , i ] <- condGeneFBATControl_robustStat_R( reference, analyze_allele_index, conditional_allele_index )
   } ## i
 
   uc <- umcNuis
 
-  umc_ucc <- condGeneFBATControl_dUdBc( reference, referenceC,
+  umc_ucc <- condGeneFBATControl_dUdBc_R( reference, referenceC,
       analyze_allele_index, conditional_allele_index,
       conditional_allele_index2, bc )
   ##print( umc_ucc )
@@ -2636,8 +2636,8 @@ condGeneP4 <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
 
   ## And finally free the memory
   for( i in 1:length(markerAnalyze) )
-    condGeneFBATControl_free( reference[i] )
-  condGeneFBATControl_free( referenceC ) ## Free the data here
+    condGeneFBATControl_free_R( reference[i] )
+  condGeneFBATControl_free_R( referenceC ) ## Free the data here
 
   if( verbose ) cat( "Going to exit condGeneP4...\n")
 
@@ -2776,7 +2776,7 @@ condGeneR <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
     reference <- haplotypeDensity( data, c(markerAnalyzeIndex[i*2-c(1,0)], markerConditionIndex), traitCol, tempPrefix, FBAT=FBAT )
 
     ## potentially needs to be sized...
-    numFam <- condGeneFBATControl_numFam( reference )
+    numFam <- condGeneFBATControl_numFam_R( reference )
     if( is.null(umcRMat) )
       umcRMat <- matrix( 0, nrow=numFam, ncol=A )
 
@@ -2788,19 +2788,19 @@ condGeneR <- function( ped=NULL, phe=NULL, data=mergePhePed( ped, phe ),
       ## Ensure that the model-based test doesn't change, just for debug externally
 
       ## Subtract the offset from the trait
-      condGeneFBATControl_centerTrait( reference=reference, center=alpha, mean=FALSE )
+      condGeneFBATControl_centerTrait_R( reference=reference, center=alpha, mean=FALSE )
     }
     #condGeneFBATControl_print( reference ) ## DEBUG
     #stop()
 
     ## And the robust statistic piece
-    umcRMat[ , i ] <- condGeneFBATControl_robustStat( reference, analyze_allele_index, conditional_allele_index )
+    umcRMat[ , i ] <- condGeneFBATControl_robustStat_R( reference, analyze_allele_index, conditional_allele_index )
 
     ## NEW! Get the number informative
-    numInformative <- c( numInformative, condGeneFBATControl_numInfFam( reference ) )
+    numInformative <- c( numInformative, condGeneFBATControl_numInfFam_R( reference ) )
 
     ## And finally free the memory
-    condGeneFBATControl_free( reference )
+    condGeneFBATControl_free_R( reference )
   } ## i
 
   ################################

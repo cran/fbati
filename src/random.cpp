@@ -15,7 +15,9 @@ void rndDetach()
 
 
 // Uniform random number U[0,1)
-double RUnif() { return unif_rand(); };
+double RUnif() {
+  return unif_rand();
+}
 //double RUnif() { return( (double)rand() / ( (double)(RAND_MAX) + 1 ) ); }
 double RUnifExt( double min, double max ){
   return( unif_rand() * (max-min) + min );

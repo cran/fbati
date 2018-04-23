@@ -20,7 +20,8 @@ void RMatrix::set( double *p_data, int *p_dimData )
 double& RMatrix::operator() ( unsigned int r, unsigned int c )
 {
 #ifdef DEBUG_RMATRIX
-  if( r<0 || r>=R || c<0 || c>=C ) {
+  //if( r<0 || r>=R || c<0 || c>=C ) {
+  if( r>=R || c>=C ) { // can't be <0 by unsigned int casting
     Rprintf("Index (%d,%d) is out of range (%d,%d). Likely to crash R.\n", r, c, R, C);
   }
 #endif
@@ -30,7 +31,8 @@ double& RMatrix::operator() ( unsigned int r, unsigned int c )
 double& RMatrix::elt( unsigned r, unsigned c )
 {
 #ifdef DEBUG_RMATRIX
-  if( r<0 || r>=R || c<0 || c>=C ) {
+  //if( r<0 || r>=R || c<0 || c>=C ) {
+  if( r>=R || c>=C ) {
     Rprintf("Index (%d,%d) is out of range (%d,%d). Likely to crash R.\n", r, c, R, C);
   }
 #endif

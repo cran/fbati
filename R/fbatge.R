@@ -169,31 +169,31 @@ mrroot3 <- function( f, ## the function
 ##############################
 ## MMatrix linking routines ##
 ##############################
-cpp_mmatrix_debug <- function() { .C("cpp_mmatrix_debug") }
+cpp_mmatrix_debug_R <- function() { .C("cpp_mmatrix_debug") }
 ##cpp_mmatrix_debug(); stop();
 
 ############################
 ## Random number routines ##
 ############################
-cpp_rn_attach <- function() { .C("cpp_rn_attach") }
-cpp_rn_detach <- function() { .C("cpp_rn_detach") }
-cpp_rn_setNormalSigma <- function( sigma ) {
+cpp_rn_attach_R <- function() { .C("cpp_rn_attach") }
+cpp_rn_detach_R <- function() { .C("cpp_rn_detach") }
+cpp_rn_setNormalSigma_R <- function( sigma ) {
   cholesky <- chol(sigma)
   print( cholesky )
   p <- nrow(sigma)
   .C("cpp_rn_setNormalSigma", as.double(cholesky), as.integer(p), DUP=TRUE) #DUP=FALSE )
   return( invisible() )
 }
-cpp_rn_debug <- function() { .C("cpp_rn_debug") }
+cpp_rn_debug_R <- function() { .C("cpp_rn_debug") }
 
 rn_debug <- function() {
-  cpp_rn_attach()
+  cpp_rn_attach_R()
 
   rho <- 0.5
   sigma <- rbind( c(1,rho,rho), c(rho,1,rho), c(rho,rho,1) )
-  cpp_rn_setNormalSigma( sigma )
-  cpp_rn_debug()
-  cpp_rn_detach()
+  cpp_rn_setNormalSigma_R( sigma )
+  cpp_rn_debug_R()
+  cpp_rn_detach_R()
 }
 ##rn_debug()
 
@@ -201,23 +201,23 @@ rn_debug <- function() {
 ## GPed & Estimating equation routines ##
 #########################################
 
-cpp_gped_clear <- function() { .C("cpp_gped_clear") }
-cpp_gped_print <- function( extended=0 ) {
+cpp_gped_clear_R <- function() { .C("cpp_gped_clear") }
+cpp_gped_print_R <- function( extended=0 ) {
   .C("cpp_gped_print", as.integer(extended) )
   return(invisible())
 }
-cpp_gped_numCovariates <- function() {
+cpp_gped_numCovariates_R <- function() {
   numCov <- as.integer(0)
   res = .C( "cpp_gped_numCovariates", numCov, DUP=TRUE) #DUP=FALSE )
   #return( numCov )
   return(res[[1]])
 }
-cpp_gped_setStrategy <- function( strategy="adaptive" ) {
+cpp_gped_setStrategy_R <- function( strategy="adaptive" ) {
   ## strategy \in geno, pheno, adaptive
   .C( "cpp_gped_setStrategy", as.character(strategy), DUP=TRUE )
   return( invisible() )
 }
-cpp_gped_estEq <- function( beta ) {
+cpp_gped_estEq_R <- function( beta ) {
   ## C++ code will crash the whole program if beta is the wrong size
   u <- as.double( rep( 0, length(beta) ) )
   res = .C( "cpp_gped_estEq", as.double(beta), as.integer(length(beta)), u, DUP=TRUE) #DUP=FALSE )
@@ -225,8 +225,8 @@ cpp_gped_estEq <- function( beta ) {
   #return( u )
   return(res[[3]])
 }
-cpp_gped_estEq_zeroGE <- function( beta ) {
-  uExtra <- cpp_gped_estEq( c( 0, 0, beta ) )
+cpp_gped_estEq_zeroGE_R <- function( beta ) {
+  uExtra <- cpp_gped_estEq_R( c( 0, 0, beta ) )
   return( uExtra[3:length(uExtra)] )
 }
 
@@ -235,7 +235,7 @@ solveBeta <- function( strategy="adaptive", includeGE=TRUE ) {
   ## Want to not includeGE when solving for the nuisance parameters for the score test
   betaLength <- 4
   if( strategy!="geno" )
-    betaLength <- 5 + cpp_gped_numCovariates()
+    betaLength <- 5 + cpp_gped_numCovariates_R()
   if( !includeGE )
     betaLength <- betaLength - 2 ## Take off the GE beta parameters
 
@@ -244,11 +244,11 @@ solveBeta <- function( strategy="adaptive", includeGE=TRUE ) {
   beta <- rep( 0, betaLength )
   ##print( "solveBeta beta" ); print( beta )
   if( includeGE )
-    return( mrroot3( f=cpp_gped_estEq, initial=beta ) )
-  return( mrroot3( f=cpp_gped_estEq_zeroGE, initial=beta ) )
+    return( mrroot3( f=cpp_gped_estEq_R, initial=beta ) )
+  return( mrroot3( f=cpp_gped_estEq_zeroGE_R, initial=beta ) )
 }
 
-cpp_gped_statPrecompute <- function( beta ) {
+cpp_gped_statPrecompute_R <- function( beta ) {
   M <- length(beta)
   if( M == 0 ) return( NULL )
   beta <- c( 0, 0, beta ) ## push in the zeros that were there for the ge stuff
@@ -257,7 +257,7 @@ cpp_gped_statPrecompute <- function( beta ) {
   dbnuis = res[[3]]
   return( matrix( dbnuis, nrow=M, ncol=M ) )
 }
-cpp_gped_statCompute <- function( dbNuisInv ) {
+cpp_gped_statCompute_R <- function( dbNuisInv ) {
   stat <- as.double(0.0)
   numInf <- as.integer(0)
   res = .C( "cpp_gped_statCompute", dbNuisInv, stat, numInf, DUP=TRUE )#DUP=FALSE )
@@ -270,7 +270,7 @@ cpp_gped_statCompute <- function( dbNuisInv ) {
 
 testBetaGE <- function( strategy="adaptive" ) {
   ## First set the strategy
-  cpp_gped_setStrategy( strategy=strategy )
+  cpp_gped_setStrategy_R( strategy=strategy )
 
   ## First solve for the nuisance parameter
   beta <- solveBeta( strategy=strategy, includeGE=FALSE )
@@ -283,7 +283,7 @@ testBetaGE <- function( strategy="adaptive" ) {
 
   ## Second, compute the test statistic
   ## - first the precompute piece
-  dbnuis <- cpp_gped_statPrecompute( beta )
+  dbnuis <- cpp_gped_statPrecompute_R( beta )
   ####cat( "testBetaGE dbnuis\n" ); print( dbnuis ); ## DEBUG DEBUG
   if( is.null(nrow(dbnuis)) ) {
     cat( "Could not invert nuisance parameters.\n" )
@@ -298,13 +298,13 @@ testBetaGE <- function( strategy="adaptive" ) {
   ####cat( "testBetaGE dbnuisInv\n" ); print( solve.svd(svd(dbnuis)) ); ## DEBUG DEBUG
 
   #solve.svd <- getFromNamespace( "solve.svd", "fbati" )
-  pvalue <- cpp_gped_statCompute( solve.svd( svd( dbnuis ) ) )
+  pvalue <- cpp_gped_statCompute_R( solve.svd( svd( dbnuis ) ) )
 
   return( pvalue );
 }
 
 ## NOW THE ADDITIVE GE ROUTINES ##
-cpp_gped_statPrecompute_A<- function( beta ) {
+cpp_gped_statPrecompute_A_R <- function( beta ) {
   M <- length(beta)
   if( M == 0 ) return( NULL )
   beta <- c( 0, beta ) ## push in the zeros that were there for the ge stuff
@@ -313,7 +313,7 @@ cpp_gped_statPrecompute_A<- function( beta ) {
   dbnuis = res[[3]]
   return( matrix( dbnuis, nrow=M, ncol=M ) )
 }
-cpp_gped_statCompute_A<- function( dbNuisInv ) {
+cpp_gped_statCompute_A_R <- function( dbNuisInv ) {
   stat <- as.double(0.0)
   numInf <- as.integer(0)
   res = .C( "cpp_gped_statCompute_A", dbNuisInv, stat, numInf, DUP=TRUE) #DUP=FALSE )
@@ -326,7 +326,7 @@ cpp_gped_statCompute_A<- function( dbNuisInv ) {
 
 testBetaGE_A <- function( strategy="adaptive" ) {
   ## First set the strategy
-  cpp_gped_setStrategy( strategy=strategy )
+  cpp_gped_setStrategy_R( strategy=strategy )
 
   ## First solve for the nuisance parameter -- tricky, does not need _A designation!
   beta <- solveBeta( strategy=strategy, includeGE=FALSE )
@@ -339,7 +339,7 @@ testBetaGE_A <- function( strategy="adaptive" ) {
 
   ## Second, compute the test statistic
   ## - first the precompute piece
-  dbnuis <- cpp_gped_statPrecompute_A( beta )
+  dbnuis <- cpp_gped_statPrecompute_A_R( beta )
   ####cat( "testBetaGE dbnuis\n" ); print( dbnuis ); ## DEBUG DEBUG
   ####print( dbnuis )
   if( is.null(nrow(dbnuis)) ) {
@@ -350,7 +350,7 @@ testBetaGE_A <- function( strategy="adaptive" ) {
 
   #solve.svd <- getFromNamespace( "solve.svd", "fbati" )
   ####cat( "testBetaGE dbnuisInv\n" ); print( solve.svd(svd(dbnuis)) ); ## DEBUG DEBUG
-  pvalue <- cpp_gped_statCompute_A( solve.svd( svd( dbnuis ) ) )
+  pvalue <- cpp_gped_statCompute_A_R( solve.svd( svd( dbnuis ) ) )
 
   #print( pvalue ) ## DEBUG DEBUG DEBUG DEBUG
 
@@ -360,7 +360,7 @@ testBetaGE_A <- function( strategy="adaptive" ) {
 ## They both estimate the same nuisance parameters, so combine them whenever possible
 testBetaGE_both <- function( strategy="adaptive" ) {
   ## First set the strategy
-  cpp_gped_setStrategy( strategy=strategy ) ## (sets up the permutations)
+  cpp_gped_setStrategy_R( strategy=strategy ) ## (sets up the permutations)
 
   ## Solve for the nuisance parameter (same for both)
   beta <- solveBeta( strategy=strategy, includeGE=FALSE )
@@ -368,29 +368,29 @@ testBetaGE_both <- function( strategy="adaptive" ) {
   ## Compute the test statistic for each
   pvalue <- pvalueA <- 1.0
   ## two df test
-  dbnuis <- cpp_gped_statPrecompute( beta )
+  dbnuis <- cpp_gped_statPrecompute_R( beta )
   if( !is.null(nrow(dbnuis)) )
-    pvalue <- cpp_gped_statCompute( solve.svd( svd( dbnuis ) ) )
+    pvalue <- cpp_gped_statCompute_R( solve.svd( svd( dbnuis ) ) )
   ## one df test
-  dbnuisA <- cpp_gped_statPrecompute_A( beta )
+  dbnuisA <- cpp_gped_statPrecompute_A_R( beta )
   if( !is.null(nrow(dbnuisA)) )
-    pvalueA <- cpp_gped_statCompute_A( solve.svd( svd( dbnuisA ) ) )
+    pvalueA <- cpp_gped_statCompute_A_R( solve.svd( svd( dbnuisA ) ) )
 
   return( c(pvalue=pvalue, pvalueA=pvalueA) )
 }
 
 ## And lastly, the routine to link it back with the dataset
-cpp_gped_set <- function( pid, id, fathid, mothid,
+cpp_gped_set_R <- function( pid, id, fathid, mothid,
                          geno, trait, env ) {
   .C( "cpp_gped_set",
      as.integer(pid), as.integer(id), as.integer(fathid), as.integer(mothid),
      as.integer(geno), as.integer(trait), as.double(env), as.integer(length(pid)), DUP=TRUE) #DUP=FALSE )
   return( invisible() )
 }
-cpp_gped_set_C<- function( pid, id, fathid, mothid,
+cpp_gped_set_C_R <- function( pid, id, fathid, mothid,
                           geno, trait, env, cov=NULL ) {
   if( is.null(cov) )
-    return( cpp_gped_set( pid, id, fathid, mothid,  geno, trait, env ) )
+    return( cpp_gped_set_R( pid, id, fathid, mothid,  geno, trait, env ) )
 
   ## Because R is an absolute bitch sometimes
   nCov <- ncol(cov)
@@ -456,7 +456,7 @@ fbatge.internal <- function( gped, phe, geno, trait="AffectionStatus", env="env"
 
   ## Now set it
   ## TOCHECK: is it fathid or idfath?
-  cpp_gped_set( gped$pid, gped$id, gped$idfath, gped$idmoth,
+  cpp_gped_set_R( gped$pid, gped$id, gped$idfath, gped$idmoth,
                gped[[geno]], traitValue, phe[[envLoc]] )
   ####cpp_gped_print() ## DEBUG
 
@@ -530,7 +530,7 @@ fbatge.internal_C<- function( gped, phe, geno, cov=NULL, trait="AffectionStatus"
 
   ## Now set it
   ## TOCHECK: is it fathid or idfath?
-  cpp_gped_set_C( gped$pid, gped$id, gped$idfath, gped$idmoth,
+  cpp_gped_set_C_R( gped$pid, gped$id, gped$idfath, gped$idmoth,
                  gped[[geno]], traitValue, phe[[envLoc]], phe[,covLoc] )
   #cat( "DAMN COVARIATES", cpp_gped_numCovariates() ); stop();
   #cpp_gped_print(); stop(); ## DEBUG
@@ -551,9 +551,9 @@ fbatge.internal_C<- function( gped, phe, geno, cov=NULL, trait="AffectionStatus"
 ## GESim routines ##
 ####################
 
-cpp_gesim_print <- function() { .C("cpp_gesim_print") }
+cpp_gesim_print_R <- function() { .C("cpp_gesim_print") }
 
-cpp_gesim_set <- function( numParents=2, numOffspring=1, numFam=500,
+cpp_gesim_set_R <- function( numParents=2, numOffspring=1, numFam=500,
                           minAffected=1, maxAffected=1,
                           afreq=0.2, geneticModel="additive",
                           link="log",
@@ -597,10 +597,10 @@ cpp_gesim_set <- function( numParents=2, numOffspring=1, numFam=500,
   return( invisible() )
 }
 
-cpp_gesim_draw <- function() { .C("cpp_gesim_draw") }
-cpp_gesim_clear <- function() { .C("cpp_gesim_clear") }
+cpp_gesim_draw_R <- function() { .C("cpp_gesim_draw") }
+cpp_gesim_clear_R <- function() { .C("cpp_gesim_clear") }
 
-cpp_gesim_debug <- function() {
+cpp_gesim_debug_R <- function() {
   #cpp_gesim_set()
   #cpp_gesim_print()
   #cpp_gesim_draw()
@@ -613,11 +613,11 @@ cpp_gesim_debug <- function() {
   #cpp_gped_print()
 
   ## And how about a mixture
-  cpp_gesim_set( numFam=10 );
-  cpp_gesim_set( numFam=20, numOffspring=3, numParents=0, minAffected=1, maxAffected=2 )
-  cpp_gesim_print()
-  cpp_gesim_draw()
-  cpp_gped_print()
+  cpp_gesim_set_R( numFam=10 );
+  cpp_gesim_set_R( numFam=20, numOffspring=3, numParents=0, minAffected=1, maxAffected=2 )
+  cpp_gesim_print_R()
+  cpp_gesim_draw_R()
+  cpp_gped_print_R()
 }
 #cpp_gesim_debug()
 
@@ -640,12 +640,12 @@ estEqDebug <- function() {
 
   set.seed(13)
   #cpp_gesim_set(numFam=500,beta=beta) ## Trios
-  cpp_gesim_set( beta=beta, numOffspring=2, minAffected=1, maxAffected=1, numParents=0 ) ## DSP's
+  cpp_gesim_set_R( beta=beta, numOffspring=2, minAffected=1, maxAffected=1, numParents=0 ) ## DSP's
   NSIM <- 1000
   pvalueLT <- 0
   for( i in 1:NSIM ) {
     cat( i, "" )
-    cpp_gesim_draw()
+    cpp_gesim_draw_R()
     ####cpp_gped_setStrategy("geno")
     #cat( "beta = " ); print( solveBeta( strategy="geno" ) )
     pvalue <- testBetaGE( strategy="geno" )
@@ -663,13 +663,13 @@ estEqDebug2 <- function() {
   beta <- c(b0,bge,bg,be)
 
   set.seed(13)
-  cpp_gesim_set( beta=beta, numOffspring=2, minAffected=1, maxAffected=1, numParents=0, link="logit", numFam=500 ) ## DSP's
-  cpp_gesim_print()
+  cpp_gesim_set_R( beta=beta, numOffspring=2, minAffected=1, maxAffected=1, numParents=0, link="logit", numFam=500 ) ## DSP's
+  cpp_gesim_print_R()
   NSIM <- 1000
   pvalueLT <- 0
   for( i in 1:NSIM ) {
     cat( i, "" )
-    cpp_gesim_draw()
+    cpp_gesim_draw_R()
     #cpp_gped_setStrategy("pheno")
     #cat( "beta = " ); print( solveBeta( strategy="pheno" ) )
     #stop()

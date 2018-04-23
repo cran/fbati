@@ -428,7 +428,7 @@ extern "C" {
     pG_group_dehash_gstr( p1, p1str );
     pG_group_dehash_gstr( p2, p2str );
 
-    if( p1!=0 & p2!=0 )
+    if( p1!=0 && p2!=0 )
       sprintf( *str, "%s,%s", p1str,p2str );
     else
       sprintf( *str, "%s,%s - AA%i AB%i BB%i", p1str,p2str, n[gAA], n[gAB], n[gBB] );

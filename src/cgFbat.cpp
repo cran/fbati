@@ -31,7 +31,7 @@
 #include <string>
 #include <sstream>
 #include <fstream>
-#include <math.h>
+//#include <math.h>
 using namespace std;
 
 enum XCODE {
@@ -219,7 +219,8 @@ public:
 	// _safely_ get a line, returns empty string if there is no line
 	//  if too slow, add a compile time #define to disable when necessary
 	string &operator [](unsigned int index) {
-		if (index < 0 || index >= l.size()) {
+		//if (index < 0 || index >= l.size()) { // fair point, it's an unsigned int, so cannot be less than 0...
+		if (index >= l.size()) {
       Rprintf("Lines index %d is out of bounds [0,%d]\n", index, (l.size() - 1));
 			return (empty);
 		}
@@ -262,7 +263,8 @@ public:
 
 	// returns value of haplotype at the index
 	char &operator [](unsigned int index) {
-		if (index < 0 || index >= a.size()) {
+		//if (index < 0 || index >= a.size()) {
+		if (index >= a.size()) {
 			Rprintf("Haplotype index %d is out of bounds [0,%d].\n", index, (a.size() - 1));
 			return (empty);
 		}
@@ -281,10 +283,10 @@ public:
 	vector<double> emWeight; // Doesn't generally matter, WARNING, not set properly for parents (since I found that it didn't matter)
 
 	// push a new genotype on
-	void push_back(Haplotype &h1, Haplotype &h2, double emWeight) {
+	void push_back(Haplotype &h1, Haplotype &h2, double m_emWeight) {
 		this->ha.push_back(h1);
 		this->hb.push_back(h2);
-		this->emWeight.push_back(emWeight);
+		this->emWeight.push_back(m_emWeight);
 	}
 
 	// convert to a string
@@ -355,7 +357,8 @@ public:
 	static const int gAB = 1;
 	static const int gBB = 2;
 	int gCode( int phase, unsigned int index ) {
-		if( ha.size()==0 || phase!=0 || index<0 || index>=ha[phase].size() ) // currently only phase=0 is supported, doesn't matter
+		//if( ha.size()==0 || phase!=0 || index<0 || index>=ha[phase].size() ) // currently only phase=0 is supported, doesn't matter
+		if( ha.size()==0 || phase!=0 || index>=ha[phase].size() ) // currently only phase=0 is supported, doesn't matter
 			return( gMiss );
 
 		int a = ha[phase][index];
@@ -368,8 +371,8 @@ public:
 	}
 
 	void debug() {
-		Rprintf("BEGIN Genotype::debug\n");
-
+		Rprintf("BEGIN Genotype::debug --> DISABLED FOR CRAN\n");
+    /*
 		Genotype g;
 		Haplotype h1, h2;
 		char DISEASE_ALLELE = 2;
@@ -385,7 +388,7 @@ public:
 		emWeight.push_back( 1.0 );
 
 		// Now test the functions
-		Rprintf("numPhases (should be 1) %d\n", numPhases());
+		Rprintf("numPhases (should be 1) %d\n", numPhases());*/
 
     /*
 		const char *genoStrs[] = {"Missing", "Homozygous minor allele", "Heterozygous", "Homozygous major allele"};
@@ -1262,8 +1265,9 @@ public:
 			contsX(analyze_allele_index, analyze_allele_index_size,
 					conditional_allele_index, conditional_allele_index_size,
 					observed[j], X);
-			contsB(alpha, sigmaSq, b, (double *)X.data(), contsBetaX(b, (double *)X.data(), R), j,
-					analyze_allele_index, analyze_allele_index_size,
+			//contsB(alpha, sigmaSq, b, (double *)X.data(), contsBetaX(b, (double *)X.data(), R), j,
+      contsB(alpha, sigmaSq, b, (double *)(&X[0]), contsBetaX(b, (double *)(&X[0]), R), j,
+          analyze_allele_index, analyze_allele_index_size,
 					conditional_allele_index, conditional_allele_index_size,
 					ignoreBtX, sumBAddi);
 
@@ -1306,14 +1310,17 @@ public:
 							conditional_allele_index,
 							conditional_allele_index_size, genoPerm[p][j],
 							XStar);
-					double bXStar = contsBetaX(b, (double *)XStar.data(), R);
+					//double bXStar = contsBetaX(b, (double *)XStar.data(), R);
+          double bXStar = contsBetaX(b, (double *)(&XStar[0]), R);
 
-					sumAStar += contsA(alpha, sigmaSq, b, (double *)XStar.data(), bXStar, j,
+          //sumAStar += contsA(alpha, sigmaSq, b, (double *)XStar.data(), bXStar, j,
+					sumAStar += contsA(alpha, sigmaSq, b, (double *)(&XStar[0]), bXStar, j,
 							analyze_allele_index, analyze_allele_index_size,
 							conditional_allele_index,
 							conditional_allele_index_size, ignoreBtX);
 
-					contsB(alpha, sigmaSq, b, (double *)XStar.data(), bXStar, j,
+					//contsB(alpha, sigmaSq, b, (double *)XStar.data(), bXStar, j,
+          contsB(alpha, sigmaSq, b, (double *)(&XStar[0]), bXStar, j,
 							analyze_allele_index, analyze_allele_index_size,
 							conditional_allele_index,
 							conditional_allele_index_size, ignoreBtX, sumBAddi);
@@ -1365,10 +1372,12 @@ public:
 			contsX(analyze_allele_index, analyze_allele_index_size,
 					conditional_allele_index, conditional_allele_index_size,
 					observed[j], X);
-			contsC(alpha, sigmaSq, b, (double *)X.data(), contsBetaX(b, (double *)X.data(), R), j,
+			//contsC(alpha, sigmaSq, b, (double *)X.data(), contsBetaX(b, (double *)X.data(), R), j,
+      contsC(alpha, sigmaSq, b, (double *)(&X[0]), contsBetaX(b, (double *)(&X[0]), R), j,
 					analyze_allele_index, analyze_allele_index_size,
 					conditional_allele_index, conditional_allele_index_size,
-					ignoreBtX, (double *)sumCAddi.data());
+          ignoreBtX, (double *)(&sumCAddi[0]));
+					//ignoreBtX, (double *)sumCAddi.data());
 
 			for (int rr = 0; rr < Rsq; rr++)
 				sumC[rr] += sumCAddi[rr];
@@ -1415,24 +1424,29 @@ public:
 							conditional_allele_index,
 							conditional_allele_index_size, genoPerm[p][j],
 							XStar);
-					double bXStar = contsBetaX(b, (double *)XStar.data(), R);
+          //double bXStar = contsBetaX(b, (double *)XStar.data(), R);
+          double bXStar = contsBetaX(b, (double *)(&XStar[0]), R);
 
-					sumAStar += contsA(alpha, sigmaSq, b, (double *)XStar.data(), bXStar, j,
+          //sumAStar += contsA(alpha, sigmaSq, b, (double *)XStar.data(), bXStar, j,
+          sumAStar += contsA(alpha, sigmaSq, b, (double *)(&XStar[0]), bXStar, j,
 							analyze_allele_index, analyze_allele_index_size,
 							conditional_allele_index,
 							conditional_allele_index_size, ignoreBtX);
 
-					contsB(alpha, sigmaSq, b, (double *)XStar.data(), bXStar, j,
+          //contsB(alpha, sigmaSq, b, (double *)XStar.data(), bXStar, j,
+          contsB(alpha, sigmaSq, b, (double *)(&XStar[0]), bXStar, j,
 							analyze_allele_index, analyze_allele_index_size,
 							conditional_allele_index,
 							conditional_allele_index_size, ignoreBtX, sumBAddi);
 					for (int r = 0; r < R; r++)
 						sumBStar[r] += sumBAddi[r];
 
-					contsC(alpha, sigmaSq, b, (double *)XStar.data(), bXStar, j,
+          //contsC(alpha, sigmaSq, b, (double *)XStar.data(), bXStar, j,
+          contsC(alpha, sigmaSq, b, (double *)(&XStar[0]), bXStar, j,
 							analyze_allele_index, analyze_allele_index_size,
 							conditional_allele_index,
-							conditional_allele_index_size, ignoreBtX, (double *)sumCAddi.data());
+              conditional_allele_index_size, ignoreBtX, (double *)(&sumCAddi[0]));
+              //conditional_allele_index_size, ignoreBtX, (double *)sumCAddi.data());
 					for (int rr = 0; rr < Rsq; rr++)
 						sumCStar[rr] = +sumCAddi[rr];
 				} // j
@@ -1623,8 +1637,10 @@ public:
 			ped[p].uimc(bm, bc0, bc1, analyze_allele_index,
 					analyze_allele_index_size, conditional_allele_index,
 					conditional_allele_index_size, onlyComputeConditional,
-					(double *)temp_ret_analyze.data(), (double *)temp_ret_conditional0.data(),
-					(double *)temp_ret_conditional1.data());
+          (double *)(&temp_ret_analyze[0]), (double *)(&temp_ret_conditional0[0]),
+          (double *)(&temp_ret_conditional1[0]));
+          //(double *)temp_ret_analyze.data(), (double *)temp_ret_conditional0.data(),
+					//(double *)temp_ret_conditional1.data());
 			for (int a = 0; a < analyze_allele_index_size; a++)
 				ret_analyze[p + a * P] = temp_ret_analyze[a];
 
@@ -1645,7 +1661,8 @@ public:
 		for (unsigned int p = 0; p < ped.size(); p++) {
 			ped[p].imc(bm, bc0, bc1, analyze_allele_index,
 					analyze_allele_index_size, conditional_allele_index,
-					conditional_allele_index_size, (double *)Iplus.data());
+          conditional_allele_index_size, (double *)(&Iplus[0]));
+          //conditional_allele_index_size, (double *)Iplus.data());
 
 			for (int r = 0; r < Rsq; r++)
 				if (!ISNAN(Iplus[r]))
@@ -1662,7 +1679,8 @@ public:
 		for (unsigned int p = 0; p < ped.size(); p++) {
 			ped[p].robustStat(analyze_allele_index, analyze_allele_index_size,
 					conditional_allele_index, conditional_allele_index_size,
-					(double *)temp_ret_analyze.data());
+          (double *)(&temp_ret_analyze[0]));
+          //(double *)temp_ret_analyze.data());
 
 			for (int a = 0; a < analyze_allele_index_size; a++)
 				ret_analyze[p + a * P] = temp_ret_analyze[a];
@@ -1685,7 +1703,8 @@ public:
 			ped[p].contsUimc(alpha, sigmaSq, b, analyze_allele_index,
 					analyze_allele_index_size, conditional_allele_index,
 					conditional_allele_index_size, onlyComputeConditional,
-					ignoreBtX, (double *)temp_ret_b.data());
+          ignoreBtX, (double *)(&temp_ret_b[0]));
+          //ignoreBtX, (double *)temp_ret_b.data());
 			for (int r = 0; r < R; r++)
 				ret_b[p + r * P] = temp_ret_b[r];
 		} // p
@@ -1710,7 +1729,8 @@ public:
 		for (unsigned int p = 0; p < ped.size(); p++) {
 			ped[p].contsImc(alpha, sigmaSq, b, analyze_allele_index,
 					analyze_allele_index_size, conditional_allele_index,
-					conditional_allele_index_size, ignoreBtX, (double *)temp_ret_I.data());
+          conditional_allele_index_size, ignoreBtX, (double *)(&temp_ret_I[0]));
+          //conditional_allele_index_size, ignoreBtX, (double *)temp_ret_I.data());
 
 			for (int rr = 0; rr < Rsq; rr++)
 				if (!ISNAN(temp_ret_I[rr]))
@@ -1932,7 +1952,7 @@ void condGeneFBATControl_estEqNuis(
 	}
 
 	// is it a quantitative trait?
-	bool qtl = (*offset == 0);
+	//////bool qtl = (*offset == 0);
 
 	// Notes:
 	// - the allele index will always be zero
@@ -1972,7 +1992,7 @@ void condGeneFBATControl_estEqNuis(
 			//  associated with it...
 			// In fact, we'd like to have a separate way of indicating informative...
 			// It might be best to find all the "informative" and replace them with "nonmissing" as the varname
-			bool informative = true; // this is just all bad -- really just X-E(X|S)=0 for the current piece
+			//////bool informative = true; // this is just all bad -- really just X-E(X|S)=0 for the current piece
 
 			for( int c=0; c<nc; c++ ) {
 				// Some pedigrees might be noninformative, so no contribution for a particular allele
@@ -1991,7 +2011,7 @@ void condGeneFBATControl_estEqNuis(
 					// noninformative, set everything to be zero
 					xijc[c*2+0] = xijc[c*2+1] = 0.0;
 					exijc[c*2+0] = exijc[c*2+1] = 0.0;
-					informative = false;
+					//////informative = false;
 				}else{
 					// compute the observed
 					xijc[c*2+0] = ped->g[ ped->observed[j] ].genotype( 0, 0, 2, 2 );
@@ -2085,7 +2105,7 @@ void condGeneFBATControl_estEqNuisUpdate(
 			// go across all of the conditioning alleles
 			bool traitSet = false;
 			eij = 0.0;
-			bool informative = true;
+			//////bool informative = true;
 			for( int c=0; c<nc; c++ ) {
 				// Some pedigrees might be noninformative, so no contribution for a particular allele
 				Pedigree *ped = &data[referenceCondition[c]].ped[i];
@@ -2093,7 +2113,7 @@ void condGeneFBATControl_estEqNuisUpdate(
 				//if( ped->observed.size() <= 0 ) {
 				if( j>=ped->observed.size() ) {
 					// noninformative, set everything to be zero
-					informative = false;
+					//////informative = false;
 				//}else if( !ped->nonzeroDelX[j] ) { // 01.20.2009
 				//	informative = false;
 				}else{
@@ -2207,7 +2227,8 @@ public:
   }
 
   SSBucketMember &operator []( unsigned int index ){
-    if( index<0 || index>=size() ) {
+    //if( index<0 || index>=size() ) {
+    if( index>=size() ) {
       Rprintf("Bucket member %d is out of bounds [0,%d]\n", index, (size()-1));
       return( empty );
     }
@@ -2358,7 +2379,7 @@ void condGeneFBATControl_estEqNuisUpdate2(
 
 			// go across all of the conditioning alleles
 			bool traitSet = false;
-			bool informative = true;
+			//////bool informative = true;
 			//double xijc[nc2], eij = 0.0;
       vector<double> xijc; xijc.resize(nc2);
       double eij = 0.0;
@@ -2369,7 +2390,7 @@ void condGeneFBATControl_estEqNuisUpdate2(
 				//if( ped->observed.size() <= 0 ) {
 				if( j >= (int)ped->observed.size() ) {
 					// noninformative, set everything to be zero
-					informative = false;
+					//////informative = false;
 				//}else if( !ped->nonzeroDelX[j] ) { // 01.20.2009
 				//	informative = false;
 				}else{
@@ -2487,7 +2508,7 @@ void condGeneFBATControl_estEq(
 			bool traitSet = false;
 			eij = 0.0;
 
-			bool informative = true;
+			//////bool informative = true;
 			// go across the analyze alleles
 			for( int a=0; a<na; a++ ) {
 				Pedigree *ped = &data[referenceAnalyze[a]].ped[i];
@@ -2495,7 +2516,7 @@ void condGeneFBATControl_estEq(
 				if( j >= ped->observed.size() ) {
 					// noninformative
 					xija[a] = exija[a] = 0.0;
-					informative = false;
+					//////informative = false;
 				}else{
 					// compute the observed
 					xija[a] = ped->g[ ped->observed[j] ].xCode( 0, 0, 2, ADDITIVE );
@@ -2526,7 +2547,7 @@ void condGeneFBATControl_estEq(
 					// noninformative, set everything to be zero
 					xijc[c*2+0] = xijc[c*2+1] = 0.0;
 					exijc[c*2+0] = exijc[c*2+1] = 0.0;
-					informative = false;
+					//////informative = false;
 				//}else if( !ped->nonzeroDelX[j] ) { // 01.20.2009
 				//	informative = false; // VERY VERY VERY IFFY, DO WE INCLUDE OR NOT INCLUDE THESE?
 				}else{
@@ -3331,11 +3352,12 @@ void condGeneFBATControl_restoreTrait( int *reference, int *referenceSize ) {
 
 #ifdef _cgFbat_DEBUG_
 
+/*
 int main() {
 	Genotype g;
 	g.debug();
 
 	return(0);
-}
+}*/
 
 #endif

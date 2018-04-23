@@ -63,7 +63,7 @@ nuclifyMerged <- function( data, OUT_MULT=2 ) {
   ##dataOutDim <- as.integer(dim(dataOut))
   dataOutDim <- as.integer( c( dim(dataOut)[1], dim(dataOut)[2] ) ) ## Bug in R?, see strataReduce
   failure <- as.integer(0)
-  res = .C("nuclify",
+  res = .C("nuclify_cpp",
      as.double(as.matrix(data)), as.integer(dim(data)),
      dataOut, dataOutDim, failure,
      DUP=TRUE, NAOK=TRUE) #DUP=FALSE, NAOK=TRUE )
@@ -122,7 +122,7 @@ strataReduce <- function( data, envCol, m0, m1=m0+1, maxSib=3 ) {
   ##dataOutDim <- as.integer(c(5,9))
   dataOutDim <- as.integer( c( dim(dataOut)[1], dim(dataOut)[2] ) ) ## Bug in R?
 
-  res = .C( "strataReduce",
+  res = .C( "strataReduce_cpp",
       as.double(as.matrix(data)), as.integer(dim(data)),
       dataOut, dataOutDim,
       as.integer(envCol-1),

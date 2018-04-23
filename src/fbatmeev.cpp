@@ -9,7 +9,7 @@ void REXP_fbatmeev(RMatrix &data, RVector &marker,  double trait, double model, 
   d.setGen( data.data, data.R, data.C );
 
   // zero out the returns
-  int m;
+  unsigned int m;
   for( m=0; m<marker.I/2; m++ ) {
     RET_stat(m) = 0.0;
     RET_numInf(m) = 0.0;
@@ -133,7 +133,7 @@ void REXP_fbatme(RMatrix &data, RVector &marker,  double trait, double model,  R
   d.setGen( data.data, data.R, data.C );
 
   // zero out the returns
-  int m;
+  unsigned int m;
   for( m=0; m<marker.I/2; m++ ) {
     RET_stat(m) = 0.0;
     RET_numInf(m) = 0.0;
@@ -155,7 +155,7 @@ void REXP_fbatme(RMatrix &data, RVector &marker,  double trait, double model,  R
       int curP=0;
       int ca[MAX_CHILD_MEEV];
       int cb[MAX_CHILD_MEEV];
-      double cEnv[MAX_CHILD_MEEV];
+      //////double cEnv[MAX_CHILD_MEEV];
       int curC=0; // n
       double y[MAX_CHILD_MEEV];
 

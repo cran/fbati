@@ -4,7 +4,7 @@
 #include "fbatdist.h"
 
 // hmm... maybe...
-//#define isnan(x) ((x) != (x))
+//#define ISNAN(x) ((x) != (x))
 
 const int MAX_CHILD = 20;
 
@@ -97,7 +97,7 @@ const int MAX_CHILD = 20;
 //         double txmex = y[j] * ( xCode( ca[j], cb[j], (int)model ) - ex ); // POTENTIALLY WANT TO DO (y[j]-OFFSET)
 //         //cout << crow[j] << " " << (int)d(crow[j],C_PID) << " " << (int)d(crow[j],C_ID) << ": " << y[j] << "; " << xCode( ca[j], cb[j], (int)model ) - ex << "  " << txmex << endl;
 //         //cout << "ex=" << ex << " trait=" << y[j] << " txmex=" << txmex << " env=" << cEnv[j] << endl;
-//         if( !isnan(txmex) && !isnan(cEnv[j]) && ca[j]!=0 && cb[j]!=0 ) {
+//         if( !ISNAN(txmex) && !ISNAN(cEnv[j]) && ca[j]!=0 && cb[j]!=0 ) {
 //           tempVec[m] += txmex;
 //           tempVec[m+1] += txmex * cEnv[j];
 //         }
