@@ -38,6 +38,13 @@ void REXP_fbatmeev(RMatrix &data, RVector &marker,  double trait, double model, 
       double cEnv[MAX_CHILD_MEEV];
       int curC=0; // n
       double y[MAX_CHILD_MEEV];
+      
+      // 2020-07-07 -- prevent some compiler target_mem_ref unfounded warnings...
+      memset(ca, 0, MAX_CHILD_MEEV*sizeof(int));
+      memset(cb, 0, MAX_CHILD_MEEV*sizeof(int));
+      memset(cEnv, 0, MAX_CHILD_MEEV*sizeof(double));
+      memset(y, 0, MAX_CHILD_MEEV*sizeof(double));
+      // 2020-07-07 end
 
       //int crow[MAX_CHILD]; // DEBUG ONLY
 

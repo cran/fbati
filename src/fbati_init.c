@@ -53,9 +53,19 @@ extern void cpp_rn_debug();
 extern void cpp_rn_detach();
 extern void cpp_rn_setNormalSigma(void *, void *);
 extern void dataComputeGroupG(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
-extern void eREXP_fbatme(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
-extern void eREXP_fbatmeev(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
-extern void eREXP_joint(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
+
+//extern void eREXP_fbatme(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
+//extern void eREXP_fbatmeev(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
+//extern void eREXP_joint(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
+
+// 2020-07-07: LTO error fixes -- too many args?
+extern void eREXP_fbatme(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
+extern void eREXP_fbatmeev(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
+extern void eREXP_joint(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
+
+
+
+
 extern void fbati_cpp(void *, void *, void *, void *, void *, void *);
 extern void nuclify_cpp(void *, void *, void *, void *, void *);
 extern void pG_group_dehash(void *, void *);
@@ -108,9 +118,12 @@ static const R_CMethodDef CEntries[] = {
     {"cpp_rn_detach",                             (DL_FUNC) &cpp_rn_detach,                              0},
     {"cpp_rn_setNormalSigma",                     (DL_FUNC) &cpp_rn_setNormalSigma,                      2},
     {"dataComputeGroupG",                         (DL_FUNC) &dataComputeGroupG,                         11},
-    {"eREXP_fbatme",                              (DL_FUNC) &eREXP_fbatme,                              11},
-    {"eREXP_fbatmeev",                            (DL_FUNC) &eREXP_fbatmeev,                            11},
-    {"eREXP_joint",                               (DL_FUNC) &eREXP_joint,                               14},
+    //{"eREXP_fbatme",                              (DL_FUNC) &eREXP_fbatme,                              11},
+    //{"eREXP_fbatmeev",                            (DL_FUNC) &eREXP_fbatmeev,                            11},
+    //{"eREXP_joint",                               (DL_FUNC) &eREXP_joint,                               14},
+    {"eREXP_fbatme",                              (DL_FUNC) &eREXP_fbatme,                              10},
+    {"eREXP_fbatmeev",                            (DL_FUNC) &eREXP_fbatmeev,                            10},
+    {"eREXP_joint",                               (DL_FUNC) &eREXP_joint,                               13},
     {"fbati_cpp",                                 (DL_FUNC) &fbati_cpp,                                   6},
     {"nuclify_cpp",                               (DL_FUNC) &nuclify_cpp,                                5},
     {"pG_group_dehash",                           (DL_FUNC) &pG_group_dehash,                            2},

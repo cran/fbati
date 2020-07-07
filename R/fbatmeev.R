@@ -1,6 +1,8 @@
+## 2020-07-07 -- removed the dup=FALSE bug
+
 ## Function auto-generated...
 REXP_fbatmeev <- function(  data, marker, trait, model, RET_stat, RET_numInf ) {
-  rexport_result <- .C( 'eREXP_fbatmeev',  as.double(data), as.integer(dim(data)), as.double(marker), as.integer(length(marker)), as.double(trait), as.double(model), as.double(RET_stat), as.integer(length(RET_stat)), as.double(RET_numInf), as.integer(length(RET_numInf)), dup=FALSE, NAOK=TRUE )
+  rexport_result <- .C( 'eREXP_fbatmeev',  as.double(data), as.integer(dim(data)), as.double(marker), as.integer(length(marker)), as.double(trait), as.double(model), as.double(RET_stat), as.integer(length(RET_stat)), as.double(RET_numInf), as.integer(length(RET_numInf)), NAOK=TRUE )
   list(   stat = rexport_result[[7]],  numInf = rexport_result[[9]] )
 }
 
@@ -148,7 +150,7 @@ fbatmeev <- function( ped=NULL, phe=NULL,
 
 ## Function auto-generated...
 REXP_fbatme <- function(  data, marker, trait, model, RET_stat, RET_numInf ) {
-  rexport_result <- .C( 'eREXP_fbatme',  as.double(data), as.integer(dim(data)), as.double(marker), as.integer(length(marker)), as.double(trait), as.double(model), as.double(RET_stat), as.integer(length(RET_stat)), as.double(RET_numInf), as.integer(length(RET_numInf)), dup=FALSE, NAOK=TRUE )
+  rexport_result <- .C( 'eREXP_fbatme',  as.double(data), as.integer(dim(data)), as.double(marker), as.integer(length(marker)), as.double(trait), as.double(model), as.double(RET_stat), as.integer(length(RET_stat)), as.double(RET_numInf), as.integer(length(RET_numInf)), NAOK=TRUE )
   list(   stat = rexport_result[[7]],  numInf = rexport_result[[9]] )
 }
 

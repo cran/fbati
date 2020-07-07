@@ -1,6 +1,6 @@
-fcc30a02e3c5d180981873e140fa3818 *DESCRIPTION
+8a8ec577786da924e3c86dc52f0e11fd *DESCRIPTION
 a28ebab86c0940eaa64f9657486e1b2d *NAMESPACE
-4c82188bd1b2a4f82c66a299b926eb9b *R/REXP_joint.R
+19bf702824d97e9745bfd0db3224facf *R/REXP_joint.R
 ddac4761df045f2c5a0aedb9526cf731 *R/cgFbatCode.R
 9692846096fa8d383483e268001e0707 *R/cgFbatInstall.R
 fb3ba0701353a25f4aa63fd2eed755b1 *R/cgFbatRun.R
@@ -12,7 +12,7 @@ d2a815af8fba15c143fdfbe89a11799a *R/fbatge.R
 8846a6b755f15445ccfca418db46156b *R/fbatgeAll.R
 ba69c406b4ae3aa321e43291b8d1254d *R/fbatgeInterface.R
 f5798a7ca203e24021648a56fd3f8bd6 *R/fbati.R
-6389934182c226017aa3fc398ee11971 *R/fbatmeev.R
+401ee0bf45acd56240d248cf742d7378 *R/fbatmeev.R
 128cd86df081455e4bdb33f14845412d *R/ibat.R
 01f01552f7755f09a20e3f095aee6529 *R/ibatGUI.R
 b5c81cfa1adf5e641b69bd0b99062303 *R/jbatGUI.R
@@ -39,8 +39,8 @@ aa025ccb20fb216480a79032d6797cf4 *src/fbatdist.cpp
 39bee78adeeb3e36ca6466f3ffd0ff22 *src/fbatge.cpp
 516996d397e07abef2e6b5751cbf699d *src/fbati.cpp
 cf6bc70b42d6263c81f993e6a2a0ea68 *src/fbati.h
-8e14a7bccbb23b75bff447ab5cfa13cb *src/fbati_init.c
-ff5e1101ef438fff2af25f5afea0e975 *src/fbatmeev.cpp
+92ea1d6fea8ef9f8a68fcd654627edb2 *src/fbati_init.c
+507a887105022f5d43405153dd43382e *src/fbatmeev.cpp
 8b7c07f7e17706420d2c9b56805aa2b0 *src/fbatmeev.h
 87f87f05675dc2d55244d32a5beb5226 *src/joint.cpp
 2812a3510a8b711e864d994bbb382ed6 *src/joint.h
