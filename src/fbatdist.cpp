@@ -228,7 +228,7 @@ bool pG( int gP1, int gP2, // parental mating type
   return(false);
 }
 
-// Ugh! What the hell am I doing! I'm rewriting code
+// rewriting code
 /*
 bool pGG( int gP1, int gP2,
           int nAA, int nAB, int nBB,

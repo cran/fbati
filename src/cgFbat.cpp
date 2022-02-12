@@ -4,7 +4,7 @@
  * Fork of condGeneFBATControl.cpp on 07/16/2008.
  *
  * Now we handle vectors of genotypes as well, I don't
- *  know what the hell we were thinking of for doing the
+ *  know what we were thinking of for doing the
  *  pairwise stuff -- I suppose it was back when
  *  we were thinking about haplotypes...
  *
@@ -2145,7 +2145,7 @@ void condGeneFBATControl_estEqNuisUpdate(
 
 	// subtract mean of eij (eijSum) from every trait
 	// NOTE: this is only doing the traits on these alleles
-	// WARNING: TODO: OH HELL: Make SURE that we search the conditioning alleles for the trait first!!!
+	// WARNING: Make SURE that we search the conditioning alleles for the trait first
 	for( int i=0; i<np; i++ ) {
 		for( int c=0; c<nc; c++ )
 			for( unsigned int j=0; j<data[referenceCondition[c]].ped[i].trait.size(); j++ )

@@ -1,4 +1,4 @@
-8a8ec577786da924e3c86dc52f0e11fd *DESCRIPTION
+59e5bf2a95293fcce911f8c06dbf23ce *DESCRIPTION
 a28ebab86c0940eaa64f9657486e1b2d *NAMESPACE
 19bf702824d97e9745bfd0db3224facf *R/REXP_joint.R
 ddac4761df045f2c5a0aedb9526cf731 *R/cgFbatCode.R
@@ -30,13 +30,13 @@ e21bc8a3c80b80fdbf326ee6387ffe2f *man/launchpad.Rd
 c819bad88951bed034000f5abcde84d5 *man/nuclify.Rd
 f071364b2c3c26949ed6711d1c455b22 *man/strataReduce.Rd
 ebd7117cbc17d89e84135e57f0f9bfbe *src/RExportGen.cpp
-7c03b1f1a00c37d23298a444a856a9f4 *src/cgFbat.cpp
+490617e290bbe7e166b955ad841761a8 *src/cgFbat.cpp
 a6d45385db339997323512b623d08e62 *src/datamatrix.cpp
 a018bcb4db0fd04cfaef7ef66f3c8d4c *src/datamatrix.h
 7e09d1de0e91f123d899c44ea4fe117b *src/defines.h
-aa025ccb20fb216480a79032d6797cf4 *src/fbatdist.cpp
+f6f3fa63f0947ce51c07919eff860198 *src/fbatdist.cpp
 291dc3f623b7a307533b60edb8ad2398 *src/fbatdist.h
-39bee78adeeb3e36ca6466f3ffd0ff22 *src/fbatge.cpp
+229be0e37322d7fb61c3927780ac27b2 *src/fbatge.cpp
 516996d397e07abef2e6b5751cbf699d *src/fbati.cpp
 cf6bc70b42d6263c81f993e6a2a0ea68 *src/fbati.h
 92ea1d6fea8ef9f8a68fcd654627edb2 *src/fbati_init.c

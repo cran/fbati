@@ -1824,7 +1824,7 @@ public:
     IMPORTANCE_MAX = 1.0;
     //return; // DEBUG ONLY DEBUG ONLY DEBUG ONLY
 
-    double pr[4];
+    double pr[4]; pr[0] = 0; pr[1] = 0; pr[2] = 0; pr[3] = 0; // to values to avoid pedantic warnings, even though it would have to in the code below
     if( env==DICHOTOMOUS ) {
       // all possible combinations for the max/min (depends on sign of beta, which is why this is as complicated as it is)
       pr[0] = pd( 2, 1 );
