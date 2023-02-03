@@ -63,20 +63,20 @@ string d2s( double d ) {
   return( oss.str() );
 }//d2s -- DEBUGGED
 
-// Returns all possible permutations of the data
-void perms( vector<int> &data, vector< vector<int> > &ret ) {
-  if( data.size() == 1 ) {
-    ret.push_back( data );
+// Returns all possible permutations of the ddata
+void perms( vector<int> &ddata, vector< vector<int> > &ret ) {
+  if( ddata.size() == 1 ) {
+    ret.push_back( ddata );
     return;
   }
 
-  for( unsigned int i=0; i<data.size(); i++ ) {
-    vector<int> subdata = data;
+  for( unsigned int i=0; i<ddata.size(); i++ ) {
+    vector<int> subdata = ddata;
     subdata.erase( subdata.begin() + i );
     vector< vector<int> > subret;
     perms( subdata, subret );
     for( unsigned int s=0; s<subret.size(); s++ ) {
-      subret[s].push_back(data[i]);
+      subret[s].push_back(ddata[i]);
       ret.push_back(subret[s]);
     }//s
   }//i
@@ -1511,7 +1511,7 @@ public:
       //*numInf += ( (temp > ZEROTOL) | (temp < -ZEROTOL) );
       *numInf += (uge.m[i][0] < -ZEROTOL) || (uge.m[i][0] > ZEROTOL);
 
-      // This next piece is just for debugging the dataset analysis, but nonetheless
+      // This next piece is just for debugging the ddataset analysis, but nonetheless
       //cout << "Informative: " << (int)(temp==0) << endl;
       //cout << families[i].toString(true) << endl;
       // debug end
@@ -1524,7 +1524,7 @@ public:
     }
   }//GPed::statCompute
 
-  // Setup from an external dataset (i.e. the one we want to analyze)
+  // Setup from an external ddataset (i.e. the one we want to analyze)
   // GPed::set
   void set( int *pid, int *id, int *idfath, int *idmoth,
             int *geno, int *trait, double *env, int n ) {
@@ -1576,7 +1576,7 @@ public:
       }//fi
     }//i
   }//GPed::set
-  // Setup from an external dataset (i.e. the one we want to analyze)
+  // Setup from an external ddataset (i.e. the one we want to analyze)
   // GPed::set_C
   void set_C( int *pid, int *id, int *idfath, int *idmoth,
               int *geno, int *trait, double *env, double *cov, int nCov, int n ) {
@@ -2544,7 +2544,7 @@ extern "C" {
   void cpp_gesim_print() {
     Rprintf("%s\n", gesim.toString().c_str());
   }
-  // set up for data generation
+  // set up for ddata generation
   // multiple calls allow for multiple different family designs
   //  in each simulation
   void cpp_gesim_set( int *numParents, int *numOffspring, int *numFam,
@@ -2570,7 +2570,7 @@ extern "C" {
 
   }
 
-  // draw up a new dataset (automatically clears old dataset)
+  // draw up a new ddataset (automatically clears old ddataset)
   void cpp_gesim_draw() {
     rn.attach(); // do we want this here?
     gesim.draw();

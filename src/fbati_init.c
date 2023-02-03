@@ -32,11 +32,15 @@ extern void condGeneFBATControl_uimc(void *, void *, void *, void *, void *, voi
 extern void condGeneFBATControl_varContsMean(void *, void *, void *, void *);
 extern void condGeneFBATControl_varContsModel(void *, void *, void *, void *);
 extern void condGeneFBATControl_varExplConts(void *, void *, void *, void *);
-extern void cpp_gesim_clear();
-extern void cpp_gesim_draw();
-extern void cpp_gesim_print();
+//extern void cpp_gesim_clear();
+extern void cpp_gesim_clear(void);
+//extern void cpp_gesim_draw();
+extern void cpp_gesim_draw(void);
+//extern void cpp_gesim_print();
+extern void cpp_gesim_print(void);
 extern void cpp_gesim_set(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
-extern void cpp_gped_clear();
+//extern void cpp_gped_clear();
+extern void cpp_gped_clear(void);
 extern void cpp_gped_estEq(void *, void *, void *);
 extern void cpp_gped_numCovariates(void *);
 extern void cpp_gped_print(void *);
@@ -47,12 +51,16 @@ extern void cpp_gped_statCompute(void *, void *, void *);
 extern void cpp_gped_statCompute_A(void *, void *, void *);
 extern void cpp_gped_statPrecompute(void *, void *, void *);
 extern void cpp_gped_statPrecompute_A(void *, void *, void *);
-extern void cpp_mmatrix_debug();
-extern void cpp_rn_attach();
-extern void cpp_rn_debug();
-extern void cpp_rn_detach();
+//extern void cpp_mmatrix_debug();
+extern void cpp_mmatrix_debug(void);
+//extern void cpp_rn_attach();
+extern void cpp_rn_attach(void);
+//extern void cpp_rn_debug();
+extern void cpp_rn_debug(void);
+//extern void cpp_rn_detach();
+extern void cpp_rn_detach(void);
 extern void cpp_rn_setNormalSigma(void *, void *);
-extern void dataComputeGroupG(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
+extern void ddataComputeGroupG(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
 
 //extern void eREXP_fbatme(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
 //extern void eREXP_fbatmeev(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
@@ -117,7 +125,7 @@ static const R_CMethodDef CEntries[] = {
     {"cpp_rn_debug",                              (DL_FUNC) &cpp_rn_debug,                               0},
     {"cpp_rn_detach",                             (DL_FUNC) &cpp_rn_detach,                              0},
     {"cpp_rn_setNormalSigma",                     (DL_FUNC) &cpp_rn_setNormalSigma,                      2},
-    {"dataComputeGroupG",                         (DL_FUNC) &dataComputeGroupG,                         11},
+    {"dataComputeGroupG",                         (DL_FUNC) &ddataComputeGroupG,                         11},
     //{"eREXP_fbatme",                              (DL_FUNC) &eREXP_fbatme,                              11},
     //{"eREXP_fbatmeev",                            (DL_FUNC) &eREXP_fbatmeev,                            11},
     //{"eREXP_joint",                               (DL_FUNC) &eREXP_joint,                               14},

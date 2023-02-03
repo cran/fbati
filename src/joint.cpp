@@ -9,13 +9,13 @@
 const int MAX_CHILD = 20;
 
 // // then with R we need to compute a^T %*% b^- %*% a ~ chi-sq(rank(b))
-// void REXP_joint( RMatrix &data,  RVector &marker, double trait, double env,  double model,  RVector &RET_a, RMatrix &RET_b )
+// void REXP_joint( RMatrix &ddata,  RVector &marker, double trait, double env,  double model,  RVector &RET_a, RMatrix &RET_b )
 // {
 //   DataMatrix d;
-//   d.setGen( data.data, data.R, data.C );
+//   d.setGen( ddata.ddata, ddata.R, ddata.C );
 //
 //   /*
-//   // print out the data -- debug
+//   // print out the ddata -- debug
 //   for( int rr=0; rr<d.R; rr++ ) {
 //     for( int cc=0; cc<d.C; cc++ ) {
 //       cout << d(rr,cc) << " ";
@@ -32,7 +32,7 @@ const int MAX_CHILD = 20;
 //       RET_b(r,c) = 0.0;
 //
 //   /*
-//   cout << "dim(data) " << d.R << " " << d.C << endl;
+//   cout << "dim(ddata) " << d.R << " " << d.C << endl;
 //   cout << "zeroed out" << endl;
 //   cout << "trait " << (int)trait << endl;
 //   cout << "env " << (int)env << endl;
@@ -131,10 +131,10 @@ const int MAX_CHILD = 20;
 
 
 // REWRITE USING THE "REAL" VARIANCE, NOT THE EMPIRICAL VARIANCE!
-void REXP_joint( RMatrix &data,  RVector &marker, double trait, double env,  double model,  RVector &RET_a, RMatrix &RET_b, RVector &RET_numInf )
+void REXP_joint( RMatrix &ddata,  RVector &marker, double trait, double env,  double model,  RVector &RET_a, RMatrix &RET_b, RVector &RET_numInf )
 {
   DataMatrix d;
-  d.setGen( data.data, data.R, data.C );
+  d.setGen( ddata.ddata, ddata.R, ddata.C );
 
   // zero out the a and b RMatrix objects
   unsigned int r=0, c=0, m=0;

@@ -1,4 +1,4 @@
-// R CMD SHLIB nuclify.cpp datamatrix.cpp rmatrix.cpp fbatdist.cpp random.cpp
+// R CMD SHLIB nuclify.cpp ddatamatrix.cpp rmatrix.cpp fbatdist.cpp random.cpp
 #include <R.h>
 
 #include <limits>  // for quiet_NaN
@@ -79,15 +79,15 @@ extern "C" {
   // Chops pedigrees up into nuclear families
   // failure=0 == success
   // failure=1 == indicates the output isn't large enough (suggest doubling it, which is what the R code does in a recursive fashion)
-  void nuclify_cpp( double *data, int *dimData,
-                double *dataOut, int *dimDataOut,
+  void nuclify_cpp( double *ddata, int *dimData,
+                double *ddataOut, int *dimDataOut,
                 int *failure ) {
     *failure = 0;
 
     // set up the DataMatrix objects
     DataMatrix din, dout;
-    din.set( data, dimData );
-    dout.set( dataOut, dimDataOut );
+    din.set( ddata, dimData );
+    dout.set( ddataOut, dimDataOut );
 
     // do the nuclification
     int start=-1, end=-1;
@@ -167,12 +167,12 @@ extern "C" {
   //  their parents ONLY if both present,
   //  otherwise it returns a random sibpair
   //
-  // Assumes data has been through the 'nuclify' routine,
-  //  so data is in nuclear families and the children have
+  // Assumes ddata has been through the 'nuclify' routine,
+  //  so ddata is in nuclear families and the children have
   //  parents, but their parents' parents are marked
   //  as missing
-  void strataReduce_cpp( double *data, int *dimData,
-                     double *dataOut, int *dimDataOut,
+  void strataReduce_cpp( double *ddata, int *dimData,
+                     double *ddataOut, int *dimDataOut,
                      int *pEnvCol, int *pm0, int *pm1,
                      int *pMaxSib ) { // new 04/08/2008
 
@@ -187,8 +187,8 @@ extern "C" {
 
     // set up the DataMatrix objects
     DataMatrix din, dout;
-    din.set( data, dimData );
-    dout.set( dataOut, dimDataOut );
+    din.set( ddata, dimData );
+    dout.set( ddataOut, dimDataOut );
 
     // do the processing
     int start=-1, end=-1;
@@ -249,7 +249,7 @@ extern "C" {
         }
       }
 
-      // Now push on the friendlier strata data
+      // Now push on the friendlier strata ddata
       // - are the parents there, and allele's not missing?
       if( parentRowSize==2
           && din(parentRow[0],m0)!=0 && din(parentRow[0],m1)!=0

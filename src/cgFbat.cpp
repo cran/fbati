@@ -12,9 +12,9 @@
  *  that we have been working on.
  * Here we control FBAT to get the haplotype density,
  *  rather than drudging through the FBAT source code.
- * We also keep the data in C++ code, we never export
- *  it back to R. Instead, we write the dataset out from
- *  R, then we run FBAT on the dataset, we read the
+ * We also keep the ddata in C++ code, we never export
+ *  it back to R. Instead, we write the ddataset out from
+ *  R, then we run FBAT on the ddataset, we read the
  *  output of FBAT into the c++ code, and pass a
  *  reference back to the R code to index the object.
  *  Thus all computations are done in this code.
@@ -53,20 +53,20 @@ string doubleToString(double d) {
 
 // Returns in 'ret' all the possible permutations of the 'data'
 // DEBUGGED Previously?
-void allPerms(vector<int> &data, vector<vector<int> > &ret) {
-	if (data.size() == 1) {
-		ret.push_back(data);
+void allPerms(vector<int> &ddata, vector<vector<int> > &ret) {
+	if (ddata.size() == 1) {
+		ret.push_back(ddata);
 		return;
 	}
 
-	for (unsigned int i = 0; i < data.size(); i++) {
-		vector<int> subdata = data;
+	for (unsigned int i = 0; i < ddata.size(); i++) {
+		vector<int> subdata = ddata;
 		subdata.erase(subdata.begin() + i);
 
 		vector<vector<int> > subret;
 		allPerms(subdata, subret);
 		for (unsigned int s = 0; s < subret.size(); s++) {
-			subret[s].push_back(data[i]);
+			subret[s].push_back(ddata[i]);
 			ret.push_back(subret[s]);
 		}
 	}
@@ -1265,7 +1265,7 @@ public:
 			contsX(analyze_allele_index, analyze_allele_index_size,
 					conditional_allele_index, conditional_allele_index_size,
 					observed[j], X);
-			//contsB(alpha, sigmaSq, b, (double *)X.data(), contsBetaX(b, (double *)X.data(), R), j,
+			//contsB(alpha, sigmaSq, b, (double *)X.ddata(), contsBetaX(b, (double *)X.ddata(), R), j,
       contsB(alpha, sigmaSq, b, (double *)(&X[0]), contsBetaX(b, (double *)(&X[0]), R), j,
           analyze_allele_index, analyze_allele_index_size,
 					conditional_allele_index, conditional_allele_index_size,
@@ -1310,16 +1310,16 @@ public:
 							conditional_allele_index,
 							conditional_allele_index_size, genoPerm[p][j],
 							XStar);
-					//double bXStar = contsBetaX(b, (double *)XStar.data(), R);
+					//double bXStar = contsBetaX(b, (double *)XStar.ddata(), R);
           double bXStar = contsBetaX(b, (double *)(&XStar[0]), R);
 
-          //sumAStar += contsA(alpha, sigmaSq, b, (double *)XStar.data(), bXStar, j,
+          //sumAStar += contsA(alpha, sigmaSq, b, (double *)XStar.ddata(), bXStar, j,
 					sumAStar += contsA(alpha, sigmaSq, b, (double *)(&XStar[0]), bXStar, j,
 							analyze_allele_index, analyze_allele_index_size,
 							conditional_allele_index,
 							conditional_allele_index_size, ignoreBtX);
 
-					//contsB(alpha, sigmaSq, b, (double *)XStar.data(), bXStar, j,
+					//contsB(alpha, sigmaSq, b, (double *)XStar.ddata(), bXStar, j,
           contsB(alpha, sigmaSq, b, (double *)(&XStar[0]), bXStar, j,
 							analyze_allele_index, analyze_allele_index_size,
 							conditional_allele_index,
@@ -1372,12 +1372,12 @@ public:
 			contsX(analyze_allele_index, analyze_allele_index_size,
 					conditional_allele_index, conditional_allele_index_size,
 					observed[j], X);
-			//contsC(alpha, sigmaSq, b, (double *)X.data(), contsBetaX(b, (double *)X.data(), R), j,
+			//contsC(alpha, sigmaSq, b, (double *)X.ddata(), contsBetaX(b, (double *)X.ddata(), R), j,
       contsC(alpha, sigmaSq, b, (double *)(&X[0]), contsBetaX(b, (double *)(&X[0]), R), j,
 					analyze_allele_index, analyze_allele_index_size,
 					conditional_allele_index, conditional_allele_index_size,
           ignoreBtX, (double *)(&sumCAddi[0]));
-					//ignoreBtX, (double *)sumCAddi.data());
+					//ignoreBtX, (double *)sumCAddi.ddata());
 
 			for (int rr = 0; rr < Rsq; rr++)
 				sumC[rr] += sumCAddi[rr];
@@ -1424,16 +1424,16 @@ public:
 							conditional_allele_index,
 							conditional_allele_index_size, genoPerm[p][j],
 							XStar);
-          //double bXStar = contsBetaX(b, (double *)XStar.data(), R);
+          //double bXStar = contsBetaX(b, (double *)XStar.ddata(), R);
           double bXStar = contsBetaX(b, (double *)(&XStar[0]), R);
 
-          //sumAStar += contsA(alpha, sigmaSq, b, (double *)XStar.data(), bXStar, j,
+          //sumAStar += contsA(alpha, sigmaSq, b, (double *)XStar.ddata(), bXStar, j,
           sumAStar += contsA(alpha, sigmaSq, b, (double *)(&XStar[0]), bXStar, j,
 							analyze_allele_index, analyze_allele_index_size,
 							conditional_allele_index,
 							conditional_allele_index_size, ignoreBtX);
 
-          //contsB(alpha, sigmaSq, b, (double *)XStar.data(), bXStar, j,
+          //contsB(alpha, sigmaSq, b, (double *)XStar.ddata(), bXStar, j,
           contsB(alpha, sigmaSq, b, (double *)(&XStar[0]), bXStar, j,
 							analyze_allele_index, analyze_allele_index_size,
 							conditional_allele_index,
@@ -1441,12 +1441,12 @@ public:
 					for (int r = 0; r < R; r++)
 						sumBStar[r] += sumBAddi[r];
 
-          //contsC(alpha, sigmaSq, b, (double *)XStar.data(), bXStar, j,
+          //contsC(alpha, sigmaSq, b, (double *)XStar.ddata(), bXStar, j,
           contsC(alpha, sigmaSq, b, (double *)(&XStar[0]), bXStar, j,
 							analyze_allele_index, analyze_allele_index_size,
 							conditional_allele_index,
               conditional_allele_index_size, ignoreBtX, (double *)(&sumCAddi[0]));
-              //conditional_allele_index_size, ignoreBtX, (double *)sumCAddi.data());
+              //conditional_allele_index_size, ignoreBtX, (double *)sumCAddi.ddata());
 					for (int rr = 0; rr < Rsq; rr++)
 						sumCStar[rr] = +sumCAddi[rr];
 				} // j
@@ -1639,8 +1639,8 @@ public:
 					conditional_allele_index_size, onlyComputeConditional,
           (double *)(&temp_ret_analyze[0]), (double *)(&temp_ret_conditional0[0]),
           (double *)(&temp_ret_conditional1[0]));
-          //(double *)temp_ret_analyze.data(), (double *)temp_ret_conditional0.data(),
-					//(double *)temp_ret_conditional1.data());
+          //(double *)temp_ret_analyze.ddata(), (double *)temp_ret_conditional0.ddata(),
+					//(double *)temp_ret_conditional1.ddata());
 			for (int a = 0; a < analyze_allele_index_size; a++)
 				ret_analyze[p + a * P] = temp_ret_analyze[a];
 
@@ -1662,7 +1662,7 @@ public:
 			ped[p].imc(bm, bc0, bc1, analyze_allele_index,
 					analyze_allele_index_size, conditional_allele_index,
           conditional_allele_index_size, (double *)(&Iplus[0]));
-          //conditional_allele_index_size, (double *)Iplus.data());
+          //conditional_allele_index_size, (double *)Iplus.ddata());
 
 			for (int r = 0; r < Rsq; r++)
 				if (!ISNAN(Iplus[r]))
@@ -1680,7 +1680,7 @@ public:
 			ped[p].robustStat(analyze_allele_index, analyze_allele_index_size,
 					conditional_allele_index, conditional_allele_index_size,
           (double *)(&temp_ret_analyze[0]));
-          //(double *)temp_ret_analyze.data());
+          //(double *)temp_ret_analyze.ddata());
 
 			for (int a = 0; a < analyze_allele_index_size; a++)
 				ret_analyze[p + a * P] = temp_ret_analyze[a];
@@ -1704,7 +1704,7 @@ public:
 					analyze_allele_index_size, conditional_allele_index,
 					conditional_allele_index_size, onlyComputeConditional,
           ignoreBtX, (double *)(&temp_ret_b[0]));
-          //ignoreBtX, (double *)temp_ret_b.data());
+          //ignoreBtX, (double *)temp_ret_b.ddata());
 			for (int r = 0; r < R; r++)
 				ret_b[p + r * P] = temp_ret_b[r];
 		} // p
@@ -1730,7 +1730,7 @@ public:
 			ped[p].contsImc(alpha, sigmaSq, b, analyze_allele_index,
 					analyze_allele_index_size, conditional_allele_index,
           conditional_allele_index_size, ignoreBtX, (double *)(&temp_ret_I[0]));
-          //conditional_allele_index_size, ignoreBtX, (double *)temp_ret_I.data());
+          //conditional_allele_index_size, ignoreBtX, (double *)temp_ret_I.ddata());
 
 			for (int rr = 0; rr < Rsq; rr++)
 				if (!ISNAN(temp_ret_I[rr]))
@@ -1754,24 +1754,24 @@ public:
 };
 
 /** Code related to talking / exporting to R **/
-vector<Data> data; // vector of data stored in the shared library, not in R
-vector<bool> dataUsed; // whether the current vector slot is in use
-// allocate by extending data, or using an empty slot
-unsigned int dataAllocate() {
-	for (unsigned int i = 0; i < dataUsed.size(); i++) {
-		if (dataUsed[i] == false) {
-			dataUsed[i] = true;
+vector<Data> ddata; // vector of ddata stored in the shared library, not in R
+vector<bool> ddataUsed; // whether the current vector slot is in use
+// allocate by extending ddata, or using an empty slot
+unsigned int ddataAllocate() {
+	for (unsigned int i = 0; i < ddataUsed.size(); i++) {
+		if (ddataUsed[i] == false) {
+			ddataUsed[i] = true;
 			return (i);
 		}
 	}
-	data.resize(data.size() + 1);
-	dataUsed.push_back(true);
-	return (data.size() - 1);
+	ddata.resize(ddata.size() + 1);
+	ddataUsed.push_back(true);
+	return (ddata.size() - 1);
 }
-// free up the data
-void dataFree(int dataIndex) {
-	data[dataIndex].clear();
-	dataUsed[dataIndex] = false;
+// free up the ddata
+void ddataFree(int ddataIndex) {
+	ddata[ddataIndex].clear();
+	ddataUsed[ddataIndex] = false;
 }
 
 // EXPORTED FUNCTION TO R
@@ -1779,80 +1779,80 @@ extern "C" {
 // loads and stores the output in memory here
 // -- reference is a returned value to index in for the rest of the routines
 void condGeneFBATControl_load(char** filename, int *reference) {
-	int dataIndex = dataAllocate();
+	int ddataIndex = ddataAllocate();
 	string strFilename = *filename;
-	data[dataIndex].create(strFilename);
+	ddata[ddataIndex].create(strFilename);
 
-	*reference = dataIndex;
+	*reference = ddataIndex;
 }
 
 // frees memory allocated here
 void condGeneFBATControl_free(int *reference) {
-	if (*reference < 0 || *reference >= (int) data.size()) {
+	if (*reference < 0 || *reference >= (int) ddata.size()) {
     Rprintf("condGeneFBATControl_free::Reference %d no longer exists.\n", (*reference));
     return;
 	}
 
-	dataFree(*reference);
+	ddataFree(*reference);
 }
 
 // printing (primarily for debugging)
 void condGeneFBATControl_print(int *reference) {
-	if (*reference < 0 || *reference >= (int) data.size()) {
+	if (*reference < 0 || *reference >= (int) ddata.size()) {
     Rprintf("condGeneFBATControl_print::Reference %d no longer exists.\n", (*reference));
     return;
 	}
-	Rprintf("%s\n", data[*reference].toString().c_str());
+	Rprintf("%s\n", ddata[*reference].toString().c_str());
 }
 
 // linking in the trait
 void condGeneFBATControl_linkTrait(int *reference, int *pid, double *trait,
 		int *n) {
-	if (*reference < 0 || *reference >= (int) data.size()) {
+	if (*reference < 0 || *reference >= (int) ddata.size()) {
     Rprintf("condGeneFBATControl_free::linkTrait %d no longer exists.\n", (*reference));
     return;
 	}
-	data[*reference].linkTrait(pid, trait, *n);
+	ddata[*reference].linkTrait(pid, trait, *n);
 }
 
 // informative
 void condGeneFBATControl_proportionInformative(int *reference, double *ret) {
-	if (*reference < 0 || *reference >= (int) data.size()) {
+	if (*reference < 0 || *reference >= (int) ddata.size()) {
     Rprintf("condGeneFBATControl_proportionInformative::Reference %d no longer exists.\n", (*reference));
     return;
 	}
 
-	*ret = data[*reference].proportionInferrable();
+	*ret = ddata[*reference].proportionInferrable();
 }
 
 // removing unphased individuals
 void condGeneFBATControl_removeUnphased(int *reference) {
-	if (*reference < 0 || *reference >= (int) data.size()) {
+	if (*reference < 0 || *reference >= (int) ddata.size()) {
     Rprintf("condGeneFBATControl_removeUnphased::Reference %d no longer exists.\n", (*reference));
     return;
 	}
 
-	data[*reference].removeUnphased();
+	ddata[*reference].removeUnphased();
 }
 
 // how many families are there?
 void condGeneFBATControl_numFam(int *reference, int *numFam) {
-	if (*reference < 0 || *reference >= (int) data.size()) {
+	if (*reference < 0 || *reference >= (int) ddata.size()) {
     Rprintf("condGeneFBATControl_numFam::Reference %d no longer exists.\n", (*reference));
     return;
 	}
 
-	*numFam = data[*reference].ped.size();
+	*numFam = ddata[*reference].ped.size();
 }
 
 // centering the trait
 void condGeneFBATControl_centerTrait(int *reference, double *center, int *mean) {
-	if (*reference < 0 || *reference >= (int) data.size()) {
+	if (*reference < 0 || *reference >= (int) ddata.size()) {
     Rprintf("condGeneFBATControl_centerTrait::Reference %d no longer exists.\n", (*reference));
     return;
 	}
 
-	data[*reference].centerTrait(center, (bool) ((*mean) == 1));
+	ddata[*reference].centerTrait(center, (bool) ((*mean) == 1));
 }
 
 void condGeneFBATControl_uimc(int *reference, double *bm, double *bc0,
@@ -1860,12 +1860,12 @@ void condGeneFBATControl_uimc(int *reference, double *bm, double *bc0,
 		int *conditional_allele_index, int *conditional_allele_index_size,
 		int *onlyComputeConditional, double *ret_analyze,
 		double *ret_conditional0, double *ret_conditional1) {
-	if (*reference < 0 || *reference >= (int) data.size()) {
+	if (*reference < 0 || *reference >= (int) ddata.size()) {
     Rprintf("condGeneFBATControl_uimc %d no longer exists.\n", (*reference));
     return;
 	}
 
-	data[*reference].uimc(bm, bc0, bc1, analyze_allele_index,
+	ddata[*reference].uimc(bm, bc0, bc1, analyze_allele_index,
 			*analyze_allele_index_size, conditional_allele_index,
 			*conditional_allele_index_size, ((*onlyComputeConditional) != 0),
 			ret_analyze, ret_conditional0, ret_conditional1);
@@ -1875,12 +1875,12 @@ void condGeneFBATControl_imc(int *reference, double *bm, double *bc0,
 		double *bc1, int *analyze_allele_index, int *analyze_allele_index_size,
 		int *conditional_allele_index, int *conditional_allele_index_size,
 		double *ret_I) {
-	if (*reference < 0 || *reference >= (int) data.size()) {
+	if (*reference < 0 || *reference >= (int) ddata.size()) {
     Rprintf("condGeneFBATControl_imc %d no longer exists.\n", (*reference));
     return;
 	}
 
-	data[*reference].imc(bm, bc0, bc1, analyze_allele_index,
+	ddata[*reference].imc(bm, bc0, bc1, analyze_allele_index,
 			*analyze_allele_index_size, conditional_allele_index,
 			*conditional_allele_index_size, ret_I);
 }
@@ -1888,12 +1888,12 @@ void condGeneFBATControl_imc(int *reference, double *bm, double *bc0,
 void condGeneFBATControl_robustStat(int *reference, int *analyze_allele_index,
 		int *analyze_allele_index_size, int *conditional_allele_index,
 		int *conditional_allele_index_size, double *ret_analyze) {
-	if (*reference < 0 || *reference >= (int) data.size()) {
+	if (*reference < 0 || *reference >= (int) ddata.size()) {
     Rprintf("condGeneFBATControl_robustStat::Reference %d no longer exists.\n", (*reference));
     return;
 	}
 
-	data[*reference].robustStat(analyze_allele_index,
+	ddata[*reference].robustStat(analyze_allele_index,
 			*analyze_allele_index_size, conditional_allele_index,
 			*conditional_allele_index_size, ret_analyze);
 }
@@ -1903,7 +1903,7 @@ void condGeneFBATControl_contsUimc(int *reference, double *alpha,
 		int *analyze_allele_index_size, int *conditional_allele_index,
 		int *conditional_allele_index_size, int *onlyComputeConditional,
 		int *ignoreBtX, double *ret_b) {
-	if (*reference < 0 || *reference >= (int) data.size()) {
+	if (*reference < 0 || *reference >= (int) ddata.size()) {
     Rprintf("condGeneFBATControl_contsUimc::Reference %d no longer exists.\n", (*reference));
     return;
 	}
@@ -1916,7 +1916,7 @@ void condGeneFBATControl_contsUimc(int *reference, double *alpha,
 	 cout << endl;
 	 */
 
-	data[*reference].contsUimc(*alpha, (*sigma) * (*sigma), b,
+	ddata[*reference].contsUimc(*alpha, (*sigma) * (*sigma), b,
 			analyze_allele_index, *analyze_allele_index_size,
 			conditional_allele_index, *conditional_allele_index_size,
 			((*onlyComputeConditional) != 0), ((*ignoreBtX) != 0), ret_b);
@@ -1926,12 +1926,12 @@ void condGeneFBATControl_contsImc(int *reference, double *alpha, double *sigma,
 		double *b, int *analyze_allele_index, int *analyze_allele_index_size,
 		int *conditional_allele_index, int *conditional_allele_index_size,
 		int *ignoreBtX, double *ret_I) {
-	if (*reference < 0 || *reference >= (int) data.size()) {
+	if (*reference < 0 || *reference >= (int) ddata.size()) {
     Rprintf("condGeneFBATControl_contsImc::Reference %d no longer exists.\n", (*reference));
     return;
 	}
 
-	data[*reference].contsImc(*alpha, (*sigma) * (*sigma), b,
+	ddata[*reference].contsImc(*alpha, (*sigma) * (*sigma), b,
 			analyze_allele_index, *analyze_allele_index_size,
 			conditional_allele_index, *conditional_allele_index_size,
 			((*ignoreBtX) != 0), ret_I);
@@ -1945,7 +1945,7 @@ void condGeneFBATControl_estEqNuis(
 		double *ret_rhs ) {
 	// Make sure the references are good
 	for( int c=0; c<*referenceConditionSize; c++ ) {
-		if( referenceCondition[c] < 0 || referenceCondition[c] >= (int) data.size()) {
+		if( referenceCondition[c] < 0 || referenceCondition[c] >= (int) ddata.size()) {
       Rprintf("condGeneFBATControl_estEqNuis::Reference %d no longer exists.\n", referenceCondition[c]);
       return;
 		}
@@ -1960,7 +1960,7 @@ void condGeneFBATControl_estEqNuis(
 	// make some constants
 	int nc = *referenceConditionSize;
 	int nc2 = 2 * nc;
-	int np = data[ referenceCondition[0] ].ped.size();
+	int np = ddata[ referenceCondition[0] ].ped.size();
 
 	// zero out the return piece (actually this is done in the R code, so not really necessary)
 	for( int c=0; c<nc2*nc2; c++ )
@@ -1976,10 +1976,10 @@ void condGeneFBATControl_estEqNuis(
     double eij = 0;
 
 		// need to know the number of offspring
-		unsigned int noff = data[referenceCondition[0]].ped[i].observed.size();
+		unsigned int noff = ddata[referenceCondition[0]].ped[i].observed.size();
 		for( int c=1; c<nc; c++)
-			if( data[referenceCondition[c]].ped[i].observed.size() < noff )
-				noff = data[referenceCondition[c]].ped[i].observed.size();
+			if( ddata[referenceCondition[c]].ped[i].observed.size() < noff )
+				noff = ddata[referenceCondition[c]].ped[i].observed.size();
 
 		// go across each of the offspring
 		for( unsigned int j=0; j<noff; j++ ) {
@@ -1988,7 +1988,7 @@ void condGeneFBATControl_estEqNuis(
 			eij = 0.0;
 
 			// OK, this was a horrible choice of words... I don't really mean "informative" as in X-E(X|S)!=0
-			//  here. Instead, what we really mean is that this marker doesn't have any missing data
+			//  here. Instead, what we really mean is that this marker doesn't have any missing ddata
 			//  associated with it...
 			// In fact, we'd like to have a separate way of indicating informative...
 			// It might be best to find all the "informative" and replace them with "nonmissing" as the varname
@@ -1996,7 +1996,7 @@ void condGeneFBATControl_estEqNuis(
 
 			for( int c=0; c<nc; c++ ) {
 				// Some pedigrees might be noninformative, so no contribution for a particular allele
-				Pedigree *ped = &data[referenceCondition[c]].ped[i];
+				Pedigree *ped = &ddata[referenceCondition[c]].ped[i];
 
 				// 01.20.2009
 				if( ped->observed.size() != ped->nonzeroDelX.size() ) {
@@ -2052,7 +2052,7 @@ void condGeneFBATControl_estEqNuis(
 
 				// 01.20.2009 update
 				for( int c=0; c<nc; c++ ) {
-					Pedigree *ped = &data[referenceCondition[c]].ped[i];
+					Pedigree *ped = &ddata[referenceCondition[c]].ped[i];
 					ped->nonzeroDelX[j] = nonzeroDelX;
 				}
 
@@ -2070,7 +2070,7 @@ void condGeneFBATControl_estEqNuisUpdate(
 		double *bc ) {
 	// Make sure the references are good
 	for( int c=0; c<*referenceConditionSize; c++ ) {
-		if( referenceCondition[c] < 0 || referenceCondition[c] >= (int) data.size()) {
+		if( referenceCondition[c] < 0 || referenceCondition[c] >= (int) ddata.size()) {
       Rprintf("condGeneFBATControl_estEqNuis %d no longer exists.\n", referenceCondition[c]);
       return;
 		}
@@ -2085,7 +2085,7 @@ void condGeneFBATControl_estEqNuisUpdate(
 	// make some constants
 	int nc = *referenceConditionSize;
 	int nc2 = 2 * nc;
-	int np = data[ referenceCondition[0] ].ped.size();
+	int np = ddata[ referenceCondition[0] ].ped.size();
 
 	// across each pedigree
 	double eijSum = 0.0; int eijCount = 0;
@@ -2095,10 +2095,10 @@ void condGeneFBATControl_estEqNuisUpdate(
     double eij = 0;
 
 		// need to know the number of offspring
-		unsigned int noff = data[referenceCondition[0]].ped[i].observed.size();
+		unsigned int noff = ddata[referenceCondition[0]].ped[i].observed.size();
 		for( int c=1; c<nc; c++)
-			if( data[referenceCondition[c]].ped[i].observed.size() < noff )
-				noff = data[referenceCondition[c]].ped[i].observed.size();
+			if( ddata[referenceCondition[c]].ped[i].observed.size() < noff )
+				noff = ddata[referenceCondition[c]].ped[i].observed.size();
 
 		// go across each of the offspring
 		for( unsigned int j=0; j<noff; j++ ) {
@@ -2108,7 +2108,7 @@ void condGeneFBATControl_estEqNuisUpdate(
 			//////bool informative = true;
 			for( int c=0; c<nc; c++ ) {
 				// Some pedigrees might be noninformative, so no contribution for a particular allele
-				Pedigree *ped = &data[referenceCondition[c]].ped[i];
+				Pedigree *ped = &ddata[referenceCondition[c]].ped[i];
 				////if( ped[i].observed.size() < 0 ) {
 				//if( ped->observed.size() <= 0 ) {
 				if( j>=ped->observed.size() ) {
@@ -2148,8 +2148,8 @@ void condGeneFBATControl_estEqNuisUpdate(
 	// WARNING: Make SURE that we search the conditioning alleles for the trait first
 	for( int i=0; i<np; i++ ) {
 		for( int c=0; c<nc; c++ )
-			for( unsigned int j=0; j<data[referenceCondition[c]].ped[i].trait.size(); j++ )
-				data[referenceCondition[c]].ped[i].trait[j] -= eijSum;
+			for( unsigned int j=0; j<ddata[referenceCondition[c]].ped[i].trait.size(); j++ )
+				ddata[referenceCondition[c]].ped[i].trait[j] -= eijSum;
 	}
 }
 
@@ -2312,7 +2312,7 @@ void condGeneFBATControl_estEqNuisUpdate2(
 		double *bc ) {
 	// Make sure the references are good
 	for( int c=0; c<*referenceConditionSize; c++ ) {
-		if( referenceCondition[c] < 0 || referenceCondition[c] >= (int) data.size()) {
+		if( referenceCondition[c] < 0 || referenceCondition[c] >= (int) ddata.size()) {
       Rprintf("condGeneFBATControl_free::Reference %d no longer exists.\n", referenceCondition[c]);
       return;
 		}
@@ -2321,7 +2321,7 @@ void condGeneFBATControl_estEqNuisUpdate2(
 	// a few constants
 	int nc = *referenceConditionSize;
 	int nc2 = nc*2;
-	int np = data[ referenceCondition[0] ].ped.size();
+	int np = ddata[ referenceCondition[0] ].ped.size();
 
 	//cout << "about to create bucket" << endl;
 	// Create an SSBucket of all of the pedigree members for _each_ allele (then merge them)
@@ -2334,19 +2334,19 @@ void condGeneFBATControl_estEqNuisUpdate2(
 			//////int c = b;
 
 			// get the number of offspring
-			unsigned int noff = data[referenceCondition[0]].ped[i].observed.size();
+			unsigned int noff = ddata[referenceCondition[0]].ped[i].observed.size();
 			for( int ck=1; ck<nc; ck++ )
-				if( data[referenceCondition[ck]].ped[i].observed.size() < noff )
-					noff = data[referenceCondition[ck]].ped[i].observed.size();
+				if( ddata[referenceCondition[ck]].ped[i].observed.size() < noff )
+					noff = ddata[referenceCondition[ck]].ped[i].observed.size();
 			//cout << "noff = " << noff << endl;
 
 			if( noff > 0 ) {
 				// compute the group
 				//cout << "b=" << b << " i=" << i << endl;
-				//cout << "data.size() = " << data.size() << endl;
-				//cout << "data[referenceCondition[b]].ped.size()" << data[referenceCondition[b]].ped.size() << endl;
+				//cout << "data.size() = " << ddata.size() << endl;
+				//cout << "data[referenceCondition[b]].ped.size()" << ddata[referenceCondition[b]].ped.size() << endl;
 
-				int ss = data[referenceCondition[b]].ped[i].ssGroup(0); // always will be index 0
+				int ss = ddata[referenceCondition[b]].ped[i].ssGroup(0); // always will be index 0
 				//cout << "ss = " << ss << endl;
 
 				// go across the offspring, and add them to the hash table
@@ -2385,7 +2385,7 @@ void condGeneFBATControl_estEqNuisUpdate2(
       double eij = 0.0;
 			for( int c=0; c<nc; c++ ) {
 				// Some pedigrees might be noninformative, so no contribution for a particular allele
-				Pedigree *ped = &data[referenceCondition[c]].ped[i];
+				Pedigree *ped = &ddata[referenceCondition[c]].ped[i];
 				////if( ped[i].observed.size() < 0 ) {
 				//if( ped->observed.size() <= 0 ) {
 				if( j >= (int)ped->observed.size() ) {
@@ -2426,16 +2426,16 @@ void condGeneFBATControl_estEqNuisUpdate2(
 			int j = mbucket[h].memberPedIndexJ[k];
 
 			for( int c=0; c<nc; c++ ) {
-				if( j < (int)data[referenceCondition[c]].ped[i].trait.size() ) {
+				if( j < (int)ddata[referenceCondition[c]].ped[i].trait.size() ) {
 					/*
 					cout << "Trait (" << i << "," << j << "," << c << ") before=" <<
-						data[referenceCondition[c]].ped[i].trait[j] <<
+						ddata[referenceCondition[c]].ped[i].trait[j] <<
 						" after=" <<
-						(data[referenceCondition[c]].ped[i].trait[j] - eijSum) <<
+						(ddata[referenceCondition[c]].ped[i].trait[j] - eijSum) <<
 						endl;
 						*/
 
-					data[referenceCondition[c]].ped[i].trait[j] -= eijSum;
+					ddata[referenceCondition[c]].ped[i].trait[j] -= eijSum;
 				}
 			}
 		}// k
@@ -2456,7 +2456,7 @@ void condGeneFBATControl_estEq(
 	int na = *referenceAnalyzeSize;
 	int nc = *referenceConditionSize;
 	int nc2 = nc * 2;
-	int np = data[ referenceCondition[0] ].ped.size();
+	int np = ddata[ referenceCondition[0] ].ped.size();
 
 	//cout << "na = " << na << " nc=" << nc << " nc2=" << nc2 << " np=" << np << endl;
 	//for( int a=0; a<na; a++ )
@@ -2464,13 +2464,13 @@ void condGeneFBATControl_estEq(
 
 	// make sure the references are good
 	for( int a=0; a<na; a++ ) {
-		if( referenceAnalyze[a] < 0 || referenceAnalyze[a] >= (int)data.size() ) {
+		if( referenceAnalyze[a] < 0 || referenceAnalyze[a] >= (int)ddata.size() ) {
 			Rprintf("condGeneFBATControl_estEq %d no longer exists.\n", referenceAnalyze[a]);
 			return;
 		}
 	}
 	for( int c=0; c<nc; c++ ) {
-		if( referenceCondition[c] < 0 || referenceCondition[c] >= (int) data.size()) {
+		if( referenceCondition[c] < 0 || referenceCondition[c] >= (int) ddata.size()) {
 			Rprintf("condGeneFBATControl_estEq %d no longer exists.\n", referenceCondition[c]);
 			return;
 		}
@@ -2495,13 +2495,13 @@ void condGeneFBATControl_estEq(
     double eij = 0.0;
 
 		// need to know the number of offspring? why?
-		unsigned int noff = data[referenceCondition[0]].ped[i].observed.size();
+		unsigned int noff = ddata[referenceCondition[0]].ped[i].observed.size();
 		for( int c=1; c<nc; c++ )
-			if( data[referenceCondition[c]].ped[i].observed.size() > noff )
-				noff = data[referenceCondition[c]].ped[i].observed.size();
+			if( ddata[referenceCondition[c]].ped[i].observed.size() > noff )
+				noff = ddata[referenceCondition[c]].ped[i].observed.size();
 		for( int a=0; a<na; a++ )
-			if( data[referenceAnalyze[a]].ped[i].observed.size() > noff )
-				noff = data[referenceAnalyze[a]].ped[i].observed.size();
+			if( ddata[referenceAnalyze[a]].ped[i].observed.size() > noff )
+				noff = ddata[referenceAnalyze[a]].ped[i].observed.size();
 
 		// go across each of the offspring
 		for( unsigned int j=0; j<noff; j++ ) {
@@ -2511,7 +2511,7 @@ void condGeneFBATControl_estEq(
 			//////bool informative = true;
 			// go across the analyze alleles
 			for( int a=0; a<na; a++ ) {
-				Pedigree *ped = &data[referenceAnalyze[a]].ped[i];
+				Pedigree *ped = &ddata[referenceAnalyze[a]].ped[i];
 				//if( ped->observed.size() <= 0 ) {
 				if( j >= ped->observed.size() ) {
 					// noninformative
@@ -2540,7 +2540,7 @@ void condGeneFBATControl_estEq(
 			// go across the condition alleles
 			for( int c=0; c<nc; c++ ) {
 				// Some pedigrees might be noninformative, so no contribution for a particular allele
-				Pedigree *ped = &data[referenceCondition[c]].ped[i];
+				Pedigree *ped = &ddata[referenceCondition[c]].ped[i];
 				////if( ped[i].observed.size() < 0 ) {
 				//if( ped->observed.size() <= 0 ) {
 				if( j >= ped->observed.size() ) {
@@ -2589,12 +2589,12 @@ void condGeneFBATControl_estEq(
 					// FOR TWO STEP APPROACH ADDITION 10/22/2008 -- simply BAD, exported elsewhere!!!
 					// -- a little overkill? Really should be able to just get away with the first one...
 					//for( int a=0; a<na; a++ ) {
-					//	Pedigree *ped = &data[referenceAnalyze[a]].ped[i];
+					//	Pedigree *ped = &ddata[referenceAnalyze[a]].ped[i];
 					//	if( !ISNAN(ped->trait[j]) )
 					//		ped->trait[j] = eij;
 					//}
 					//for( int c=0; c<nc; c++ ) {
-					//	Pedigree *ped = &data[referenceCondition[c]].ped[i];
+					//	Pedigree *ped = &ddata[referenceCondition[c]].ped[i];
 					//	if( !ISNAN(ped->trait[j]) )
 					//		ped->trait[j] = eij;
 					//}
@@ -2617,21 +2617,21 @@ void condGeneFBATControl_estEq(
 }
 
 void condGeneFBATControl_numInfFam(int *reference, int *numInf) {
-	if (*reference < 0 || *reference >= (int) data.size()) {
+	if (*reference < 0 || *reference >= (int) ddata.size()) {
     Rprintf("condGeneFBATControl_numInfFam %d no longer exists.\n", (*reference));
     return;
 	}
 
-	*numInf = data[*reference].numInfFam();
+	*numInf = ddata[*reference].numInfFam();
 } // condGeneFBATControl_numInfFam
 
 void condGeneFBATControl_pids(int *reference, int *pid) {
-	if (*reference < 0 || *reference >= (int) data.size()) {
+	if (*reference < 0 || *reference >= (int) ddata.size()) {
     Rprintf("condGeneFBATControl_pids %d no longer exists.\n", (*reference));
     return;
 	}
 
-	data[*reference].pids(pid);
+	ddata[*reference].pids(pid);
 }
 
 void condGeneFBATControl_dUdBc(
@@ -2652,18 +2652,18 @@ void condGeneFBATControl_dUdBc(
 	int nc2 = nc*2;
 	// make sure the references are good
 	for( int a=0; a<na; a++ ) {
-		if( referenceAnalyze[a] < 0 || referenceAnalyze[a] >= (int)data.size() ) {
+		if( referenceAnalyze[a] < 0 || referenceAnalyze[a] >= (int)ddata.size() ) {
 			Rprintf("condGeneFBATControl_dUmdBc %d no longer exists. Terminating.\n", referenceAnalyze[a]);
 			return;
 		}
 	}
 	for( int c=0; c<nc; c++ ) {
-		if( referenceCondition[c] < 0 || referenceCondition[c] >= (int)data.size() ) {
+		if( referenceCondition[c] < 0 || referenceCondition[c] >= (int)ddata.size() ) {
 			Rprintf("condGeneFBATControl_dUmdBc %d no longer exists. Terminating.\n", referenceCondition[c]);
 			return;
 		}
 	}
-	int np = data[ referenceAnalyze[0] ].ped.size();
+	int np = ddata[ referenceAnalyze[0] ].ped.size();
 
 	// split up the bc
 	//double bc0[nc], bc1[nc];
@@ -2700,7 +2700,7 @@ void condGeneFBATControl_dUdBc(
 					Ai11[ka][kc] = 0.0;
 			} // kc
 
-			Pedigree *pp = &data[referenceAnalyze[a]].ped[i];
+			Pedigree *pp = &ddata[referenceAnalyze[a]].ped[i];
 			for( unsigned int x=0; x<pp->genoDist.size(); x++ ) {
 				// create all genotype permutations
 				vector<int> genoToPerm;
@@ -2769,7 +2769,7 @@ void condGeneFBATControl_dUdBc(
 		} // a
 
 		// Now we've got to a similar thing across the distribution for the conditional allele
-		Pedigree *pp = &data[referenceCondition[0]].ped[i];
+		Pedigree *pp = &ddata[referenceCondition[0]].ped[i];
 		//double Bi2[nc2][nc2];
     vector<vector<double> > Bi2; Bi2.resize(nc2); for(int bb=0; bb<nc2; bb++) Bi2[bb].resize(nc2);
 		//double Bi1[nc2];
@@ -2863,18 +2863,18 @@ void condGeneFBATControl_dUdBc(
   int nc2 = nc*2;
   // make sure the references are good
   for( int a=0; a<na; a++ ) {
-    if( referenceAnalyze[a] < 0 || referenceAnalyze[a] >= (int)data.size() ) {
+    if( referenceAnalyze[a] < 0 || referenceAnalyze[a] >= (int)ddata.size() ) {
       cout << "condGeneFBATControl_dUmdBc " << referenceAnalyze[a] << " no longer exists. Terminating." << endl;
       return;
     }
   }
   for( int c=0; c<nc; c++ ) {
-    if( referenceCondition[c] < 0 || referenceCondition[c] >= (int)data.size() ) {
+    if( referenceCondition[c] < 0 || referenceCondition[c] >= (int)ddata.size() ) {
       cout << "condGeneFBATControl_dUmdBc " << referenceCondition[c] << " no longer exists. Terminating." << endl;
       return;
     }
   }
-  int np = data[ referenceAnalyze[0] ].ped.size();
+  int np = ddata[ referenceAnalyze[0] ].ped.size();
 
   // split up the bc
   double bc0[nc], bc1[nc];
@@ -2890,7 +2890,7 @@ void condGeneFBATControl_dUdBc(
   // go across each pedigree
   for( int i=0; i<np; i++ ) {
     // Pointer to the current pedigree
-    Pedigree *pp = &data[referenceAnalyze[a]].ped[i];
+    Pedigree *pp = &ddata[referenceAnalyze[a]].ped[i];
 
     // Storage for Ai__
     double Ai11[na][nc2];
@@ -3036,18 +3036,18 @@ void condGeneFBATControl_varExplConts(
 
 	int nc = *referenceSize;
 	//////int nc2 = nc * 2;
-	int np = data[ reference[0] ].ped.size();
+	int np = ddata[ reference[0] ].ped.size();
 
 	//cout << "nc: " << nc << " nc2: " << nc2 << " np: " << np << endl;
 
 	// make sure the references are good
 	for( int c=0; c<nc; c++ ) {
-		if( reference[c] < 0 || reference[c] >= (int)data.size() ) {
+		if( reference[c] < 0 || reference[c] >= (int)ddata.size() ) {
 			Rprintf("condGeneFbatControl_varExplConts %d no longer exists\n", reference[c]);
 		}
 	}
 
-	double ymean = 0.0; // in case data isn't really centered...
+	double ymean = 0.0; // in case ddata isn't really centered...
 	double varModel = 0.0;
 	double varMean = 0.0;
 
@@ -3056,14 +3056,14 @@ void condGeneFBATControl_varExplConts(
 	int ymeanCount = 0;
 	for( int i=0; i<np; i++ ) {
 		// determine the number of offspring
-		unsigned int noff = data[ reference[0] ].ped[i].observed.size();
+		unsigned int noff = ddata[ reference[0] ].ped[i].observed.size();
 		for( int c=1; c<nc; c++ )
-			if( data[reference[c]].ped[i].observed.size() < noff )
-				noff = data[reference[c]].ped[i].observed.size();
+			if( ddata[reference[c]].ped[i].observed.size() < noff )
+				noff = ddata[reference[c]].ped[i].observed.size();
 
 		// go across each offspring
 		for( unsigned int j=0; j<noff; j++ ) {
-			double y = data[ reference[0] ].ped[i].trait[j];
+			double y = ddata[ reference[0] ].ped[i].trait[j];
 			if( !ISNAN(y) ) {
 				ymean += y;
 				ymeanCount++;
@@ -3086,15 +3086,15 @@ void condGeneFBATControl_varExplConts(
 		double ym = 0.0; int ymCount = 0;
 		for( int i=0; i<np; i++ ) {
 			// determine the number of offspring
-			int noff = data[ reference[0] ].ped[i].observed.size();
+			int noff = ddata[ reference[0] ].ped[i].observed.size();
 			for( int c=1; c<nc; c++ )
-				if( data[reference[c]].ped[i].observed.size() < noff )
-					noff = data[reference[c]].ped[i].observed.size();
+				if( ddata[reference[c]].ped[i].observed.size() < noff )
+					noff = ddata[reference[c]].ped[i].observed.size();
 
-			Pedigree *ped = &data[reference[c]].ped[i];
+			Pedigree *ped = &ddata[reference[c]].ped[i];
 			// go across each offspring
 			for( int j=0; j<noff; j++ ) {
-				double y = data[ reference[0] ].ped[i].trait[j];
+				double y = ddata[ reference[0] ].ped[i].trait[j];
 				if( !ISNAN(y) && ped->g[ped->observed[j]].genotype(0,0,geno_a[g],geno_b[g])==1 ) {
 					ym += y;
 					ymCount++;
@@ -3111,14 +3111,14 @@ void condGeneFBATControl_varExplConts(
 	// - go across each pedigree to compute the variances
 	for( int i=0; i<np; i++ ) {
 		// determine the number of offspring
-		unsigned int noff = data[ reference[0] ].ped[i].observed.size();
+		unsigned int noff = ddata[ reference[0] ].ped[i].observed.size();
 		for( int c=1; c<nc; c++ )
-			if( data[reference[c]].ped[i].observed.size() < noff )
-				noff = data[reference[c]].ped[i].observed.size();
+			if( ddata[reference[c]].ped[i].observed.size() < noff )
+				noff = ddata[reference[c]].ped[i].observed.size();
 
     // ????
-		if( data[reference[0] ].ped[i].trait.size() < noff )
-      noff = data[reference[0]].ped[i].trait.size();
+		if( ddata[reference[0] ].ped[i].trait.size() < noff )
+      noff = ddata[reference[0]].ped[i].trait.size();
 
 		// go across each offspring
 		for( unsigned int j=0; j<noff; j++ ) {
@@ -3127,7 +3127,7 @@ void condGeneFBATControl_varExplConts(
 			// go across the "conditioning" alleles
 			double bx = 0.0;
 			for( int c=0; c<nc; c++ ) {
-				Pedigree *ped = &data[reference[c]].ped[i];
+				Pedigree *ped = &ddata[reference[c]].ped[i];
 				if( j >= ped->observed.size() ) {
 					informative = false;
 				}else{
@@ -3142,7 +3142,7 @@ void condGeneFBATControl_varExplConts(
 
 			if( informative ) {
 				// finally compute the variance pieces
-				double y = data[ reference[0] ].ped[i].trait[j];
+				double y = ddata[ reference[0] ].ped[i].trait[j];
 				if( !ISNAN(y) ) {
 					//ymean += y;
 					varModel += ( y - bx ) * ( y - bx );
@@ -3154,9 +3154,9 @@ void condGeneFBATControl_varExplConts(
 					cout << "y: " << y << " ymean: " << ymean << " yfit: " << bx << " |y-ymean|: " << fabs(y-ymean) << " |y-yfit|: " << fabs(y-bx) << endl;
 					//cout << "beta (1 parm): " << betaEst[0] << "," << betaEst[1] << endl;
 					cout << " genotype (2parm): "
-						<< data[reference[0]].ped[i].g[ data[reference[0]].ped[i].observed[j] ].genotype( 0, 0, 2, 2 ) << ","
-						<< data[reference[0]].ped[i].g[ data[reference[0]].ped[i].observed[j] ].genotype( 0, 0, 1, 2 ) << ","
-						<< data[reference[0]].ped[i].g[ data[reference[0]].ped[i].observed[j] ].genotype( 0, 0, 1, 1 ) << "  " << endl;
+						<< ddata[reference[0]].ped[i].g[ ddata[reference[0]].ped[i].observed[j] ].genotype( 0, 0, 2, 2 ) << ","
+						<< ddata[reference[0]].ped[i].g[ ddata[reference[0]].ped[i].observed[j] ].genotype( 0, 0, 1, 2 ) << ","
+						<< ddata[reference[0]].ped[i].g[ ddata[reference[0]].ped[i].observed[j] ].genotype( 0, 0, 1, 1 ) << "  " << endl;
 						*/
 
 					/*
@@ -3164,12 +3164,12 @@ void condGeneFBATControl_varExplConts(
 					cout << "beta (2 parm): " << betaEst[0] << "," << betaEst[1] << "," << betaEst[2] << "," << betaEst[3] << endl;
 
 					cout << " genotype (2parm): "
-						<< data[reference[0]].ped[i].g[ data[reference[0]].ped[i].observed[j] ].genotype( 0, 0, 2, 2 ) << ","
-						<< data[reference[0]].ped[i].g[ data[reference[0]].ped[i].observed[j] ].genotype( 0, 0, 1, 2 ) << ","
-						<< data[reference[0]].ped[i].g[ data[reference[0]].ped[i].observed[j] ].genotype( 0, 0, 1, 1 ) << "  "
-						<< data[reference[1]].ped[i].g[ data[reference[1]].ped[i].observed[j] ].genotype( 0, 0, 2, 2 ) << ","
-						<< data[reference[1]].ped[i].g[ data[reference[1]].ped[i].observed[j] ].genotype( 0, 0, 1, 2 ) << ","
-						<< data[reference[1]].ped[i].g[ data[reference[1]].ped[i].observed[j] ].genotype( 0, 0, 1, 1 ) << endl; */
+						<< ddata[reference[0]].ped[i].g[ ddata[reference[0]].ped[i].observed[j] ].genotype( 0, 0, 2, 2 ) << ","
+						<< ddata[reference[0]].ped[i].g[ ddata[reference[0]].ped[i].observed[j] ].genotype( 0, 0, 1, 2 ) << ","
+						<< ddata[reference[0]].ped[i].g[ ddata[reference[0]].ped[i].observed[j] ].genotype( 0, 0, 1, 1 ) << "  "
+						<< ddata[reference[1]].ped[i].g[ ddata[reference[1]].ped[i].observed[j] ].genotype( 0, 0, 2, 2 ) << ","
+						<< ddata[reference[1]].ped[i].g[ ddata[reference[1]].ped[i].observed[j] ].genotype( 0, 0, 1, 2 ) << ","
+						<< ddata[reference[1]].ped[i].g[ ddata[reference[1]].ped[i].observed[j] ].genotype( 0, 0, 1, 1 ) << endl; */
 				}
 			}
 		}
@@ -3181,14 +3181,14 @@ void condGeneFBATControl_varExplConts(
 	*ret_varExpl = 1.0 - ( varModel / varMean );
 }
 
-// references are needed so that we know which traits won't be used because they have missing genotype data
+// references are needed so that we know which traits won't be used because they have missing genotype ddata
 void condGeneFBATControl_varContsMean(
 		int *reference, int *referenceSize,
 		double *betaEst,
 		double *ret_var ) {
 	// make sure the references are good
 	for( int c=0; c<*referenceSize; c++ ) {
-		if( reference[c] < 0 || reference[c] >= (int)data.size() ) {
+		if( reference[c] < 0 || reference[c] >= (int)ddata.size() ) {
 			Rprintf("condGeneFbatControl_varExplConts %d no longer exists\n", reference[c]);
 			return;
 		}
@@ -3197,17 +3197,17 @@ void condGeneFBATControl_varContsMean(
 	// fill in some constants
 	int nc = *referenceSize;
 	//////int nc2 = nc*2;
-	int np = data[ reference[0] ].ped.size();
+	int np = ddata[ reference[0] ].ped.size();
 
 	// fill in the mean, but select those that are informative to the current markers...
 	double ymean = 0.0;
 	vector<int> good_i, good_j;
 	for( int i=0; i<np; i++ ) {
 		// determine the number of offspring
-		unsigned int noff = data[reference[0]].ped[i].observed.size();
+		unsigned int noff = ddata[reference[0]].ped[i].observed.size();
 		for( int c=1; c<nc; c++ )
-			if( data[reference[c]].ped[i].observed.size() < noff )
-				noff = data[reference[c]].ped[i].observed.size();
+			if( ddata[reference[c]].ped[i].observed.size() < noff )
+				noff = ddata[reference[c]].ped[i].observed.size();
 
 		// go across each offspring
 		for( unsigned int j=0; j<noff; j++ ) {
@@ -3215,7 +3215,7 @@ void condGeneFBATControl_varContsMean(
 
 			// go across the conditioning alleles
 			for( int c=0; c<nc; c++ ) {
-				Pedigree *ped = &data[reference[c]].ped[i];
+				Pedigree *ped = &ddata[reference[c]].ped[i];
 				if( j >= ped->observed.size() ) {
 					informative = false;
 				}else if( !ped->nonzeroDelX[j] ) { // 01.20.2009
@@ -3225,7 +3225,7 @@ void condGeneFBATControl_varContsMean(
 			}
 
 			if( informative ) {
-				double y = data[reference[0]].ped[i].trait[j];
+				double y = ddata[reference[0]].ped[i].trait[j];
 				if( !ISNAN(y) ) {
 					//cout << "y = " << y << endl;
 					ymean += y;
@@ -3245,7 +3245,7 @@ void condGeneFBATControl_varContsMean(
 	// finally compute the variance
 	double var = 0.0;
 	for( unsigned int k=0; k<good_i.size(); k++ ) {
-		double y = data[reference[0]].ped[good_i[k]].trait[good_j[k]];
+		double y = ddata[reference[0]].ped[good_i[k]].trait[good_j[k]];
 		var += ( y - ymean ) * ( y - ymean );
 	}
 
@@ -3260,7 +3260,7 @@ void condGeneFBATControl_varContsModel(
 		double *ret_var ) {
 	// make sure the references are good
 	for( int c=0; c<*referenceSize; c++ ) {
-		if( reference[c] < 0 || reference[c] >= (int)data.size() ) {
+		if( reference[c] < 0 || reference[c] >= (int)ddata.size() ) {
 			Rprintf("condGeneFbatControl_varExplConts %d no longer exists.\n", reference[c]);
 			return;
 		}
@@ -3269,16 +3269,16 @@ void condGeneFBATControl_varContsModel(
 	// fill in some constants
 	int nc = *referenceSize;
 	//////int nc2 = nc*2;
-	int np = data[ reference[0] ].ped.size();
+	int np = ddata[ reference[0] ].ped.size();
 
 	// fill in the variance
 	double varModel = 0.0;
 	for( int i=0; i<np; i++ ) {
 		// determine the number of offspring
-		unsigned int noff = data[reference[0]].ped[i].observed.size();
+		unsigned int noff = ddata[reference[0]].ped[i].observed.size();
 		for( int c=1; c<nc; c++ )
-			if( data[reference[c]].ped[i].observed.size() < noff )
-				noff = data[reference[c]].ped[i].observed.size();
+			if( ddata[reference[c]].ped[i].observed.size() < noff )
+				noff = ddata[reference[c]].ped[i].observed.size();
 
 		// go across each offspring
 		for( unsigned int j=0; j<noff; j++ ) {
@@ -3287,7 +3287,7 @@ void condGeneFBATControl_varContsModel(
 			// go across the conditioning alleles
 			double bx = 0.0;
 			for( int c=0; c<nc; c++ ) {
-				Pedigree *ped = &data[reference[c]].ped[i];
+				Pedigree *ped = &ddata[reference[c]].ped[i];
 				if( j >= ped->observed.size() ) {
 					informative = false;
 //				}else if( !ped->nonzeroDelX[j] ) { // 01.20.2009
@@ -3303,7 +3303,7 @@ void condGeneFBATControl_varContsModel(
 
 			if( informative ) {
 				// finally compute the variance pieces
-				double y = data[reference[0]].ped[i].trait[j];
+				double y = ddata[reference[0]].ped[i].trait[j];
 				if( !ISNAN(y) )
 					varModel += ( y - bx ) * ( y - bx );
 			}// fi(informative)
@@ -3317,31 +3317,31 @@ void condGeneFBATControl_backupTrait( int *reference, int *referenceSize ) {
 	int R = *referenceSize;
 	for( int c=0; c<R; c++ ) {
 		// first make sure it's a good reference
-		if( reference[c] < 0 || reference[c] >= (int)data.size() ) {
+		if( reference[c] < 0 || reference[c] >= (int)ddata.size() ) {
       Rprintf("condGeneFBATControl_backupTrait::Reference %d no longer exists.\n", reference[c]);
       return;
 		}
 
 		// now go ahead and backup
-		int P = data[reference[c]].ped.size();
+		int P = ddata[reference[c]].ped.size();
 		for( int p=0; p<P; p++ )
-			data[reference[c]].ped[p].traitBackup = data[reference[c]].ped[p].trait;
+			ddata[reference[c]].ped[p].traitBackup = ddata[reference[c]].ped[p].trait;
 	}
 }
 void condGeneFBATControl_restoreTrait( int *reference, int *referenceSize ) {
 	int R = *referenceSize;
 	for( int c=0; c<R; c++ ) {
 		// first make sure it's a good reference
-		if( reference[c] < 0 || reference[c] >= (int)data.size() ) {
+		if( reference[c] < 0 || reference[c] >= (int)ddata.size() ) {
 			//cout << "condGeneFbatControl_restoreTrait " << reference[c] << " no longer exists." << endl;
       Rprintf("condGeneFBATControl_restoreTrait::Reference %d no longer exists.\n", reference[c]);
       return;
 		}
 
 		// now go ahead and restore!
-		int P = data[reference[c]].ped.size();
+		int P = ddata[reference[c]].ped.size();
 		for( int p=0; p<P; p++ )
-			data[reference[c]].ped[p].trait = data[reference[c]].ped[p].traitBackup;
+			ddata[reference[c]].ped[p].trait = ddata[reference[c]].ped[p].traitBackup;
 	}
 }
 

@@ -13,7 +13,7 @@ class RVector
     double& operator () ( unsigned i );
     double& elt( unsigned i );
   public:
-    double *data;
+    double *ddata;
     unsigned I;
 };
 

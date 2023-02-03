@@ -13,7 +13,7 @@ class RMatrix
     double& operator() ( unsigned r, unsigned c );
     double& elt( unsigned r, unsigned c );
   public:
-    double *data;
+    double *ddata;
     unsigned int R, C;
 };
 

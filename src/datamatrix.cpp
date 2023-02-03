@@ -37,12 +37,12 @@ void DataMatrix::computeGroupG( int *groups,
                                 double *g0, double *g1, double *g2,
                                 int *affected_index,
                                 int &affected_index_size,
-                                int &data_num_families )
+                                int &ddata_num_families )
 {
   int start=-1, end=-1;
 
   int prevInformativePid = -1; // for when firstAffectedOnly=true, which has been altered to _always_ be the case, since this is the analysis portion!
-  data_num_families = 0;
+  ddata_num_families = 0;
 
   // new precaution
   memset( g0, 255, R*sizeof(double) ); // this is sort of okay I guess (it has desired effect)
@@ -53,7 +53,7 @@ void DataMatrix::computeGroupG( int *groups,
   affected_index_size = 0;
 
   while( getNextFamily( start, end ) ){
-    data_num_families++;
+    ddata_num_families++;
 
     // get the alleles that correspond to this family
     int numChild = 0;
@@ -99,7 +99,7 @@ void DataMatrix::computeGroupG( int *groups,
 
       // loop through all the children
       for( int c=0; c<numChild; c++ ){
-        // set the data stuff
+        // set the ddata stuff
         groups[ childi[c] ] = group;
         // NOTE: It's sort of coded backwards in fbatDist.cpp than
         //  I've been thinking of it in terms of g0 g1 g2
@@ -148,16 +148,16 @@ void DataMatrix::genPush( int pid, int id, int idfath, int idmoth,
 
 // R routine
 extern "C" {
-  void dataComputeGroupG( double *data, int *dataDim,
+  void ddataComputeGroupG( double *ddata, int *ddataDim,
                           int *m0pos, int *m1pos,
                           int *groups,
                           double *g0, double *g1, double *g2,
                           int *affected_index,
                           int *affected_index_size,
-                          int *data_num_families )
+                          int *ddata_num_families )
   {
     DataMatrix m;
-    m.set( data, dataDim );
+    m.set( ddata, ddataDim );
     m.c_m0 = *m0pos;
     m.c_m1 = *m1pos;
 
@@ -166,6 +166,6 @@ extern "C" {
     m.computeGroupG( groups,  g0, g1, g2,  affected_index,
                      p_affected_index_size, p_data_num_families );
     *affected_index_size = p_affected_index_size;
-    *data_num_families = p_data_num_families;
+    *ddata_num_families = p_data_num_families;
   }
 }

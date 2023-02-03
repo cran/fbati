@@ -11,11 +11,11 @@
 #include "datamatrix.h"
 
 extern "C" {
-  void nuclify_cpp( double *data, int *dimData,
-                double *dataOut, int *dimDataOut,
+  void nuclify_cpp( double *ddata, int *dimData,
+                double *ddataOut, int *dimDataOut,
                 int *failure );
-  void strataReduce_cpp( double *data, int *dimData,
-                     double *dataOut, int *dimDataOut,
+  void strataReduce_cpp( double *ddata, int *dimData,
+                     double *ddataOut, int *dimDataOut,
                      int *pEnvCol, int *pm0, int *pm1,
                      int *pMaxSib ); // new 04/08/2008
 }

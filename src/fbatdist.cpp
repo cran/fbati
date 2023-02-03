@@ -400,13 +400,17 @@ int extractDigitRHS( int number, int digit ) {
 }
 void pG_group_dehash_gstr( int g, char *str ) {
   if( g==(gAA+1) )
-    sprintf( str, "AA" );
+    snprintf( str, 50, "AA" );
+    //sprintf( str, "AA" );
   else if( g==(gAB+1) )
-    sprintf( str, "AB" );
+    snprintf( str, 50, "AB" );
+    //sprintf( str, "AB" );
   else if( g==(gBB+1) )
-    sprintf( str, "BB" );
+    snprintf( str, 50, "BB" );
+    //sprintf( str, "BB" );
   else
-    sprintf( str, "?" );
+    snprintf( str, 50, "?" );
+    //sprintf( str, "?" );
 }
 extern "C" {
   void pG_group_dehash( int* num, char **str ) {
@@ -429,9 +433,11 @@ extern "C" {
     pG_group_dehash_gstr( p2, p2str );
 
     if( p1!=0 && p2!=0 )
-      sprintf( *str, "%s,%s", p1str,p2str );
+      snprintf( *str, 50, "%s,%s", p1str,p2str );
+      //sprintf( *str, "%s,%s", p1str,p2str );
     else
-      sprintf( *str, "%s,%s - AA%i AB%i BB%i", p1str,p2str, n[gAA], n[gAB], n[gBB] );
+      snprintf( *str, 50, "%s,%s - AA%i AB%i BB%i", p1str,p2str, n[gAA], n[gAB], n[gBB] );
+      //sprintf( *str, "%s,%s - AA%i AB%i BB%i", p1str,p2str, n[gAA], n[gAB], n[gBB] );
   }
 }
 

@@ -7,7 +7,7 @@ using namespace std;
 // Call to initialize
 void RMatrix::set( double *p_data, unsigned int p_R, unsigned int p_C )
 {
-  this->data = p_data; // sunCC hell
+  this->ddata = p_data; // sunCC hell
   this->R = p_R;
   this->C = p_C;
 }
@@ -25,7 +25,7 @@ double& RMatrix::operator() ( unsigned int r, unsigned int c )
     Rprintf("Index (%d,%d) is out of range (%d,%d). Likely to crash R.\n", r, c, R, C);
   }
 #endif
-  return( data[ r + c*R ] );
+  return( ddata[ r + c*R ] );
 }
 
 double& RMatrix::elt( unsigned r, unsigned c )
@@ -36,17 +36,17 @@ double& RMatrix::elt( unsigned r, unsigned c )
     Rprintf("Index (%d,%d) is out of range (%d,%d). Likely to crash R.\n", r, c, R, C);
   }
 #endif
-  return( data[ r + c*R ] );
+  return( ddata[ r + c*R ] );
 }
 
 
 /*
 // R CMD SHLIB rmatrix.cpp
 extern "C" {
-  void pmat(double *data, int *R, int *C)
+  void pmat(double *ddata, int *R, int *C)
   {
     RMatrix m;
-    m.set( data, *R, *C );
+    m.set( ddata, *R, *C );
 
     cout << *R << " " << *C << endl;
 

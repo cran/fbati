@@ -6,6 +6,6 @@
 #include "datamatrix.h"
 #include "fbatdist.h"
 
-void REXP_fbatmeeev( RMatrix &data, RVector &marker,  double trait, double model,  RVector &RET_stat );
+void REXP_fbatmeeev( RMatrix &ddata, RVector &marker,  double trait, double model,  RVector &RET_stat );
 
 #endif

@@ -63,7 +63,7 @@
 // SUGGESTED
 #define COVARIATE_MODEL_FIX_USE_OR
 
-// similarly, use it for the data generation
+// similarly, use it for the ddata generation
 // (as opposed to using the bahadur fix...)
 #define FIX_USE_OR
 

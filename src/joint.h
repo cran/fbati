@@ -6,7 +6,7 @@
 #include "datamatrix.h"
 #include "fbatdist.h"
 
-void REXP_joint( RMatrix &data,  RVector &marker, double trait, double env,  double model,  RVector &RET_a, RMatrix &RET_b,  RVector &RET_numInf );
+void REXP_joint( RMatrix &ddata,  RVector &marker, double trait, double env,  double model,  RVector &RET_a, RMatrix &RET_b,  RVector &RET_numInf );
 
 #endif
 

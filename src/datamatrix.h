@@ -1,5 +1,5 @@
 /* Provides a few extra constants and vars
- *  to the RMatrix class to deal with the data
+ *  to the RMatrix class to deal with the ddata
  *  in the gene by environment case.
  *
  * The format is essentially a merged pedigree/phenotype file
@@ -17,7 +17,7 @@ using namespace std;
 #include "fbatdist.h"
 
 
-// Constants based on the data
+// Constants based on the ddata
 const int C_PID  = 0;
 const int C_ID   = 1;
 const int C_FATH = 2;
@@ -45,7 +45,7 @@ class DataMatrix : public RMatrix
                         double *g0, double *g1, double *g2,
                         int *affected_index,
                         int &affected_index_size,
-                        int &data_num_families );
+                        int &ddata_num_families );
 
     void genPush( int pid, int id, int idfath, int idmoth,
                   int sex, int affection,
@@ -56,13 +56,13 @@ class DataMatrix : public RMatrix
 };
 
 extern "C" {
-  void dataComputeGroupG( double *data, int *dataDim,
+  void ddataComputeGroupG( double *ddata, int *ddataDim,
                           int *m0pos, int *m1pos,
                           int *groups,
                           double *g0, double *g1, double *g2,
                           int *affected_index,
                           int *affected_index_size,
-                          int *data_num_families );
+                          int *ddata_num_families );
 }
 
 #endif

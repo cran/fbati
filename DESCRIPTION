@@ -1,6 +1,6 @@
 Package: fbati
-Version: 1.0-5
-Date: 2022-02-12
+Version: 1.0-7
+Date: 2023-02-03
 Title: Gene by Environment Interaction and Conditional Gene Tests for
         Nuclear Families
 Author: Thomas Hoffmann <tjhoffm@gmail.com>
@@ -11,8 +11,7 @@ Description: Does family-based gene by environment interaction tests, joint gene
 License: GPL
 URL: https://sites.google.com/site/thomashoffmannproject/software/fbati
 LazyLoad: true
-SystemRequirements: C++11
 NeedsCompilation: yes
-Packaged: 2022-02-12 22:32:17 UTC; tom
+Packaged: 2023-02-03 19:36:11 UTC; tom
 Repository: CRAN
-Date/Publication: 2022-02-12 23:10:16 UTC
+Date/Publication: 2023-02-03 23:32:35 UTC
