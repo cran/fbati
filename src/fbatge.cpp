@@ -184,13 +184,13 @@ void printperms( vector< vector<int> > &perm ) {
 }//printperms -- DEBUGGED
 void printpermsw( vector< vector<int> > &perm, vector<double> &w ) {
   if( perm.size() != w.size() ) {
-    Rprintf("printpermsw perm.size()=%d, but w.size()=%d\n", perm.size(), w.size());
+    Rprintf("printpermsw perm.size()=%d, but w.size()=%d\n", (int)perm.size(), (int)w.size());
   }
 
   for( unsigned int i=0; i<perm.size(); i++ ) {
     for( unsigned int j=0; j<perm[i].size(); j++ )
-      Rprintf("%d ", perm[i][j]);
-    Rprintf("%d\n", w[i]);
+      Rprintf("%d ", (int)perm[i][j]);  // not needed int?
+    Rprintf("%d\n", (int)w[i]);
   }
 }//printpermsw -- DEBUGGED
 
@@ -561,7 +561,7 @@ public:
     vector<double> v;
     mvrnorm( v );
     for( unsigned int i=0; i<v.size(); i++ )
-      Rprintf("%d ", v[i]);
+      Rprintf("%d ", (int)v[i]);
     Rprintf("\n");
 
     // now generate a whole bunch of random numbers, and then print them in such a way that it can be loaded into R, and the correlation matrix checked...
@@ -689,7 +689,7 @@ public:
         genoPermWeight[p] = w;
     }else{
       if( P != (int)genoPermWeight.size() ) {
-        Rprintf("GFamily::normalizeGenoPerm error, genoPermWeight.size()=%d, but genoPerm.size()=%d.", genoPermWeight.size(), genoPerm.size());
+        Rprintf("GFamily::normalizeGenoPerm error, genoPermWeight.size()=%d, but genoPerm.size()=%d.", (int)genoPermWeight.size(), (int)genoPerm.size());
         return;
       }
 
@@ -834,7 +834,7 @@ public:
         phenoPermWeight[p] = w;
     }else{
       if( P != (int)phenoPermWeight.size() ) {
-        Rprintf("GFamily::normalizePhenoPerm error, phenoPermWeight.size()=%d, but phenoPerm.size()=%d\n", phenoPermWeight.size(), phenoPerm.size());
+        Rprintf("GFamily::normalizePhenoPerm error, phenoPermWeight.size()=%d, but phenoPerm.size()=%d\n", (int)phenoPermWeight.size(), (int)phenoPerm.size());
         return;
       }
 
@@ -1027,7 +1027,7 @@ public:
     }else if( strategyStr == "adaptive" ) {
       strategy = ADAPTIVE;
     }else{
-      Rprintf("GPed::setStrategy not understood, should be 'geno', 'pheno', or 'adaptive'; you supplied ' %d.\n", strat);
+      Rprintf("GPed::setStrategy not understood, should be 'geno', 'pheno', or 'adaptive'; you supplied ' %s.\n", strat);
       //exit(1);
       return;
     }
@@ -1901,7 +1901,7 @@ public:
     }else if( geneticModelString == "recessive" ) {
       this->geneticModel = RECESSIVE;
     }else{
-      Rprintf("GESimSub genetic model must be 'additive', 'dominant', or 'recessive'. You supplied '%d'.\n", geneticModel);
+      Rprintf("GESimSub genetic model must be 'additive', 'dominant', or 'recessive'. You supplied '%s'.\n", geneticModel);
       //exit(1);
       return;
     }
@@ -1912,7 +1912,7 @@ public:
     }else if( linkString=="logit" || linkString == "logistic" ) {
       this->link = LOGISTIC;
     }else{
-      Rprintf("GESimSub::set link function must be 'log' or 'logit' ('logistic' also accepted); you supplied '%d'.\n", link);
+      Rprintf("GESimSub::set link function must be 'log' or 'logit' ('logistic' also accepted); you supplied '%s'.\n", link);
       //exit(0);
       return;
     }

@@ -68,7 +68,7 @@ void DataMatrix::computeGroupG( int *groups,
         // then you know it's a parent -- oy, a requirement!
         if( curParent>1 ) {
           Rprintf("More than two parents in a pedigree! Current code can only handle nuclear pedigrees where the parents have no parents.\n");
-          Rprintf("pid=%d\n", elt(i,C_PID));
+          Rprintf("pid=%d\n", (int)elt(i,C_PID));
           //exit(1);
           return;
         }

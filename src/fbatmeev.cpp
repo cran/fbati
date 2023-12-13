@@ -53,7 +53,7 @@ void REXP_fbatmeev(RMatrix &ddata, RVector &marker,  double trait, double model,
         if( d(i, C_FATH)==0 && d(i, C_MOTH)==0 ) {
           // it's a parent
           if( curP>1 ) {
-            Rprintf("Too many parents in family %d, ignoring parents 3 and higher.\n", d(i,C_PID));
+            Rprintf("Too many parents in family %d, ignoring parents 3 and higher.\n", (int)d(i,C_PID));
           }else{
             if( curP==0 ) {
               p1[0] = (int)d(i,m0);
@@ -173,7 +173,7 @@ void REXP_fbatme(RMatrix &ddata, RVector &marker,  double trait, double model,  
         if( d(i, C_FATH)==0 && d(i, C_MOTH)==0 ) {
           // it's a parent
           if( curP>1 ) {
-            Rprintf("Too many parents in family %d, ignoring parents 3 and higher.\n", d(i,C_PID));
+            Rprintf("Too many parents in family %d, ignoring parents 3 and higher.\n", (int)d(i,C_PID));
           }else{
             if( curP==0 ) {
               p1[0] = (int)d(i,m0);

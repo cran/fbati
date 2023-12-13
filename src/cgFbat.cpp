@@ -221,7 +221,7 @@ public:
 	string &operator [](unsigned int index) {
 		//if (index < 0 || index >= l.size()) { // fair point, it's an unsigned int, so cannot be less than 0...
 		if (index >= l.size()) {
-      Rprintf("Lines index %d is out of bounds [0,%d]\n", index, (l.size() - 1));
+      Rprintf("Lines index %d is out of bounds [0,%d]\n", (int)index, (int)(l.size() - 1));  // %d changed to %u
 			return (empty);
 		}
 
@@ -265,7 +265,7 @@ public:
 	char &operator [](unsigned int index) {
 		//if (index < 0 || index >= a.size()) {
 		if (index >= a.size()) {
-			Rprintf("Haplotype index %d is out of bounds [0,%d].\n", index, (a.size() - 1));
+			Rprintf("Haplotype index %d is out of bounds [0,%d].\n", (int)index, (int)(a.size() - 1));
 			return (empty);
 		}
 
@@ -292,7 +292,7 @@ public:
 	// convert to a string
 	string toString() {
 		if (ha.size() != hb.size() || hb.size() != emWeight.size()) {
-			Rprintf("Genotype::toString() -- ha, hb, emWeight are not all the same size (%d, %d, %d).\n", ha.size(), hb.size(), emWeight.size());
+			Rprintf("Genotype::toString() -- ha, hb, emWeight are not all the same size (%d, %d, %d).\n", (int)ha.size(), (int)hb.size(), (int)emWeight.size());
 			string empty;
 			return (empty);
 		}
@@ -1565,7 +1565,7 @@ public:
 			if (ped[p].observed.size() != ped[p].trait.size()
 					&& ped[p].observed.size() != 0) {
 				//if( ped[p].observed.size() > ped[p].trait.size() ) {
-        Rprintf("data::linkTrait::observed.size()(%d) != trait.size()(%d) for pedigree %d\n", ped[p].observed.size(), ped[p].trait.size(), ped[p].pid);
+        Rprintf("data::linkTrait::observed.size()(%d) != trait.size()(%d) for pedigree %d\n", (int)ped[p].observed.size(), (int)ped[p].trait.size(), (int)ped[p].pid);
 				Rprintf("%s\n", ped[p].toString().c_str());
 			}
 		} // p
