@@ -9,14 +9,14 @@
 	Apply the FBAT-C test in a stepwise fashion using \code{fbatcStrategyStep} (which does forward selection with \code{fbatcStrategyStepUp}, followed by backwards selection with \code{fbatcStrategyStepDown}) and get the results ready for publication with \code{fbatcStrategyStepLatex}.
 }
 \usage{
-fbatcStrategyStepUp(ped, phe, markers=ped.markerNames(ped), trait="trait",
+fbatcStrategyStepUp(ped, phe, markers=pedMarkerNames(ped), trait="trait",
   traitType="auto", alphaMMarker=0.05, alphaStep=alphaMMarker, sortByCorrelation=TRUE,
   tempPrefix="temp_", sim=FALSE, debug=FALSE )
-fbatcStrategyStepDown(ped, phe,  markers=ped.markerNames(ped),
-  markersChosen=ped.markerNames(ped), markersChosenR=markersChosen, trait="trait",
+fbatcStrategyStepDown(ped, phe,  markers=pedMarkerNames(ped),
+  markersChosen=pedMarkerNames(ped), markersChosenR=markersChosen, trait="trait",
   traitType="auto", alphaMMarker=0.05, alphaStep=alphaMMarker, sortByCorrelation=TRUE,
   tempPrefix="temp_", sim=FALSE, debug=FALSE )
-fbatcStrategyStep(ped, phe, markers=ped.markerNames(ped), trait="trait",
+fbatcStrategyStep(ped, phe, markers=pedMarkerNames(ped), trait="trait",
   traitType="auto", alphaMMarker=0.05, alphaStep=alphaMMarker, sortByCorrelation=TRUE,
   tempPrefix="temp_", sim=FALSE, debug=FALSE )
 fbatcStrategyStepLatex(res, digits=4, ffile="", preamble=FALSE, build=preamble, pdf="")

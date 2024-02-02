@@ -102,7 +102,7 @@ updateFbatgeGUI <- function( arg ) {
     pedfile <- guiGetValue(1)
     ped <- read.ped( pedfile )
 
-    possibleMarkers <- ped.markerNames( ped )
+    possibleMarkers <- pedMarkerNames( ped )
     setListElements( "geno", sort(possibleMarkers) )
 
     file.strip.extension <- getFromNamespace( "file.strip.extension", "pbatR" )

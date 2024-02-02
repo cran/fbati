@@ -131,7 +131,7 @@ fbatmeev <- function( ped=NULL, phe=NULL,
   numInf <- rep( as.double(0), NN/2 )
   res <- REXP_fbatmeev( as.matrix(data), marker-1, traitCols-1, model, stats, numInf )
   pvalues <- pchisq( res$stat, df=1, lower.tail=FALSE )  ## Damn you and your stupid lower.tail...
-  try( names(pvalues) <- ped.markerNames(ped) )
+  try( names(pvalues) <- pedMarkerNames(ped) )
 
   return( data.frame(marker=names(pvalues), afreq=afreq, numInf=res$numInf, pvalue=pvalues) )
 }
@@ -279,7 +279,7 @@ fbatme <- function( ped=NULL, phe=NULL,
   numInf <- rep( as.double(0), NN/2 )
   res <- REXP_fbatme( as.matrix(data), marker-1, traitCols-1, model, stats, numInf )
   pvalues <- pchisq( res$stat, df=1, lower.tail=FALSE )  ## Damn you and your stupid lower.tail...
-  try( names(pvalues) <- ped.markerNames(ped) )
+  try( names(pvalues) <- pedMarkerNames(ped) )
 
   return( data.frame(marker=names(pvalues), afreq=afreq, numInf=res$numInf, pvalue=pvalues) )
 }

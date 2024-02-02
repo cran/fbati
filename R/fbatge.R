@@ -12,7 +12,7 @@ TRYRR <- 1000 ## 1000
 ## Always sorts the alleles, so it would be possible to merge two gped objects
 as.gped <- function( ped ) {
   gped <- ped[,1:6]
-  mnames <- ped.markerNames(ped)
+  mnames <- pedMarkerNames(ped)
   for( m in 1:length(mnames) ) {
     #if( debug ) cat( "genotypeCode marker", mnames[m], "\n" )
 

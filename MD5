@@ -1,4 +1,4 @@
-db9036c4ad2bcc54036583a85c9fdadc *DESCRIPTION
+26eb02142da6e0a04cdd1e553a5821d4 *DESCRIPTION
 a28ebab86c0940eaa64f9657486e1b2d *NAMESPACE
 19bf702824d97e9745bfd0db3224facf *R/REXP_joint.R
 ddac4761df045f2c5a0aedb9526cf731 *R/cgFbatCode.R
@@ -7,12 +7,12 @@ fb3ba0701353a25f4aa63fd2eed755b1 *R/cgFbatRun.R
 3b21df4559cd942911733fd78a26b1b6 *R/datamatrix.R
 8e410a7e833c6e119c277c034a720042 *R/defines.R
 5b96c4beb427c5edc7c17758f15e942c *R/fbatShell.R
-2ae6e689f5603362ca7f8ff81f107adb *R/fbatcStrategyStep.R
-d2a815af8fba15c143fdfbe89a11799a *R/fbatge.R
-8846a6b755f15445ccfca418db46156b *R/fbatgeAll.R
-ba69c406b4ae3aa321e43291b8d1254d *R/fbatgeInterface.R
+3da103aa903663db0ba204f0273873c1 *R/fbatcStrategyStep.R
+b55aa391694cd8e8cb28069b957e2a9f *R/fbatge.R
+cee070b4661f8d3c42c75be9409990b4 *R/fbatgeAll.R
+efdd33a94bd7cdbc34ce809fe1fd10d6 *R/fbatgeInterface.R
 f5798a7ca203e24021648a56fd3f8bd6 *R/fbati.R
-401ee0bf45acd56240d248cf742d7378 *R/fbatmeev.R
+4dc11b9aab3d6e34994b285a0edc5203 *R/fbatmeev.R
 128cd86df081455e4bdb33f14845412d *R/ibat.R
 01f01552f7755f09a20e3f095aee6529 *R/ibatGUI.R
 b5c81cfa1adf5e641b69bd0b99062303 *R/jbatGUI.R
@@ -21,7 +21,7 @@ d8396bd3737ed07245c7da987580819f *R/launchPad.R
 e21abfc24253fe10a3ee75510377dce3 *R/merge.R
 509ab6f00ab4c79f7052906995a848ce *R/namespc.R
 be36a521e2593709900bc6c1e6fee207 *man/fbatc.Rd
-2494242747cc536b66a73f1eafb8c3ec *man/fbatcStrategyStep.Rd
+9b023eb0e39e171eacfea8b2da134725 *man/fbatcStrategyStep.Rd
 c300fc562b44f1a8da0cc0b66c671f32 *man/fbatge.Rd
 20489ce7cf6b4d18247a2bacbfaaeadf *man/fbati.Rd
 1a9252eb4b339ec6ababf83722d92799 *man/fbatj.Rd

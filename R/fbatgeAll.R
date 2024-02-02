@@ -5,7 +5,7 @@
 #   #fbatShell <- getFromNamespace( "fbatShell", "fbati" )
 #
 #   numMarkers <- (ncol(ped) - 6) / 2
-#   markers <- ped.markerNames(ped)
+#   markers <- pedMarkerNames(ped)
 #   res <- univariateFilter( ped=ped, phe=phe, markers=markers, trait=trait, alpha=alpha/numMarkers, tempPrefix=tempPrefix, FBATEXE=FBATEXE )
 #   #print( res )
 #   #stop()
@@ -119,7 +119,7 @@ updateFbatgeAllGUI <- function( arg ) {
     pedfile <- guiGetValue(1)
     ## ped <- read.ped( pedfile )  ## 02/20/2014 codetools
 
-    #possibleMarkers <- ped.markerNames( ped )
+    #possibleMarkers <- pedMarkerNames( ped )
     #setListElements( "geno", sort(possibleMarkers) )
 
     file.strip.extension <- getFromNamespace( "file.strip.extension", "pbatR" )

@@ -85,7 +85,7 @@ correlationOrder.debug <- function() {
   correlationOrder( mat )
 }
 
-fbatcStrategyStepUp <- function( ped, phe, markers=ped.markerNames(ped), trait="trait", traitType="auto", alphaMMarker=0.05, alphaStep=alphaMMarker, sortByCorrelation=TRUE, tempPrefix="temp_", sim=FALSE, debug=FALSE ) {
+fbatcStrategyStepUp <- function( ped, phe, markers=pedMarkerNames(ped), trait="trait", traitType="auto", alphaMMarker=0.05, alphaStep=alphaMMarker, sortByCorrelation=TRUE, tempPrefix="temp_", sim=FALSE, debug=FALSE ) {
   fbat.install()
   sh.install()
   #FBAT <- fbat.exename()  ## 02/20/2014 codetools
@@ -485,7 +485,7 @@ print.fbatcSStep <- function( x, ... ) {
   return(invisible())
 }
 
-fbatcStrategyStepDown <- function( ped, phe, markers=ped.markerNames(ped), markersChosen=ped.markerNames(ped), markersChosenR=markersChosen, trait="trait", traitType="auto", alphaMMarker=0.05, alphaStep=alphaMMarker, sortByCorrelation=TRUE, tempPrefix="temp_", sim=FALSE, debug=FALSE ) {
+fbatcStrategyStepDown <- function( ped, phe, markers=pedMarkerNames(ped), markersChosen=pedMarkerNames(ped), markersChosenR=markersChosen, trait="trait", traitType="auto", alphaMMarker=0.05, alphaStep=alphaMMarker, sortByCorrelation=TRUE, tempPrefix="temp_", sim=FALSE, debug=FALSE ) {
   fbat.install()
   sh.install()
   FBAT <- fbat.exename()
@@ -657,7 +657,7 @@ fbatcStrategyStepDown <- function( ped, phe, markers=ped.markerNames(ped), marke
   return( res )
 }
 
-fbatcStrategyStep <- function( ped=NULL, phe=NULL, markers=ped.markerNames(ped), trait="trait", traitType="auto", alphaMMarker=0.05, alphaStep=alphaMMarker, sortByCorrelation=TRUE, tempPrefix="temp_", sim=FALSE, debug=FALSE ) {
+fbatcStrategyStep <- function( ped=NULL, phe=NULL, markers=pedMarkerNames(ped), trait="trait", traitType="auto", alphaMMarker=0.05, alphaStep=alphaMMarker, sortByCorrelation=TRUE, tempPrefix="temp_", sim=FALSE, debug=FALSE ) {
   if( is.null(ped) )
     return( fbatcSSFuncGUI() )
 
