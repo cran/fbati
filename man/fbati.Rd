@@ -45,6 +45,7 @@ fbati( ped=NULL, phe=NULL,
   consistency.
 }
 \examples{
+\dontrun{
 ## Data is simulated according to the formula in the
 ##  paper (you can see it from the code).
 
@@ -138,10 +139,10 @@ fbati( data=data, env="env", marker=c(7,8) )
 
 ## And we could also run a joint test instead
 ##  (see fbatj)
-fbatj( ped=ped, phe=phe, env="env" )
-fbatj( data=data, env="env", marker=c(7,8) )
+## fbatj temporarily removed from namespace
+#fbatj( ped=ped, phe=phe, env="env" )
+#fbatj( data=data, env="env", marker=c(7,8) )
 
-\dontrun{
 ## This won't be run, but we could do this with the gui.
 ## It requires the data to be written to disk, so we do so:
 write.ped( ped, "simulated" )
@@ -150,9 +151,6 @@ write.phe( phe, "simulated" )
 ##  but for the first two, navigate to the 'simulated.ped' and 'simulated.phe' files.
 fbati()
 }
-}
-\seealso{
-  \code{\link{fbatj}},
 }
 \references{
 Hoffmann, Thomas J.,  Lange, Christoph,  Vansteelandt, Stijn,  and Laird, Nan M.  Gene-Environment Interaction Test for Dichotomous Traits in Trios and Sibships. Submitted.

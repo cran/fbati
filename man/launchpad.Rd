@@ -9,5 +9,4 @@ launchpad()
 }
 \seealso{
   \code{\link{fbati}}
-  \code{\link{fbatj}}
 }

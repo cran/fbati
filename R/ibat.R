@@ -152,7 +152,11 @@ ibat2 <- function( data, marker, markerNames, envCols, envColsNames, method, mod
         pvalue <- NA
         numInf <- NA
         strataSum <- NULL
-        res <- dataComputeGroupG_R( dataRecode, s.m0pos, s.m1pos )
+        ####res <- dataComputeGroupG_R( dataRecode, s.m0pos, s.m1pos )
+        res <- computeGroupG_r(dataRecode, s.m0pos, s.m1pos)
+
+
+
         #print( head( res$groupsG ) )
         #print( res$affectedIndex )
         if( method=="fbati" ) {

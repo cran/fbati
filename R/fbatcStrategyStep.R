@@ -632,7 +632,7 @@ fbatcStrategyStepDown <- function( ped, phe, markers=pedMarkerNames(ped), marker
     ## Now see if we should add any other markers, or if we are done!
     if( !done ) {
       step[[length(step)+1]] <- list( pvalue=pvalue, numInf=numInf, markersAnalyze=markersA, markersCondition=markersC, varExpl=varExpl )
-      if( !all( pvalue > alphaStep, na.rm=TRUE ) && any( pvalue > alphaStep, na.rm=TRUE ) ) { ## 05.01.2009
+      if( !all( pvalue > alphaStep ) && any( pvalue > alphaStep, na.rm=TRUE ) ) { ## 05.01.2009
         wh <- which( pvalue==max(pvalue) )[1]
         markersChosen <- setdiff( markersChosen, markersA[[wh]] )
         ## No update to done given special case at the top of the loop for univariate

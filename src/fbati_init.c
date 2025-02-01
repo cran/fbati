@@ -74,7 +74,7 @@ extern void eREXP_joint(void *, void *, void *, void *, void *, void *, void *, 
 
 
 
-extern void fbati_cpp(void *, void *, void *, void *, void *, void *);
+//extern void fbati_cpp(void *, void *, void *, void *, void *, void *); // 2025-01-05
 extern void nuclify_cpp(void *, void *, void *, void *, void *);
 extern void pG_group_dehash(void *, void *);
 extern void strataReduce_cpp(void *, void *, void *, void *, void *, void *, void *, void *);
@@ -132,7 +132,7 @@ static const R_CMethodDef CEntries[] = {
     {"eREXP_fbatme",                              (DL_FUNC) &eREXP_fbatme,                              10},
     {"eREXP_fbatmeev",                            (DL_FUNC) &eREXP_fbatmeev,                            10},
     {"eREXP_joint",                               (DL_FUNC) &eREXP_joint,                               13},
-    {"fbati_cpp",                                 (DL_FUNC) &fbati_cpp,                                   6},
+    //{"fbati_cpp",                                 (DL_FUNC) &fbati_cpp,                                   6},  // commented out 2025-01-05
     {"nuclify_cpp",                               (DL_FUNC) &nuclify_cpp,                                5},
     {"pG_group_dehash",                           (DL_FUNC) &pG_group_dehash,                            2},
     {"strataReduce_cpp",                          (DL_FUNC) &strataReduce_cpp,                           8},

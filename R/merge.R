@@ -57,37 +57,39 @@ mergePhePed <- function( ped, phe ) {
 
 ## New c++ code does this a lot faster
 nuclifyMerged <- function( data, OUT_MULT=2 ) {
-  OUT_MAXSIZE <- nrow(data)*OUT_MULT ## Actually should be fine for _all_ datasets?
+  return(nuclify_r(data))  ## 2025-01-18
 
-  dataOut <- matrix(as.double(0),nrow=OUT_MAXSIZE,ncol=ncol(data))
-  ##dataOutDim <- as.integer(dim(dataOut))
-  dataOutDim <- as.integer( c( dim(dataOut)[1], dim(dataOut)[2] ) ) ## Bug in R?, see strataReduce
-  failure <- as.integer(0)
-  res = .C("nuclify_cpp",
-     as.double(as.matrix(data)), as.integer(dim(data)),
-     dataOut, dataOutDim, failure,
-     DUP=TRUE, NAOK=TRUE) #DUP=FALSE, NAOK=TRUE )
-  dataOut = res[[3]]
-  dataOutDim = res[[4]]
-  failure = res[[5]]
+  # OUT_MAXSIZE <- nrow(data)*OUT_MULT ## Actually should be fine for _all_ datasets?
 
-  if(failure == 1) {
-    ## output isn't big enough! not the best implementation...
-    if(OUT_MULT > 100)
-      cat("Probable error in nuclification unless there are really strange nuclear families.\n")
+  # dataOut <- matrix(as.double(0),nrow=OUT_MAXSIZE,ncol=ncol(data))
+  # ##dataOutDim <- as.integer(dim(dataOut))
+  # dataOutDim <- as.integer( c( dim(dataOut)[1], dim(dataOut)[2] ) ) ## Bug in R?, see strataReduce
+  # failure <- as.integer(0)
+  # res = .C("nuclify_cpp",
+  #    as.double(as.matrix(data)), as.integer(dim(data)),
+  #    dataOut, dataOutDim, failure,
+  #    DUP=TRUE, NAOK=TRUE) #DUP=FALSE, NAOK=TRUE )
+  # dataOut = res[[3]]
+  # dataOutDim = res[[4]]
+  # failure = res[[5]]
 
-    return(nuclifyMerged(data=data, OUT_MULT=OUT_MULT*2))
-  }
+  # if(failure == 1) {
+  #   ## output isn't big enough! not the best implementation...
+  #   if(OUT_MULT > 100)
+  #     cat("Probable error in nuclification unless there are really strange nuclear families.\n")
 
-  #print( "nuclifyMerged" )
-  #print( dataOutDim )
+  #   return(nuclifyMerged(data=data, OUT_MULT=OUT_MULT*2))
+  # }
 
-  if( dataOutDim[1] == 0 )
-    return( NULL )
+  # #print( "nuclifyMerged" )
+  # #print( dataOutDim )
 
-  dataOut <- data.frame( dataOut[ 1:dataOutDim[1], 1:dataOutDim[2] ] )
-  names(dataOut) <- names(data)
-  return(dataOut)
+  # if( dataOutDim[1] == 0 )
+  #   return( NULL )
+
+  # dataOut <- data.frame( dataOut[ 1:dataOutDim[1], 1:dataOutDim[2] ] )
+  # names(dataOut) <- names(data)
+  # return(dataOut)
 }
 ## returns a list of a pedigree and a phenotype object
 ##  that have been nuclified
@@ -111,34 +113,37 @@ nuclify <- function( ped, phe ) {
 
 ## Returns a more strata friendly family
 strataReduce <- function( data, envCol, m0, m1=m0+1, maxSib=3 ) {
-  OUT_MAXSIZE <- nrow(data) ## here, can't be any larger
+  return(strataReduce_r(din=data, envCol=envCol, m0=m0, m1=m1, maxSib=maxSib))
 
-  #print( "MAXSIB" )
-  #print( maxSib )
 
-  ## NASTY little new introduction of R!!! ARGH!!!
-  dataOut <- matrix( as.double(0), nrow=OUT_MAXSIZE, ncol=ncol(data) )
-  ##dataOutDim <- as.integer(dim(dataOut))
-  ##dataOutDim <- as.integer(c(5,9))
-  dataOutDim <- as.integer( c( dim(dataOut)[1], dim(dataOut)[2] ) ) ## Bug in R?
+  # OUT_MAXSIZE <- nrow(data) ## here, can't be any larger
 
-  res = .C( "strataReduce_cpp",
-      as.double(as.matrix(data)), as.integer(dim(data)),
-      dataOut, dataOutDim,
-      as.integer(envCol-1),
-      as.integer(m0-1), as.integer(m1-1),
-      as.integer(maxSib),
-      DUP=TRUE, NAOK=TRUE) #DUP=FALSE, NAOK=TRUE )
-  dataOut = res[[3]]
-  dataOutDim = res[[4]]
+  # #print( "MAXSIB" )
+  # #print( maxSib )
 
-  if( dataOutDim[1] == 0 )
-    return(NULL)
+  # ## NASTY little new introduction of R!!! ARGH!!!
+  # dataOut <- matrix( as.double(0), nrow=OUT_MAXSIZE, ncol=ncol(data) )
+  # ##dataOutDim <- as.integer(dim(dataOut))
+  # ##dataOutDim <- as.integer(c(5,9))
+  # dataOutDim <- as.integer( c( dim(dataOut)[1], dim(dataOut)[2] ) ) ## Bug in R?
 
-  dataOut <- data.frame( dataOut[ 1:dataOutDim[1], 1:dataOutDim[2] ] )
+  # res = .C( "strataReduce_cpp",
+  #     as.double(as.matrix(data)), as.integer(dim(data)),
+  #     dataOut, dataOutDim,
+  #     as.integer(envCol-1),
+  #     as.integer(m0-1), as.integer(m1-1),
+  #     as.integer(maxSib),
+  #     DUP=TRUE, NAOK=TRUE) #DUP=FALSE, NAOK=TRUE )
+  # dataOut = res[[3]]
+  # dataOutDim = res[[4]]
 
-  names(dataOut) <- names(data)
-  return( dataOut )
+  # if( dataOutDim[1] == 0 )
+  #   return(NULL)
+
+  # dataOut <- data.frame( dataOut[ 1:dataOutDim[1], 1:dataOutDim[2] ] )
+
+  # names(dataOut) <- names(data)
+  # return( dataOut )
 }
 
 ###################################

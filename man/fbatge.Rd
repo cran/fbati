@@ -33,10 +33,12 @@ fbatgeAll( ped=NULL, phe=NULL, env=NULL, trait="AffectionStatus" )
   NOTE: The allele frequency is simply based on the allele frequency in all genotyped individuals, and is not the best choice.
 }
 \examples{
-  example( fbati ) ## See fbati, creates a dataset for us in 'phe' and 'ped'
-  print( fbatge( ped=ped, phe=phe, env="env" ) )
-  ## The results are very close to the FBAT-I function, which
-  ##  we would expect for trios.
+  \dontrun{
+    example( fbati ) ## See fbati, creates a dataset for us in 'phe' and 'ped'
+    print( fbatge( ped=ped, phe=phe, env="env" ) )
+    ## The results are very close to the FBAT-I function, which
+    ##  we would expect for trios.
+  }
 }
 \references{
   Hoffmann, Thomas J., and Laird, Nan M. Combining Multiple Disease Models for a More Powerful Gene-Environment Interaction Test in Nuclear Families.

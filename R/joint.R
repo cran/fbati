@@ -21,6 +21,7 @@ solve.svd <- function( x, b=NULL, tol=1e-15 ) {
   return( b )
 }
 
+
 ## The joint routine
 fbatj <- function( ped=NULL, phe=NULL,
                    data=mergePhePed(ped,phe),
@@ -125,18 +126,37 @@ fbatj <- function( ped=NULL, phe=NULL,
     if( length(alleles) > 2 )
       stop( paste( "Currently only biallelic markers are supported, marker", markerNames[m], "values are not supported." ) )
 
+    print("??? or does it not make it here???")
+
     ## recode the dataset
     wh1 <- data[,m0pos]==alleles[1]
     wh2 <- data[,m0pos]==alleles[2]
+    print("?here?")
     data[wh1,m0pos] <- 1
-    if( !all(is.na(wh2)) )
+    print("?here??")
+    print("wh2")
+    print(wh2)
+    print("m0pos")
+    print(m0pos)
+    print("sum(wh2)???")
+    print(sum(wh2))
+    print("sum(is.na(wh2))")
+    print(sum(is.na(wh2)))
+    print("dim(data)")
+    print(dim(data))
+    print("str(data)")
+    print(str(data))
+    if( !base::all(is.na(wh2)) )  ## weird, base all is somehow not the all in scope here?
       data[wh2,m0pos] <- 2
+    print("?or here???")
 
     wh1 <- data[,m1pos]==alleles[1]
     wh2 <- data[,m1pos]==alleles[2]
     data[wh1,m1pos] <- 1
-    if( !all(is.na(wh2)) )
+    print("??? it dies right after this???")
+    if( !base::all(is.na(wh2)) )
       data[wh2,m1pos] <- 2
+    print("??? or it makes it past???")
   }
 
   if( trait=="AffectionStatus" ) {
@@ -156,16 +176,26 @@ fbatj <- function( ped=NULL, phe=NULL,
 
   ## Create the output pieces
   NN <- length(marker)
-  a <- rep( as.double(0), NN )
-  b <- matrix( as.double(0), nrow=NN, ncol=NN )
-  numInf <- rep( as.double(0), 1 )   ## This doesn't work with multi-marker mode yet...
-  as.matrix( data )
-  results <- REXP_joint( as.matrix(data), marker-1, traitCols-1, envCols-1, model, a, b, numInf )
+  ###a <- rep( as.double(0), NN )
+  ###b <- matrix( as.double(0), nrow=NN, ncol=NN )
+  ###numInf <- rep( as.double(0), 1 )   ## This doesn't work with multi-marker mode yet...
+  #as.matrix( data )
+  #results <- REXP_joint_r( as.matrix(data), marker-1, traitCols-1, envCols-1, model, a, b, numInf )
+  cat("JUST BEFORE REXP_JOINT_R")
+  results <- REXP_joint_r( as.matrix(data), marker, traitCols, envCols, model )
+  # return(list(RET_a = RET_a, RET_b = RET_b, RET_numInf = RET_numInf))
+
+  cat("JUST AFTER REXP_JOINT_R")
+  print("results")
+  print(results)
 
   a <- results$a
+  cat("is it effing up here?")
   b <- matrix( results$b, nrow=NN, ncol=NN )
   numInf <- results$numInf
   #print( results )
+
+  print("got here?")
 
   ## Main effect would almost come for free (debugging -- it is correct at least!)
   #print( "length(marker)" )
@@ -185,11 +215,12 @@ fbatj <- function( ped=NULL, phe=NULL,
   }
 
   ## Give a try to removing the bloody 0 rows...
-  kill <- c()
-  for( rr in 1:nrow(b) ) {
-    if( all( b[rr,]==0 ) )
-      kill <- c(kill, rr)
-  }
+  #print("pre-kill unused")
+  #kill <- c()
+  #for( rr in 1:nrow(b) ) {
+  #  if( all( b[rr,]==0 ) )
+  #    kill <- c(kill, rr)
+  #}
   #print( kill )
 
 
@@ -216,11 +247,15 @@ fbatj <- function( ped=NULL, phe=NULL,
   #print( "stat" )
   #print( stat )
 
+  cat("are you dieing in the svd?")
+
   post <- solve.svd( svd(b), a )
   rank <- attr(post,"rank")
   stat <- a %*% post
   #print( stat )
   #print( rank )
+
+  cat("probably didn't get here...")
 
   ## DEBUG BEGIN (usual emp var)
   ##stat2 <- a[1]^2 / b[1,1]
